@@ -62,7 +62,7 @@ class ConvertReviewTest(unittest.TestCase):
                 (review_notes / "weekly-2026-06-22_06-26.html").write_text(
                     """<html><head><title>W26 周复盘</title></head><body>
 <h1>W26 周复盘（2026-06-22 至 2026-06-26）</h1>
-<div class="kpi green"><span>周度收益</span><strong>+3.08%</strong></div>
+<div class="kpi green"><span>周度收益</span><strong class="gain">+3.08%</strong></div>
 <div class="kpi"><span>交易日</span><strong>5天</strong></div>
 <div class="kpi red"><span>风控事件</span><strong>DAY_STOP</strong></div>
 </body></html>""",
@@ -124,6 +124,14 @@ class ConvertReviewTest(unittest.TestCase):
             finally:
                 convert_review.PORTAL = original_portal
                 convert_review.REVIEW_NOTES = original_review_notes
+
+    def test_extract_period_metric_accepts_classed_strong(self):
+        html = '<span>周度收益</span><strong class="gain">+3.08%</strong>'
+
+        self.assertEqual(
+            convert_review.extract_period_metric(html, ["周度收益", "收益"]),
+            "+3.08%",
+        )
 
     def test_parse_s0_keeps_tables_with_their_headings(self):
         markdown = """> 来源：昨日预案
@@ -603,6 +611,24 @@ weekday: 周二
         self.assertIn("人工裁决", text)
         self.assertIn("内部校验字段", text)
         self.assertIn("交易复核", text)
+
+    def test_public_review_text_redacts_internal_stage_markers(self):
+        text = convert_review.sanitize_public_review_text(
+            "终稿结论（stage_final=done）；stage_C=degraded_done。"
+        )
+
+        self.assertNotIn("stage_final", text)
+        self.assertNotIn("stage_C", text)
+        self.assertIn("终稿结论（终稿）", text)
+        self.assertIn("流程状态已确认", text)
+
+    def test_public_review_text_preserves_gap_without_placeholder_wording(self):
+        text = convert_review.sanitize_public_review_text(
+            "连板风险值缺源占位；大市值赚钱比例缺源脚本占位。"
+        )
+
+        self.assertNotIn("占位", text)
+        self.assertEqual(text.count("数据缺口估算"), 2)
 
     def test_public_review_cells_redact_action_prices_and_monetary_pnl(self):
         self.assertEqual(

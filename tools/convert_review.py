@@ -292,6 +292,14 @@ def sanitize_public_review_text(text):
         '数据降级，仅观察', cleaned, flags=re.I,
     )
     cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])stage_final\s*[:=]\s*done(?![A-Za-z0-9_])',
+        '终稿', cleaned, flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])stage_(?:a|b|c|d0|d|red_team|final)\s*[:=]\s*[A-Za-z_]+(?![A-Za-z0-9_])',
+        '流程状态已确认', cleaned, flags=re.I,
+    )
+    cleaned = re.sub(
         r'(?<![A-Za-z0-9_])(?:finalized[_-]?degraded|degraded[_-]?(?:done|accepted))(?![A-Za-z0-9_])',
         '降级流程已记录', cleaned, flags=re.I,
     )
@@ -353,6 +361,7 @@ def sanitize_public_review_text(text):
     cleaned = re.sub(r'(?<![A-Za-z0-9_])d2_receipt(?![A-Za-z0-9_])', '裁决记录', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])ledger(?![A-Za-z0-9_])', '候选记录', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])source_gap(?![A-Za-z0-9_])', '数据缺口', cleaned, flags=re.I)
+    cleaned = re.sub(r'缺源(?:脚本)?占位', '数据缺口估算', cleaned)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])radarsignal(?![A-Za-z0-9_])', '观察信号', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])decision_gate(?![A-Za-z0-9_])', '实时门禁', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])POS-SIZE-\d+(?![A-Za-z0-9_])', '仓位规则', cleaned, flags=re.I)
@@ -1824,7 +1833,7 @@ def parse_period_review_path(path):
 
 def extract_period_metric(html, labels, fallback="--"):
     for label in labels:
-        m = re.search(rf"<span>{re.escape(label)}</span>\s*<strong>(.*?)</strong>", html, flags=re.S)
+        m = re.search(rf"<span>{re.escape(label)}</span>\s*<strong[^>]*>(.*?)</strong>", html, flags=re.S)
         if m:
             return strip_html_tags(m.group(1)) or fallback
     return fallback

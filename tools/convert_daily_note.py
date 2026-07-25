@@ -200,12 +200,18 @@ def strip_source_guidance(text: str) -> str:
         if not line:
             continue
         if "Portal 今日一句话来源" in line:
-            continue
+            line = re.sub(
+                r"^>?\s*\*{0,2}Portal 今日一句话来源\*{0,2}\s*[：:]\s*",
+                "",
+                line,
+            ).strip()
+            if not line:
+                continue
         if "一句话讲清当日市场状态和系统判断" in line:
             continue
         if "不写 ticket" in line or "精确买卖指令" in line:
             continue
-        kept.append(raw)
+        kept.append(line)
     return "\n".join(kept).strip()
 
 
@@ -222,7 +228,7 @@ def first_sentence(text: str, fallback: str) -> str:
 
 def clean_cognition_title(title: str) -> str:
     return re.sub(
-        r"^\[(?:核心认知|认知|教训|议题|流程纪律|账户纪律|风险信号)\]\s*",
+        r"^\[(?:核心认知|认知|教训|议题|流程纪律|账户纪律|风险信号)(?:#\d+)?\]\s*",
         "",
         title or "",
     ).strip(" 。；;")
@@ -230,7 +236,8 @@ def clean_cognition_title(title: str) -> str:
 
 def sanitize_cognition_evidence(text: str) -> str:
     """Keep the lesson evidence while removing private execution details."""
-    return sanitize_public_text(convert_review.sanitize_public_review_text(text))
+    cleaned = sanitize_public_text(convert_review.sanitize_public_review_text(text))
+    return re.sub(r"^[—-]\s*", "", cleaned).strip()
 
 
 def extract_date(md_path: Path, fm: dict) -> str:

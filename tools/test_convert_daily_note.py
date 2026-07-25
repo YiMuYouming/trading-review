@@ -230,6 +230,31 @@ class ConvertDailyNoteTest(unittest.TestCase):
         )
         self.assertEqual(body, "早盘过早提高暴露，尾盘只能被动纠偏。")
 
+    def test_strips_numbered_lesson_tag_from_bold_cognition_title(self):
+        section = """### 今日认知
+
+1. **[教训#39] 冰点竞价不买** — 竞价即出现退潮信号；冰点竞价只处理持仓、不新开。
+2. **[认知#05] 第二条不应替代第一条** — 第二条证据。
+"""
+
+        title, body, _action = convert_daily_note.extract_first_cognition(section)
+
+        self.assertEqual(title, "冰点竞价不买")
+        self.assertIn("竞价即出现退潮信号", body)
+        self.assertFalse(body.startswith("—"))
+        self.assertNotIn("[教训#39]", title)
+
+    def test_keeps_copy_after_inline_portal_one_line_source_label(self):
+        section = """### 一句话结论
+
+> **Portal 今日一句话来源**：周五冰点退潮全面确认，赚钱效应未修复前只处理风险。
+"""
+
+        summary = convert_daily_note.extract_one_line(section, {})
+
+        self.assertEqual(summary, "周五冰点退潮全面确认，赚钱效应未修复前只处理风险。")
+        self.assertNotIn("Portal 今日一句话来源", summary)
+
     def test_core_cognition_keeps_evidence_after_redacting_execution_details(self):
         section = """### 今日认知
 
