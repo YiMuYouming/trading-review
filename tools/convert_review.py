@@ -366,6 +366,18 @@ def sanitize_public_review_text(text):
     cleaned = re.sub(r'(?<![A-Za-z0-9_])decision_gate(?![A-Za-z0-9_])', '实时门禁', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])POS-SIZE-\d+(?![A-Za-z0-9_])', '仓位规则', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])W1_[A-Z0-9_]+(?![A-Za-z0-9_])', '窗口条件', cleaned, flags=re.I)
+    public_rule_labels = {
+        'CLIMAX_STOP': '高潮风险约束',
+        'WEEK_STOP': '周回撤门禁',
+        'LOSS_STREAK': '连亏门禁',
+        'DAY_STOP': '日内风险约束',
+    }
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:CLIMAX_STOP|WEEK_STOP|LOSS_STREAK|DAY_STOP)(?![A-Za-z0-9_])',
+        lambda match: public_rule_labels[match.group(0).upper()],
+        cleaned,
+        flags=re.I,
+    )
     cleaned = re.sub(
         r'/Users/[A-Za-z0-9._-]+/[^\s`<>|，。；]+',
         '内部审计记录（路径已隐藏）',
@@ -463,9 +475,21 @@ def sanitize_public_review_text(text):
         cleaned,
     )
     cleaned = re.sub(
-        r'((?:跌破|破|站稳|收复|守住|守|不站回|未站|失守|考验|识别|上方|看|复核|低于|高于|突破)(?:MA\d+=)?)'
+        r'((?:用|看|参考|区间(?:为)?|验证(?:区间)?|(?:再次)?测试)[：:]?\s*)'
+        r'\d{2,3}(?:\.\d+)?\s*[—~-]\s*\d{2,3}(?:\.\d+)?'
+        r'(?:\s*/\s*\d{2,3}(?:\.\d+)?\s*[—~-]\s*\d{2,3}(?:\.\d+)?)?',
+        r'\1关键区间',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|上方|看|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
         r'\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*',
         r'\1关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(关键位)\s*[<>]\s*\d+(?:\.\d+)?',
+        r'\1附近',
         cleaned,
     )
     cleaned = re.sub(
@@ -500,6 +524,11 @@ def sanitize_public_review_text(text):
         r'\1已脱敏',
         cleaned,
     )
+    cleaned = re.sub(
+        r'\d{2,4}(?:\.\d+)?(?=\s*(?:风险区|止损位|结构位|复核线|低点))',
+        '关键位',
+        cleaned,
+    )
 
     safe_lines = []
     for line in cleaned.splitlines():
@@ -509,11 +538,27 @@ def sanitize_public_review_text(text):
             'Portal 每日市场手记 SSOT',
         )):
             continue
-        if re.search(r'盈亏|亏损|盈利|实现|成交|买入|加仓|减仓|清仓|卖出', line):
+        if re.search(r'盈亏|浮盈|亏损|浮亏|盈利|实现|成交|买入|加仓|减仓|清仓|卖出|仓位|账户|试仓|暴露', line):
             line = re.sub(r'(?<!\d)\d{1,2}:\d{2}(?::\d{2})?', '盘中', line)
+            line = re.sub(
+                r'((?:午盘|尾盘|日内低点|买入后(?:五分钟K线)?最低(?:跌至)?|成交后最低)[：:]?\s*)'
+                r'\d{2,4}(?:\.\d+)?',
+                r'\1价格已脱敏',
+                line,
+            )
             line = re.sub(
                 r'(?<![\d.])[-+]?(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*元',
                 '金额已脱敏',
+                line,
+            )
+            line = re.sub(
+                r'(?<![\d.])[-+]?\d+(?:\.\d+)?\s*万(?!亿)',
+                '金额已脱敏',
+                line,
+            )
+            line = re.sub(
+                r'(?:约)?\d+(?:\.\d+)?%\s*(?:账户|仓位)',
+                '账户比例已脱敏',
                 line,
             )
             line = re.sub(

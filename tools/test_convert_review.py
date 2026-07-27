@@ -706,6 +706,58 @@ weekday: 周二
         self.assertIn("考验关键位", text)
         self.assertIn("关键位突破后完成回踩", text)
 
+    def test_public_review_text_redacts_execution_adjacent_prices_and_rule_codes(self):
+        text = convert_review.sanitize_public_review_text(
+            "新增中微公司，午盘390.97；日内低点370.08早于盘中买入；"
+            "买入后最低383.62，收盘+2.90%，最大浮亏-3.81%。"
+            "该笔直接违反CLIMAX_STOP，属gate=false自主交易。"
+        )
+
+        for secret in ("390.97", "370.08", "383.62", "CLIMAX_STOP", "gate=false"):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertIn("+2.90%", text)
+        self.assertIn("-3.81%", text)
+        self.assertIn("风险约束", text)
+
+    def test_public_review_text_redacts_plan_ranges_and_account_exposure(self):
+        text = convert_review.sanitize_public_review_text(
+            "错过长鑫后，中微主逻辑用405—407/388—392验证。"
+            "同为200股，长鑫38元≈0.76万(约1%账户) vs "
+            "中微398.81元≈7.98万(约11.3%账户)，不可控敞口占11.3%仓位。"
+        )
+
+        for secret in (
+            "405", "407", "388", "392", "200股", "38元", "0.76万",
+            "1%账户", "398.81元", "7.98万", "11.3%账户", "11.3%仓位",
+        ):
+            self.assertNotIn(secret, text)
+        self.assertIn("关键区间", text)
+        self.assertIn("账户比例已脱敏", text)
+
+    def test_public_review_text_redacts_red_team_risk_price_forms(self):
+        text = convert_review.sanitize_public_review_text(
+            "中微尾盘393.46，浮亏收窄；若明日回调，可能再次测试388—392风险区"
+            "甚至370低点。歌尔K线低点22.08 < 22.20，收盘22.87重新站上22.48；"
+            "中微低点370.08未记录，买入后最低跌至370。"
+        )
+
+        for secret in ("393.46", "388", "392", "370低点", "22.08", "22.20", "22.48", "370.08", "跌至370"):
+            self.assertNotIn(secret, text)
+        self.assertIn("收盘22.87", text)
+        self.assertIn("关键区间", text)
+        self.assertIn("关键位", text)
+
+    def test_public_review_text_redacts_ranges_before_single_price_rules(self):
+        text = convert_review.sanitize_public_review_text(
+            "中微看405—407/388—392与设备材料锚；歌尔连续击穿22.20；"
+            "中科不应等待98.50被动触发。"
+        )
+
+        for secret in ("405", "407", "388", "392", "22.20", "98.50"):
+            self.assertNotIn(secret, text)
+        self.assertIn("关键区间", text)
+        self.assertIn("关键位", text)
+
     def test_public_review_text_redacts_execution_time_pairs_and_internal_fields(self):
         text = convert_review.sanitize_public_review_text(
             "两笔买入（09:46 + 09:57）都与执行卡冲突；"
