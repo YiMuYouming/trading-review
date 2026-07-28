@@ -362,10 +362,20 @@ def sanitize_public_review_text(text):
     cleaned = re.sub(r'(?<![A-Za-z0-9_])ledger(?![A-Za-z0-9_])', '候选记录', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])source_gap(?![A-Za-z0-9_])', '数据缺口', cleaned, flags=re.I)
     cleaned = re.sub(r'缺源(?:脚本)?占位', '数据缺口估算', cleaned)
+    cleaned = re.sub(r'占位内容', '临时内容', cleaned)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])radarsignal(?![A-Za-z0-9_])', '观察信号', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])decision_gate(?![A-Za-z0-9_])', '实时门禁', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])POS-SIZE-\d+(?![A-Za-z0-9_])', '仓位规则', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])W1_[A-Z0-9_]+(?![A-Za-z0-9_])', '窗口条件', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])C1\.5(?![A-Za-z0-9_])', '候选证据层', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])C2(?![A-Za-z0-9_])', '板块复核层', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])D1(?![A-Za-z0-9_])', '机器预案层', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])D2(?![A-Za-z0-9_])', '人工裁决层', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])F-\d{3}(?![A-Za-z0-9_])', '审阅项', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])fail[-_ ]closed(?![A-Za-z0-9_])', '证据不足则关闭', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])(?:added_at_)?peak_risk(?![A-Za-z0-9_])', '高位风险标记', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])rotation_state(?![A-Za-z0-9_])', '轮动状态证据', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])candidate_codes(?![A-Za-z0-9_])', '候选代码记录', cleaned, flags=re.I)
     public_rule_labels = {
         'CLIMAX_STOP': '高潮风险约束',
         'WEEK_STOP': '周回撤门禁',
@@ -470,19 +480,61 @@ def sanitize_public_review_text(text):
         cleaned,
     )
     cleaned = re.sub(
+        r'(?:全部|新?部分仓位)?\s*T\+1\s*(?:已)?(?:锁定|解锁|可卖|不可卖)',
+        '可卖状态已记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
         r'((?:先|再|计划)?(?:买入|卖出|加仓|减仓|清仓|买|卖|减))\s*\d+(?![\d.%])',
         r'\1部分仓位',
         cleaned,
     )
     cleaned = re.sub(
-        r'((?:用|看|参考|区间(?:为)?|验证(?:区间)?|(?:再次)?测试)[：:]?\s*)'
+        r'((?:用|看|观察|参考|区间(?:为)?|验证(?:区间)?|(?:再次)?测试)[：:]?\s*)'
         r'\d{2,3}(?:\.\d+)?\s*[—~-]\s*\d{2,3}(?:\.\d+)?'
         r'(?:\s*/\s*\d{2,3}(?:\.\d+)?\s*[—~-]\s*\d{2,3}(?:\.\d+)?)?',
         r'\1关键区间',
         cleaned,
     )
     cleaned = re.sub(
-        r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|上方|看|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
+        r'(?<![\d.])\d{2,4}(?:\.\d+)?\s*[—~-]\s*\d{2,4}(?:\.\d+)?'
+        r'(?=\s*(?:/|风险区|修复区|验证区|下方|上方|失守|修复))',
+        '关键区间',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<=[\u4e00-\u9fff])\d{2,4}(?:\.\d+)?'
+        r'(?=\s*(?:下方|修复(?:受阻|条件|彻底|判断)?|风险区|止损线))',
+        '关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<=[\u4e00-\u9fff])\d{2,4}(?:\.\d+)?'
+        r'(?=\s*(?:/|与)[\u4e00-\u9fff]{2,8}\d)',
+        '关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<=[\u4e00-\u9fff])\d{2,4}(?:\.\d+)?'
+        r'(?=\s*(?:/|与)[^，。；\n|]{0,24}(?:风险区|失守))',
+        '关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:风险复核带|价格风险带)[^，。；\n|]*?MA\d+\s*[(]?\s*)'
+        r'\d{2,4}(?:\.\d+)?',
+        r'\1关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<![\d.])\d{2,4}(?:\.\d+)?'
+        r'(?=\s*修复(?:受阻|条件|彻底|判断|失败))',
+        '关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|上方|看|观察|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
         r'\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*',
         r'\1关键位',
         cleaned,
@@ -515,6 +567,16 @@ def sanitize_public_review_text(text):
         cleaned,
     )
     cleaned = re.sub(
+        r'(?<![\d.])\d{2,4}\.\d+(?=\s*(?:买入|卖出|加仓|减仓|清仓|全清))',
+        '成交价已隐藏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'买入均价\s*\([^)]*\)\s*/\s*\d+(?:\.\d+)?\s*=\s*\d+(?:\.\d+)?',
+        '买入均价已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
         r'((?:均)?成本(?:价|线)?(?:约|为|≈)?\s*[:：]?\s*)\d+(?:\.\d+)?',
         r'\1已脱敏',
         cleaned,
@@ -542,8 +604,14 @@ def sanitize_public_review_text(text):
             line = re.sub(r'(?<!\d)\d{1,2}:\d{2}(?::\d{2})?', '盘中', line)
             line = re.sub(
                 r'((?:午盘|尾盘|日内低点|买入后(?:五分钟K线)?最低(?:跌至)?|成交后最低)[：:]?\s*)'
+                r'(?!(?:\d{2,4}(?:\.\d+)?)(?:%|家|只|→|飙至))'
                 r'\d{2,4}(?:\.\d+)?',
                 r'\1价格已脱敏',
+                line,
+            )
+            line = re.sub(
+                r'(MA\d+\s*[(=:]?\s*)\d{2,4}(?:\.\d+)?',
+                r'\1关键位',
                 line,
             )
             line = re.sub(

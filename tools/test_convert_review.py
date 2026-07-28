@@ -624,11 +624,13 @@ weekday: 周二
 
     def test_public_review_text_preserves_gap_without_placeholder_wording(self):
         text = convert_review.sanitize_public_review_text(
-            "连板风险值缺源占位；大市值赚钱比例缺源脚本占位。"
+            "连板风险值缺源占位；大市值赚钱比例缺源脚本占位；"
+            "前置版本的占位内容已由正式审阅覆盖。"
         )
 
         self.assertNotIn("占位", text)
         self.assertEqual(text.count("数据缺口估算"), 2)
+        self.assertIn("前置版本的临时内容", text)
 
     def test_public_review_cells_redact_action_prices_and_monetary_pnl(self):
         self.assertEqual(
@@ -804,6 +806,48 @@ weekday: 周二
             self.assertNotIn(secret, text)
         self.assertIn("看关键位", text)
         self.assertIn("不站回关键位", text)
+
+    def test_public_review_text_preserves_market_stage_metrics(self):
+        text = convert_review.sanitize_public_review_text(
+            "尾盘情绪44.4%（较午盘50.9%持续回落），"
+            "跌停家数从午盘33飙至113，较午盘33→尾盘113→收盘128持续恶化；"
+            "当时买入条件不成立，仓位继续收缩。"
+        )
+
+        for metric in ("午盘50.9%", "午盘33飙至113", "午盘33→尾盘113→收盘128"):
+            self.assertIn(metric, text)
+        self.assertNotIn("午盘价格已脱敏", text)
+        self.assertNotIn("尾盘价格已脱敏", text)
+
+    def test_public_review_text_redacts_postfixed_execution_prices_and_average(self):
+        text = convert_review.sanitize_public_review_text(
+            "金山247.36买入、245.10加仓；中科93.32全清；"
+            "买入均价(247.36+245.10)/2=246.23，距日内低点约4.1%。"
+        )
+
+        for secret in ("247.36", "245.10", "93.32", "246.23"):
+            self.assertNotIn(secret, text)
+        self.assertIn("成交价已隐藏", text)
+        self.assertIn("买入均价已脱敏", text)
+
+    def test_public_review_text_redacts_named_risk_levels_and_internal_labels(self):
+        text = convert_review.sanitize_public_review_text(
+            "中微388-392/中科98.50下方，中科98.50/中微388—392风险区失守，98.50修复受阻；"
+            "风险复核带MA5 237.46/当日低点236.36；"
+            "盘中观察388—392与设备锚，观察22.20/22.48结构；"
+            "C1.5→C2→D1→D2仍为fail-closed，F-008与added_at_peak_risk仅作研究；"
+            "rotation_state与candidate_codes缺失，金山T+1锁定。"
+        )
+
+        for secret in (
+            "388", "392", "98.50", "237.46", "236.36", "22.20", "22.48", "C1.5", "C2",
+            "D1", "D2", "fail-closed", "F-008", "peak_risk",
+            "rotation_state", "candidate_codes", "T+1锁定",
+        ):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertIn("关键区间", text)
+        self.assertIn("关键位", text)
+        self.assertIn("可卖状态已记录", text)
 
     def test_public_review_cells_redact_numeric_trigger_thresholds(self):
         self.assertEqual(
