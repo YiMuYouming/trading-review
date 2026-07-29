@@ -510,7 +510,10 @@ def sanitize_public_review_text(text):
         cleaned,
     )
     cleaned = re.sub(
-        r'(?<=[\u4e00-\u9fff])\d{2,4}(?:\.\d+)?'
+        r'(?<!涨停)(?<!跌停)(?<!上涨)(?<!下跌)'
+        r'(?<=[\u4e00-\u9fff])'
+        r'(?!\d{2,4}(?:\.\d+)?\s*/\s*(?:涨停|跌停|上涨|下跌)\d)'
+        r'\d{2,4}(?:\.\d+)?'
         r'(?=\s*(?:/|与)[\u4e00-\u9fff]{2,8}\d)',
         '关键位',
         cleaned,
@@ -531,6 +534,12 @@ def sanitize_public_review_text(text):
         r'(?<![\d.])\d{2,4}(?:\.\d+)?'
         r'(?=\s*修复(?:受阻|条件|彻底|判断|失败))',
         '关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|上方|看|观察|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
+        r'\d+(?:\.\d+)?\s*[—~-]\s*\d+(?:\.\d+)?',
+        r'\1关键区间',
         cleaned,
     )
     cleaned = re.sub(
@@ -600,11 +609,17 @@ def sanitize_public_review_text(text):
             'Portal 每日市场手记 SSOT',
         )):
             continue
+        line = re.sub(
+            r'^\s*(?:-\s*)?T\+1[：:].*$',
+            '- 可卖状态以账户事实为准。',
+            line,
+            flags=re.I,
+        )
         if re.search(r'盈亏|浮盈|亏损|浮亏|盈利|实现|成交|买入|加仓|减仓|清仓|卖出|仓位|账户|试仓|暴露', line):
             line = re.sub(r'(?<!\d)\d{1,2}:\d{2}(?::\d{2})?', '盘中', line)
             line = re.sub(
                 r'((?:午盘|尾盘|日内低点|买入后(?:五分钟K线)?最低(?:跌至)?|成交后最低)[：:]?\s*)'
-                r'(?!(?:\d{2,4}(?:\.\d+)?)(?:%|家|只|→|飙至))'
+                r'(?!(?:\d{2,4}(?:\.\d+)?)(?:%|家|只|/|→|飙至))'
                 r'\d{2,4}(?:\.\d+)?',
                 r'\1价格已脱敏',
                 line,
@@ -627,6 +642,11 @@ def sanitize_public_review_text(text):
             line = re.sub(
                 r'(?:约)?\d+(?:\.\d+)?%\s*(?:账户|仓位)',
                 '账户比例已脱敏',
+                line,
+            )
+            line = re.sub(
+                r'((?:\*\*)?仓位(?:\*\*)?\s*[：:]?\s*(?:维持|约为|为|盘后)?\s*)(?:约)?\d+(?:\.\d+)?%',
+                r'\1账户比例已脱敏',
                 line,
             )
             line = re.sub(
@@ -673,7 +693,7 @@ def sanitize_public_review_cell(header, value):
         return '已脱敏'
     if header == '仓位':
         return '已脱敏'
-    if 'T+1可卖' in header:
+    if 'T+1可卖' in header or '可卖状态' in header:
         return '按账户事实复核'
     if '止损' in header:
         return '关键风险位（已脱敏）'

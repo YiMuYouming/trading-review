@@ -349,6 +349,16 @@ class ConvertDailyNoteTest(unittest.TestCase):
         self.assertNotIn("标的/标的", html)
         self.assertIn("持仓标的全部重新走触发/失效", html)
 
+    def test_daily_note_redacts_new_position_aliases_joined_by_chinese_comma(self):
+        text = convert_daily_note.sanitize_public_text(
+            "只处理歌尔、金山两只持仓风险，并观察板块修复。"
+        )
+
+        self.assertNotIn("歌尔", text)
+        self.assertNotIn("金山", text)
+        self.assertNotIn("标的、标的", text)
+        self.assertIn("只处理两只持仓标的风险", text)
+
     def test_daily_note_redacts_standalone_execution_quantities_and_anchor_aliases(self):
         review_note = self.root / "2026_7_6_Monday_ReviewNote.md"
         review_note.write_text(

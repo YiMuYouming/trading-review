@@ -736,6 +736,23 @@ weekday: 周二
         self.assertIn("关键区间", text)
         self.assertIn("账户比例已脱敏", text)
 
+    def test_public_review_text_redacts_position_first_exposure_and_t1_guidance(self):
+        text = convert_review.sanitize_public_review_text(
+            "**仓位**：维持约34.48%；次日以账户事实为准。\n"
+            "- T+1：次日重新回读歌尔、金山可卖数量。"
+        )
+
+        for secret in ("34.48%", "T+1", "歌尔", "金山", "可卖数量"):
+            self.assertNotIn(secret, text)
+        self.assertIn("账户比例已脱敏", text)
+        self.assertIn("可卖状态以账户事实为准", text)
+
+    def test_public_review_cell_redacts_post_sanitized_sellable_header(self):
+        self.assertEqual(
+            convert_review.sanitize_public_review_cell("可卖状态已记录", "是（6000）"),
+            "按账户事实复核",
+        )
+
     def test_public_review_text_redacts_red_team_risk_price_forms(self):
         text = convert_review.sanitize_public_review_text(
             "中微尾盘393.46，浮亏收窄；若明日回调，可能再次测试388—392风险区"
@@ -818,6 +835,34 @@ weekday: 周二
             self.assertIn(metric, text)
         self.assertNotIn("午盘价格已脱敏", text)
         self.assertNotIn("尾盘价格已脱敏", text)
+
+    def test_public_review_text_preserves_market_count_pairs(self):
+        text = convert_review.sanitize_public_review_text(
+            "当日成交已记录；早盘涨停41/跌停13，上涨4033/下跌1179；"
+            "涨跌比4033/1179（较午盘3227/1944大幅改善）；"
+            "涨停扩至58/跌停19；涨停86家（午盘58/19→收盘86/9）。"
+        )
+
+        for metric in (
+            "涨停41/跌停13",
+            "上涨4033/下跌1179",
+            "较午盘3227/1944",
+            "涨停扩至58/跌停19",
+            "午盘58/19→收盘86/9",
+        ):
+            self.assertIn(metric, text)
+        self.assertNotIn("关键位/", text)
+        self.assertNotIn("价格已脱敏/", text)
+
+    def test_public_review_text_redacts_action_prefixed_risk_range_as_a_unit(self):
+        text = convert_review.sanitize_public_review_text(
+            "具体原因未提供；事后结构显示已跌破388-392且锚点同弱。"
+        )
+
+        self.assertNotIn("388", text)
+        self.assertNotIn("392", text)
+        self.assertIn("跌破关键区间", text)
+        self.assertNotIn("关键位-", text)
 
     def test_public_review_text_redacts_postfixed_execution_prices_and_average(self):
         text = convert_review.sanitize_public_review_text(
