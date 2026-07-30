@@ -429,7 +429,7 @@ def sanitize_public_review_text(text):
         flags=re.I,
     )
     cleaned = re.sub(
-        r'实时门禁\.allowed\s*=\s*(?:true|false)',
+        r'实时门禁(?:\.allowed)?\s*=\s*(?:true|false)',
         '内部执行校验已脱敏',
         cleaned,
         flags=re.I,
@@ -561,6 +561,39 @@ def sanitize_public_review_text(text):
     cleaned = re.sub(r'受\d+(?:\.\d+)?前高', '受前高', cleaned)
     cleaned = re.sub(r'@\s*\d+(?:\.\d+)?', '@成交价已隐藏', cleaned)
     cleaned = re.sub(
+        r'\d+\s*@\s*成交价已隐藏',
+        '部分仓位@成交价已隐藏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?:仅)?(?:\d+(?:\s*股)?|部分仓位)\s*(?:可卖|不可卖)',
+        '可卖状态已记录',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])lot(?![A-Za-z0-9_])',
+        '账户批次',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'次日\s*解锁(?:后)?(?:再)?',
+        '次日可卖状态复核后',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'[-+]?\d+(?:\.\d+)?\s*pcts?(?![A-Za-z0-9_])',
+        '账户比例已脱敏',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])24\s*h(?:ours?)?(?![A-Za-z0-9_])|24\s*小时',
+        '次日',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
         r'((?:以|按)\s*)\d+(?:\.\d+)?(?=\s*(?:成交|买入|加仓|减仓|清仓|卖出|买|卖|减))',
         r'\1成交价已隐藏',
         cleaned,
@@ -568,6 +601,11 @@ def sanitize_public_review_text(text):
     cleaned = re.sub(
         r'((?:成交|买入|卖出|加仓|减仓|清仓)价(?:约|为)?\s*[:：]?\s*)\d+(?:\.\d+)?',
         r'\1已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:买入|卖出|加仓|减仓|清仓)后)\s*\d+(?:\.\d+)?',
+        r'\1价格已脱敏',
         cleaned,
     )
     cleaned = re.sub(
@@ -600,6 +638,12 @@ def sanitize_public_review_text(text):
         '关键位',
         cleaned,
     )
+    cleaned = re.sub(
+        r'(?<![\d.])\d+(?:\.\d+)?\s*[—~-]\s*\d+(?:\.\d+)?'
+        r'(?=\s*(?:有)?(?:短压|压力|阻力|支撑))',
+        '关键区间',
+        cleaned,
+    )
 
     safe_lines = []
     for line in cleaned.splitlines():
@@ -627,6 +671,11 @@ def sanitize_public_review_text(text):
             line = re.sub(
                 r'(MA\d+\s*[(=:]?\s*)\d{2,4}(?:\.\d+)?',
                 r'\1关键位',
+                line,
+            )
+            line = re.sub(
+                r'(关键位)\s*[<>]\s*\d+(?:\.\d+)?',
+                r'\1附近',
                 line,
             )
             line = re.sub(
@@ -699,7 +748,7 @@ def sanitize_public_review_cell(header, value):
         return '关键风险位（已脱敏）'
     if any(key in header for key in ('触发', '失效')) and (
         re.search(r'买入|卖出|加仓|减仓|清仓|止损|降险|补仓|提高暴露|先减|再减', raw_value)
-        or re.search(r'\d{2,3}\.\d+', raw_value)
+        or re.search(r'\d+(?:\.\d+)', raw_value)
     ):
         return '风险条件已记录（具体阈值已脱敏）'
     if header == '今日检查' and re.search(

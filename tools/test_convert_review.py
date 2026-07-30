@@ -539,6 +539,21 @@ weekday: 周二
         self.assertIn("仓位数量已脱敏", text)
         self.assertIn("累计仓位已脱敏", text)
 
+    def test_public_review_text_redacts_compact_quantity_and_internal_risk_shorthand(self):
+        text = convert_review.sanitize_public_review_text(
+            "长鑫盘中开仓1000@52.83；歌尔6000可卖，金山仅400可卖，"
+            "长鑫次日解锁后再按lot回读。仓位单日+14.76pcts，"
+            "两笔逆规则成交进入24h风控复核。"
+        )
+
+        for secret in ("1000", "6000", "400可卖", "次日解锁", "lot", "14.76pcts", "24h"):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertIn("部分仓位@成交价已隐藏", text)
+        self.assertIn("可卖状态已记录", text)
+        self.assertIn("次日可卖状态复核", text)
+        self.assertIn("账户比例已脱敏", text)
+        self.assertIn("次日风控复核", text)
+
     def test_public_review_text_redacts_execution_shorthand_from_daily_review(self):
         text = convert_review.sanitize_public_review_text(
             "命中旧lot trade:150，总仓1000→700，保留400股可卖旧仓+300股T+1锁定至7/24；"
@@ -712,14 +727,28 @@ weekday: 周二
         text = convert_review.sanitize_public_review_text(
             "新增中微公司，午盘390.97；日内低点370.08早于盘中买入；"
             "买入后最低383.62，收盘+2.90%，最大浮亏-3.81%。"
-            "该笔直接违反CLIMAX_STOP，属gate=false自主交易。"
+            "该笔直接违反CLIMAX_STOP，属gate=false自主交易；另有decision_gate=false。"
         )
 
-        for secret in ("390.97", "370.08", "383.62", "CLIMAX_STOP", "gate=false"):
+        for secret in (
+            "390.97", "370.08", "383.62", "CLIMAX_STOP", "gate=false", "实时门禁=false",
+        ):
             self.assertNotIn(secret.lower(), text.lower())
         self.assertIn("+2.90%", text)
         self.assertIn("-3.81%", text)
         self.assertIn("风险约束", text)
+
+    def test_public_review_text_redacts_post_action_and_pressure_prices(self):
+        text = convert_review.sanitize_public_review_text(
+            "金山加仓后255.08；歌尔仍守MA5(23.15>23.05)；"
+            "长鑫53.99-55.03有短压。"
+        )
+
+        for secret in ("255.08", "23.15", "23.05", "53.99", "55.03"):
+            self.assertNotIn(secret, text)
+        self.assertIn("加仓后价格已脱敏", text)
+        self.assertIn("关键位附近", text)
+        self.assertIn("关键区间", text)
 
     def test_public_review_text_redacts_plan_ranges_and_account_exposure(self):
         text = convert_review.sanitize_public_review_text(
@@ -898,6 +927,12 @@ weekday: 周二
         self.assertEqual(
             convert_review.sanitize_public_review_cell(
                 "触发/失效", "突破35.89后缩量守住；失守34.09/33.49失效"
+            ),
+            "风险条件已记录（具体阈值已脱敏）",
+        )
+        self.assertEqual(
+            convert_review.sanitize_public_review_cell(
+                "触发/失效", "守MA5 9.52/MA20 9.36；转弱则失效"
             ),
             "风险条件已记录（具体阈值已脱敏）",
         )
