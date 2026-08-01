@@ -904,6 +904,44 @@ weekday: 周二
         self.assertIn("成交价已隐藏", text)
         self.assertIn("买入均价已脱敏", text)
 
+    def test_public_review_text_redacts_slash_separated_execution_prices(self):
+        text = convert_review.sanitize_public_review_text(
+            "长鑫今日加仓900股(56.96/55.10)；"
+            "红方核查加仓@56.96/55.10；"
+            "收盘跌破两笔加仓成本56.96/55.10。"
+        )
+
+        for secret in ("900股", "56.96", "55.10"):
+            self.assertNotIn(secret, text)
+        self.assertIn("成交价已隐藏", text)
+        self.assertIn("成本已脱敏", text)
+
+    def test_public_review_text_redacts_named_execution_prices_and_preserves_pct_range(self):
+        text = convert_review.sanitize_public_review_text(
+            "盘中买长鑫56.96 / 盘中卖歌尔23.23；"
+            "半导体较高点回落5-8pct但仍在强势区；"
+            "周一（8/3 T+1解锁后）再按账户事实复核。"
+        )
+
+        for secret in ("56.96", "23.23", "5-8pct", "8/3"):
+            self.assertNotIn(secret, text)
+        self.assertEqual(text.count("成交价已隐藏"), 2)
+        self.assertIn("若干个百分点", text)
+        self.assertIn("次日可卖状态复核", text)
+
+    def test_public_review_text_redacts_internal_data_and_receipt_names(self):
+        text = convert_review.sanitize_public_review_text(
+            "原因字段 pnl.db reason=null；原稿无 c15_signal_ledger/d2_decision_receipt，"
+            "现由 degraded_acceptance.v3 收口。"
+        )
+
+        for secret in ("pnl.db", "c15_signal_ledger", "d2_decision_receipt", "degraded_acceptance.v3"):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertIn("内部账户记录", text)
+        self.assertIn("候选记录", text)
+        self.assertIn("裁决记录", text)
+        self.assertIn("降级授权记录", text)
+
     def test_public_review_text_redacts_named_risk_levels_and_internal_labels(self):
         text = convert_review.sanitize_public_review_text(
             "中微388-392/中科98.50下方，中科98.50/中微388—392风险区失守，98.50修复受阻；"

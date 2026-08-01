@@ -154,7 +154,7 @@ body{font:16px/1.7 system-ui,-apple-system,'Noto Sans SC',sans-serif;background:
 .emotion-stage .stage-title{font-size:14px;font-weight:800;color:var(--accent);margin-bottom:8px}
 .emotion-row{display:grid;grid-template-columns:82px minmax(0,1fr);gap:8px;border-top:1px solid rgba(229,226,222,.75);padding:7px 0;font-size:12px}
 .emotion-row:first-of-type{border-top:0}
-.emotion-row .rlabel{color:var(--text3);white-space:nowrap}
+.emotion-row .rlabel{color:var(--text3);white-space:normal;line-height:1.35;min-width:0}
 .emotion-row .rval{color:var(--text2);line-height:1.45;word-break:break-word}
 .emotion-row.major{display:block;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 10px;margin-top:8px}
 .emotion-row.major .rlabel{display:block;margin-bottom:3px;font-weight:700;color:var(--text)}
@@ -266,6 +266,25 @@ def numeric_value(value):
 def sanitize_public_review_text(text):
     """Redact account-specific execution details from the public review layer."""
     cleaned = str(text or '')
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])pnl\.db(?![A-Za-z0-9_])', '内部账户记录', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])c15_signal_ledger(?![A-Za-z0-9_])',
+        '候选记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])d2_decision_receipt(?![A-Za-z0-9_])',
+        '裁决记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])degraded_acceptance(?:_receipt|\.v\d+)?(?![A-Za-z0-9_])',
+        '降级授权记录',
+        cleaned,
+        flags=re.I,
+    )
     cleaned = re.sub(r'TICKET-[A-Za-z0-9_-]+', '交易记录', cleaned, flags=re.I)
     cleaned = re.sub(
         r'(?<![A-Za-z0-9_])(?:execution\s+)?ticket',
@@ -480,6 +499,12 @@ def sanitize_public_review_text(text):
         cleaned,
     )
     cleaned = re.sub(
+        r'\d{1,2}/\d{1,2}\s*T\+1\s*(?:已)?(?:锁定|解锁|可卖|不可卖)',
+        '次日可卖状态复核',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
         r'(?:全部|新?部分仓位)?\s*T\+1\s*(?:已)?(?:锁定|解锁|可卖|不可卖)',
         '可卖状态已记录',
         cleaned,
@@ -561,6 +586,17 @@ def sanitize_public_review_text(text):
     cleaned = re.sub(r'受\d+(?:\.\d+)?前高', '受前高', cleaned)
     cleaned = re.sub(r'@\s*\d+(?:\.\d+)?', '@成交价已隐藏', cleaned)
     cleaned = re.sub(
+        r'(@成交价已隐藏)(?:\s*/\s*\d+(?:\.\d+)?)+',
+        r'\1',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:买入|卖出|加仓|减仓|清仓)[^，。；\n|（）()]{0,30})'
+        r'[（(]\s*\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)+\s*[）)]',
+        r'\1（成交价已隐藏）',
+        cleaned,
+    )
+    cleaned = re.sub(
         r'\d+\s*@\s*成交价已隐藏',
         '部分仓位@成交价已隐藏',
         cleaned,
@@ -580,6 +616,12 @@ def sanitize_public_review_text(text):
         r'次日\s*解锁(?:后)?(?:再)?',
         '次日可卖状态复核后',
         cleaned,
+    )
+    cleaned = re.sub(
+        r'[-+]?\d+(?:\.\d+)?\s*[—~-]\s*[-+]?\d+(?:\.\d+)?\s*pcts?(?![A-Za-z0-9_])',
+        '若干个百分点',
+        cleaned,
+        flags=re.I,
     )
     cleaned = re.sub(
         r'[-+]?\d+(?:\.\d+)?\s*pcts?(?![A-Za-z0-9_])',
@@ -614,6 +656,18 @@ def sanitize_public_review_text(text):
         cleaned,
     )
     cleaned = re.sub(
+        r'((?:组合|加仓|买入)?成本(?:价|线)?(?:约|为|≈)?\s*[:：]?\s*)'
+        r'\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)+',
+        r'\1已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:买入|卖出|加仓|减仓|清仓|买|卖|减)\s*'
+        r'[\u4e00-\u9fffA-Za-z]{1,12})\d{2,4}(?:\.\d+)',
+        r'\1成交价已隐藏',
+        cleaned,
+    )
+    cleaned = re.sub(
         r'(?<![\d.])\d{2,4}\.\d+(?=\s*(?:买入|卖出|加仓|减仓|清仓|全清))',
         '成交价已隐藏',
         cleaned,
@@ -626,6 +680,11 @@ def sanitize_public_review_text(text):
     cleaned = re.sub(
         r'((?:均)?成本(?:价|线)?(?:约|为|≈)?\s*[:：]?\s*)\d+(?:\.\d+)?',
         r'\1已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(成本已脱敏)(?:\s*/\s*\d+(?:\.\d+)?)+',
+        r'\1',
         cleaned,
     )
     cleaned = re.sub(

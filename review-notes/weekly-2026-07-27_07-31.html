@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W31 周复盘 · 弈沐资本</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#F7F5F3;--paper:#fff;--soft:#F5F2EE;--line:#E5E2DE;--text:#2D2926;--muted:#5C5652;--faint:#8A8480;--accent:#D97706;--red:#DC2626;--green:#059669}html{scroll-behavior:smooth}body{font:15px/1.7 system-ui,-apple-system,"Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;min-height:54px;padding:10px 22px;background:rgba(247,245,243,.92);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.back{border:1px solid var(--line);border-radius:7px;padding:4px 10px;font-size:13px;color:var(--muted);background:#fff}.title{font-weight:900}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.chip{border:1px solid var(--line);border-radius:999px;padding:2px 9px;background:#fff;font-size:11px;font-weight:800;color:var(--muted)}.chip.up{color:var(--red);background:rgba(220,38,38,.06)}.layout{display:flex;max-width:1320px;margin:0 auto}.sidebar{position:sticky;top:54px;width:224px;height:calc(100vh - 54px);padding:20px 14px;border-right:1px solid var(--line)}.sidebar .label{padding:0 10px 8px;color:var(--faint);font-size:11px;font-weight:900;letter-spacing:.12em}.sidebar a{display:block;border-left:3px solid transparent;border-radius:0 8px 8px 0;padding:7px 10px;color:var(--muted);font-size:12px}.sidebar a:hover,.sidebar a.active{background:var(--soft);color:var(--accent);border-left-color:var(--accent)}.content{width:min(1080px,calc(100% - 224px));padding:24px 32px 64px}.hero{background:linear-gradient(145deg,#fff,#FBF8F3);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:18px;box-shadow:0 16px 40px rgba(45,41,38,.05)}.hero h1{font-family:"Noto Serif SC",Georgia,serif;font-size:31px;line-height:1.25;margin-bottom:8px}.hero p{color:var(--muted)}.kpis,.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.kpi,.metric-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;min-width:0}.kpi span,.metric-card span{display:block;font-size:11px;color:var(--faint);font-weight:900;margin-bottom:3px}.kpi strong{font-size:22px}.metric-card strong{display:block;font-size:16px}.metric-card em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:3px}.gain{color:var(--red)}.loss{color:var(--green)}.note{border-left:4px solid var(--accent);border-radius:0 10px 10px 0;background:rgba(217,119,6,.07);padding:12px 14px;margin-bottom:18px;color:var(--muted)}.section{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:18px;overflow:hidden}.sh{width:100%;display:flex;align-items:center;gap:9px;border:0;border-bottom:1px solid var(--line);background:var(--soft);padding:13px 18px;text-align:left;font:inherit;font-weight:900;color:var(--text);cursor:pointer}.sh .tog{font-size:11px;color:var(--faint);transition:transform .15s}.sh.collapsed .tog{transform:rotate(-90deg)}.sb{padding:16px 18px 18px}.sb.hide{display:none}p{margin:8px 0}ul,ol{padding-left:22px;margin:9px 0}li{margin:4px 0}.tw{overflow:auto;max-width:100%;margin:12px 0 15px;border:1px solid var(--line);border-radius:10px;-webkit-overflow-scrolling:touch}.tw:before{content:"左右滑动查看完整表格";display:block;padding:5px 10px;background:#FCFBFA;border-bottom:1px solid var(--line);font-size:11px;font-weight:900;color:var(--faint)}table{width:100%;border-collapse:collapse;font-size:13px;background:#fff}th{background:var(--soft);text-align:left;white-space:nowrap;color:var(--muted);font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line)}td{padding:8px 10px;border-bottom:1px solid #F0EEEC;vertical-align:top;min-width:86px}tr:nth-child(even) td{background:#FCFBFA}.flow-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:14px 0}.flow-card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#fff,#FCFBFA);padding:12px;min-width:0}.flow-card .day{font-size:12px;color:var(--faint);font-weight:900}.flow-card strong{display:block;margin:4px 0 6px;color:var(--accent)}.flow-card p{font-size:12px;color:var(--muted);line-height:1.55;margin:0}.insight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.insight-card{border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:14px;padding:14px;background:linear-gradient(180deg,#fff,#FCFBFA)}.insight-card h3{font-size:16px;margin:0 0 6px}.insight-card p{color:var(--muted);line-height:1.65}@media(max-width:980px){.flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:820px){.sidebar{display:none}.content{width:100%;padding:16px}.title{white-space:normal}.meta{margin-left:0}.hero h1{font-size:25px}}@media(max-width:620px){.flow-grid,.kpis,.metric-grid,.insight-grid{grid-template-columns:1fr}.topbar{padding:10px 14px;flex-wrap:wrap}.content{padding:14px}}
+</style>
+</head>
+<body>
+<div class="topbar"><a id="back-home" class="back" href="../index.html#reviews">← 平台</a><div class="title">W31 周复盘（2026-07-27 至 2026-07-31）</div><div class="meta"><span class="chip">7/27-7/31 · 5天</span><span class="chip up">周度 +0.34%</span><span class="chip">上证 +0.47%</span><span class="chip">W31</span></div></div>
+<div class="layout">
+  <nav class="sidebar"><div class="label">目录</div><a href="#s0">核心发现</a><a href="#s1">本周概览</a><a href="#s2">节奏打法</a><a href="#s3">主线板块</a><a href="#s4">盈亏归因</a><a href="#s5">认知迭代</a><a href="#s6">下周基调</a><a href="#s7">来源边界</a></nav>
+  <main class="content">
+    <section class="hero"><h1>W31 周复盘</h1><p>账户微涨，但没有形成相对上证的超额。软件修复贡献正向结果，半导体早强尾弱；本周最需要修复的不是市场判断，而是门禁关闭后仍能把新叙事转换成新增风险。</p><div class="kpis"><div class="kpi"><span>周度收益</span><strong class="gain">+0.34%</strong></div><div class="kpi"><span>交易日</span><strong>5天</strong></div><div class="kpi"><span>相对上证</span><strong class="loss">-0.13%</strong></div><div class="kpi"><span>周末仓位</span><strong>29.80%</strong></div></div></section>
+    <div class="note"><strong>报告状态</strong>：周级事实与账户复核已完成，状态为 <code>final_with_source_gaps</code>。<br><strong>闭环说明</strong>：7月31日日复盘已于8月1日以降级终稿（仅观察）完成收口；历史数据覆盖与时效缺口继续如实披露，不把观察升级为交易授权。<br><strong>公开边界</strong>：精确股数、成本、成交金额、内部路径和具体买卖指令均已省略。</div>
+
+    <section class="section" id="s0"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>核心发现（先看这里）</button><div class="sb"><div class="tw"><table><thead><tr><th>维度</th><th>结论</th></tr></thead><tbody>
+      <tr><td>盈亏</td><td>账户周度 <strong class="gain">+0.3444%</strong>，同期上证 <strong class="gain">+0.4725%</strong>；账户落后约0.13个百分点，不能定义为超额收益。</td></tr>
+      <tr><td>节奏</td><td>风险卖出有所进步，但新增端连续用替代、轮动、板块承接和修复预期绕过既有门禁。</td></tr>
+      <tr><td>主线</td><td>周初科技拥挤交易退潮，周中消费电子与软件修复，周五软件最强；半导体尾盘扩散被证伪。</td></tr>
+      <tr><td>生态</td><td>情绪在高低档之间快速切换；周五高度打开，但首板质量与趋势承接明显背离。</td></tr>
+      <tr><td>认知</td><td>已成交事实不能追认事前合规；每一笔都要独立重验；板块承接不等于反转。</td></tr>
+    </tbody></table></div><p><strong>下周目标</strong>：先完成7月31日事实链收口；连续五个交易日做到门禁关闭时不新增、每笔独立重验、风险动作有来源留痕。</p></div></section>
+
+    <section class="section" id="s1"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>〇、本周概览</button><div class="sb"><div class="flow-grid">
+      <article class="flow-card"><div class="day">周一 7/27</div><strong>极端高潮</strong><p>市场普涨、科技弹性放大；错失后的替代暴露成为首个纪律警示。</p></article>
+      <article class="flow-card"><div class="day">周二 7/28</div><strong>科技退潮</strong><p>弱线退出方向正确，但低位轮动预期过早转成仓位。</p></article>
+      <article class="flow-card"><div class="day">周三 7/29</div><strong>修复分化</strong><p>软件与消费电子出现宽度，半导体仍偏局部独强。</p></article>
+      <article class="flow-card"><div class="day">周四 7/30</div><strong>恐慌承接</strong><p>两次回拉只证明承接，尚未证明板块宽度与资金扩散。</p></article>
+      <article class="flow-card"><div class="day">周五 7/31</div><strong>高潮分歧</strong><p>软件维持强线，半导体早强尾弱；降险与新增风险同时发生。</p></article>
+    </div><div class="metric-grid"><div class="metric-card"><span>情绪路径</span><strong>94.3 → 86.2</strong><em>周中最低32.4</em></div><div class="metric-card"><span>日收益胜率</span><strong>60%</strong><em>3盈2亏</em></div><div class="metric-card"><span>卖出胜率</span><strong>40%</strong><em>2盈3亏</em></div><div class="metric-card"><span>闭环状态</span><strong>5 final · 0 pending</strong><em>历史源缺口已披露</em></div></div></div></section>
+
+    <section class="section" id="s2"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>一、节奏与打法回顾</button><div class="sb"><ol><li><strong>结果与执行质量分开评价。</strong>账户修复为正，不代表成交过程已经合规。</li><li><strong>错失后的替代交易需要更高门槛。</strong>同板块不等于同风险，仍要重算结构、价格与仓位。</li><li><strong>同一叙事拆单不等于独立确认。</strong>第二笔必须出现新的证据并重新读取门禁。</li><li><strong>风险卖出和新增风险不能互相抵消。</strong>组合表面降仓时，也要检查风险是否只是换了载体。</li></ol><p><strong>最大进步</strong>：卖出端开始留下更明确的保护利润和弱线降险证据。</p><p><strong>最大问题</strong>：系统已经反复识别门禁关闭，但行为层仍可用新叙事绕开。</p></div></section>
+
+    <section class="section" id="s3"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>二、主线与板块</button><div class="sb"><div class="tw"><table><thead><tr><th>阶段</th><th>市场演变</th><th>公开结论</th></tr></thead><tbody>
+      <tr><td>周初</td><td>科技拥挤交易从极端普涨转向集中退潮。</td><td>高潮后优先验证，不做补偿性追涨。</td></tr>
+      <tr><td>周中</td><td>消费电子与软件获得宽度，半导体仍偏局部强。</td><td>单一先锋只能作为线索，不能代表板块修复。</td></tr>
+      <tr><td>周四</td><td>科技两次深跌回拉，软件相对抗跌。</td><td>承接不等于反转；仍需宽度、容量锚和资金扩散。</td></tr>
+      <tr><td>周五</td><td>软件全天强，半导体早盘扩散后尾盘明显分歧。</td><td>软件取得当日强线资格；其他方向下周用新鲜事实重验。</td></tr>
+    </tbody></table></div><p><strong>结构结论</strong>：总量情绪不足以单独解释板块分化，但板块级条件必须更严格，不能成为放宽高潮风控的理由。</p></div></section>
+
+    <section class="section" id="s4"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>三、盈亏归因</button><div class="sb"><div class="tw"><table><thead><tr><th>归因项</th><th>本周表现</th><th>判断</th></tr></thead><tbody>
+      <tr><td>软件相对强</td><td>存量持仓修复与部分利润保护贡献主要正向结果。</td><td>强线中保护利润是有效样本，但不追认原始买入流程。</td></tr>
+      <tr><td>旧风险退出</td><td>弱线和历史风险在退出时确认损失。</td><td>退出方向正确；亏损与纠偏动作分开评价。</td></tr>
+      <tr><td>替代与轮动</td><td>错失、低位轮动、板块承接等叙事多次转成新增风险。</td><td>计划外新增的赔率明显差于存量持仓管理。</td></tr>
+      <tr><td>组合降险</td><td>周五卖出端释放风险，但新增端又形成集中暴露。</td><td>风险只是换形态，不等于组合已经完成降险。</td></tr>
+    </tbody></table></div></div></section>
+
+    <section class="section" id="s5"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>四、认知迭代</button><div class="sb"><div class="insight-grid">
+      <article class="insight-card"><h3>替代交易独立重验</h3><p>错失后的替代标的必须重新核对结构、价格、仓位与独立逻辑。</p></article>
+      <article class="insight-card"><h3>每一笔重新获得授权</h3><p>同一叙事拆成多笔，不会自动生成新的确认。</p></article>
+      <article class="insight-card"><h3>板块承接不等于反转</h3><p>反转至少需要宽度、容量锚和同口径资金共同改善。</p></article>
+      <article class="insight-card"><h3>事实与授权分层</h3><p>事后对账只记录已发生事实，不能改写成交时点的门禁状态。</p></article>
+      <article class="insight-card"><h3>规则研究不能边做边改</h3><p>总量情绪的板块化改造要先定义样本、阈值和反例，再进入规则裁决。</p></article>
+      <article class="insight-card"><h3>红方先读完整来源</h3><p>审阅应覆盖复盘、盘中记录与成交账本，避免单一来源造成误判。</p></article>
+    </div></div></section>
+
+    <section class="section" id="s6"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>五、下周基调</button><div class="sb"><p><strong>观察方向</strong>：软件是否从单日强线升级为持续主线，半导体能否从高分歧修复为真正扩散，连板高度与首板质量的背离是否收敛。</p><ul><li>任何方向都必须用下一交易日的新鲜板块资金、宽度和容量承接重新验证。</li><li>门禁关闭时不新增、不加仓；同一逻辑的第二笔必须出现独立证据。</li><li>先补齐7月31日正式终稿链，再把下一交易日事实作为正式开工源。</li></ul><p><strong>公开边界</strong>：以上只描述观察变量，不构成投资建议或新增交易授权。</p></div></section>
+
+    <section class="section" id="s7"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>六、来源审计与边界</button><div class="sb"><div class="tw"><table><thead><tr><th>项目</th><th>采用口径</th><th>缺口与处理</th></tr></thead><tbody>
+      <tr><td>周收益与指数</td><td>Hermes 7月31日收盘快照与NAV区间重算。</td><td>周末无新快照不影响7月31日收盘边界。</td></tr>
+      <tr><td>日复盘覆盖</td><td>7月27日至31日均已收口；7月31日为降级终稿（仅观察）。</td><td>历史数据覆盖与时效缺口继续保留，不产生新增交易授权。</td></tr>
+      <tr><td>选股闭环</td><td>只采用已核验的观察与红方结论。</td><td>部分正式回执缺失，不生成新增权限。</td></tr>
+      <tr><td>公开内容</td><td>Vault W31终稿的脱敏蒸馏。</td><td>精确仓位明细、成本、数量、内部路径与操作指令均已省略。</td></tr>
+    </tbody></table></div><p class="note">本页为个人交易系统的阶段复盘与认知记录，不构成投资建议，也不产生任何交易授权。</p></div></section>
+  </main>
+</div>
+<script>function toggleSection(btn){btn.classList.toggle('collapsed');btn.nextElementSibling.classList.toggle('hide')}const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));const a=document.querySelector('.sidebar a[href="#'+e.target.id+'"]');if(a)a.classList.add('active')}})},{rootMargin:'-90px 0px -72% 0px'});document.querySelectorAll('.section[id]').forEach(s=>io.observe(s));(function(){const from=new URLSearchParams(location.search).get('from');if(from&&/^[A-Za-z0-9_-]+$/.test(from)){document.getElementById('back-home').href='../index.html#'+from}})();</script>
+</body>
+</html>
