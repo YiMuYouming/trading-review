@@ -238,7 +238,9 @@ def clean_cognition_title(title: str) -> str:
 
 def sanitize_cognition_evidence(text: str) -> str:
     """Keep the lesson evidence while removing private execution details."""
-    cleaned = sanitize_public_text(convert_review.sanitize_public_review_text(text))
+    cleaned = sanitize_public_text(
+        convert_review.sanitize_public_review_text(text, redact_internal_labels=False)
+    )
     return re.sub(r"^[—-]\s*", "", cleaned).strip()
 
 

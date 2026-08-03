@@ -263,7 +263,7 @@ def numeric_value(value):
     return float(m.group(0)) if m else None
 
 
-def sanitize_public_review_text(text):
+def sanitize_public_review_text(text, redact_internal_labels=True):
     """Redact account-specific execution details from the public review layer."""
     cleaned = str(text or '')
     cleaned = re.sub(r'(?<![A-Za-z0-9_])pnl\.db(?![A-Za-z0-9_])', '内部账户记录', cleaned, flags=re.I)
@@ -703,6 +703,42 @@ def sanitize_public_review_text(text):
         '关键区间',
         cleaned,
     )
+    # Keep inline availability and execution-process wording out of the public layer.
+    cleaned = re.sub(r'T\+1状态已记录', '可卖状态已记录', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])T\+1(?![A-Za-z0-9_])',
+        '可卖状态',
+        cleaned,
+        flags=re.I,
+    )
+    if redact_internal_labels:
+        cleaned = re.sub(r'门禁', '执行条件', cleaned)
+        cleaned = re.sub(r'执行卡', '规则条件', cleaned)
+    cleaned = re.sub(r'票据交易记录', '成交细节已隐藏', cleaned)
+    cleaned = re.sub(r'票据读取', '来源记录已隐藏', cleaned)
+    cleaned = re.sub(r'票据', '来源记录', cleaned)
+    cleaned = re.sub(r'FIFO关闭交易流水已隐藏', '成交细节已隐藏', cleaned, flags=re.I)
+    cleaned = re.sub(r'绑定账户批次\s*交易流水已隐藏', '成交细节已隐藏', cleaned)
+    cleaned = re.sub(r'账户批次', '记录已隐藏', cleaned)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])FIFO(?![A-Za-z0-9_])', '成交细节', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(成交细节已隐藏)(?:[，,；;、]\s*\1)+',
+        r'\1',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:总)?仓位(?:上限)?\*{0,2}\s*[：:]\s*'
+        r'(?:维持当前|维持|约为|为|盘后)?\s*)'
+        r'(?:约)?\d+(?:\.\d+)?%',
+        r'\1账户比例已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(r'跌超\d+(?:\.\d+)?%', '跌幅达到风险阈值', cleaned)
+    cleaned = re.sub(
+        r'((?:持仓|持有)复核[^。\n]{0,160}?/)\d{2,4}(?:\.\d+)?(?=[。．）)])',
+        r'\1价格已脱敏',
+        cleaned,
+    )
 
     safe_lines = []
     for line in cleaned.splitlines():
@@ -713,7 +749,7 @@ def sanitize_public_review_text(text):
         )):
             continue
         line = re.sub(
-            r'^\s*(?:-\s*)?T\+1[：:].*$',
+            r'^\s*(?:-\s*)?(?:T\+1|可卖状态)[：:].*$',
             '- 可卖状态以账户事实为准。',
             line,
             flags=re.I,
@@ -785,7 +821,7 @@ def sanitize_public_review_cell(header, value):
         return '盘中'
     if header == '价格':
         return '已脱敏'
-    if header == '现价' and re.search(r'成交|买入|卖出|加仓|减仓|清仓', str(value)):
+    if header == '现价':
         return '已脱敏'
     if any(key in header for key in ('成本', '成交价', '买入价', '卖出价', '浮盈/股')):
         return '已脱敏'
@@ -857,7 +893,14 @@ def html_table(headers, rows, cell_fn=None):
     for row in rows:
         tbody += '<tr>'
         for h in headers:
-            v = sanitize_public_review_cell(h, row.get(h, ''))
+            position_row = any(
+                '持仓' in str(row.get(key, ''))
+                for key in ('窗口', '今日定位', '方向', '阶段', '角色')
+            )
+            if h == '收盘价' and position_row:
+                v = '已脱敏'
+            else:
+                v = sanitize_public_review_cell(h, row.get(h, ''))
             if cell_fn:
                 v = cell_fn(h, v)
             tbody += f'<td>{v}</td>'

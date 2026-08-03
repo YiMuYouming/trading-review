@@ -504,6 +504,13 @@ weekday: 周二
             "风险条件已记录（具体阈值已脱敏）",
         )
 
+    def test_public_review_text_collapses_duplicate_hidden_detail_labels(self):
+        text = convert_review.sanitize_public_review_text(
+            "盘中记录（票据交易记录，FIFO关闭交易流水已隐藏）"
+        )
+
+        self.assertEqual(text.count("成交细节已隐藏"), 1)
+
     def test_public_review_text_redacts_prose_execution_prices(self):
         text = convert_review.sanitize_public_review_text(
             "瑞芯微盘中以207.36清仓最后部分仓位；神火股份按23.88卖出；"
@@ -574,7 +581,7 @@ weekday: 周二
             self.assertNotIn(secret, text)
         self.assertIn("交易流水已隐藏", text)
         self.assertIn("总仓数量已脱敏", text)
-        self.assertIn("T+1状态已记录", text)
+        self.assertIn("可卖状态已记录", text)
         self.assertIn("买入价已脱敏→卖出价已脱敏", text)
 
     def test_public_review_text_redacts_t1_position_availability(self):
@@ -585,7 +592,7 @@ weekday: 周二
         self.assertNotIn("锁定至7月22日", text)
         self.assertNotIn("部分仓位T+1", text)
         self.assertNotIn("全部T+1", text)
-        self.assertEqual(text.count("T+1状态已记录"), 2)
+        self.assertEqual(text.count("可卖状态已记录"), 2)
 
     def test_public_review_text_redacts_bare_risk_prices(self):
         text = convert_review.sanitize_public_review_text(
@@ -653,6 +660,10 @@ weekday: 周二
             "已脱敏",
         )
         self.assertEqual(
+            convert_review.sanitize_public_review_cell("现价", "54.99"),
+            "已脱敏",
+        )
+        self.assertEqual(
             convert_review.sanitize_public_review_cell("盈亏", "-4374"),
             "金额已脱敏",
         )
@@ -660,6 +671,18 @@ weekday: 周二
             convert_review.sanitize_public_review_cell("盈亏", "+0.02%"),
             "+0.02%",
         )
+
+    def test_public_review_tables_redact_close_price_for_position_rows(self):
+        html = convert_review.html_table(
+            ["标的", "窗口", "收盘价"],
+            [
+                {"标的": "长鑫科技", "窗口": "持仓", "收盘价": "54.99"},
+                {"标的": "中岩大地", "窗口": "观察", "收盘价": "21.16"},
+            ],
+        )
+
+        self.assertNotIn("54.99", html)
+        self.assertIn("21.16", html)
 
     def test_public_review_text_redacts_local_audit_paths_and_hashes(self):
         text = convert_review.sanitize_public_review_text(
@@ -709,6 +732,24 @@ weekday: 周二
         self.assertIn("浮盈金额已脱敏/+4.40%", text)
         self.assertIn("锁盈金额已脱敏", text)
         self.assertIn("已实现金额已脱敏", text)
+
+    def test_public_review_text_redacts_inline_execution_terms_and_exposure_thresholds(self):
+        text = convert_review.sanitize_public_review_text(
+            "明日按T+1与算力扩散验证处理；最终门禁关闭；依据来自执行卡。"
+            "盯盘笔记盘中，票据交易记录，FIFO关闭交易流水已隐藏，绑定账户批次。"
+            "总仓位上限：维持当前20.57%附近；**仓位**：维持当前20.57%附近；"
+            "不因跌超10%机械补仓。Q5 持仓复核：长鑫+1.89%/成交299.9亿；网宿-1.50%/13.82。"
+        )
+
+        for secret in (
+            "T+1", "门禁", "执行卡", "票据交易记录", "FIFO", "账户批次",
+            "交易流水", "20.57%", "跌超10%", "13.82",
+        ):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertIn("可卖状态", text)
+        self.assertIn("执行条件", text)
+        self.assertIn("账户比例已脱敏", text)
+        self.assertIn("跌幅达到风险阈值", text)
 
     def test_public_review_text_redacts_bare_gate_state_and_plan_prices(self):
         text = convert_review.sanitize_public_review_text(
