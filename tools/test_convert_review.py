@@ -166,6 +166,39 @@ class ConvertReviewTest(unittest.TestCase):
         self.assertLess(lianban_heading, lianban_table)
         self.assertLess(lianban_table, guide_heading)
 
+    def test_convert_md_to_html_accepts_operation_guide_section_alias(self):
+        markdown = """---
+date: 2026-08-04
+weekday: 周二
+情绪值: 67
+上证指数: 3822.28
+上证涨幅: 0.33
+涨停家数: 138
+跌停家数: 0
+盘后持仓: 空仓
+---
+
+## 第〇部分：当日操作指引
+
+### 操作指南
+
+公开操作边界。
+"""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            original_review_notes = convert_review.REVIEW_NOTES
+            convert_review.REVIEW_NOTES = Path(tmp)
+            try:
+                source = Path(tmp) / "2026_8_4_Tuesday_ReviewNote.md"
+                source.write_text(markdown, encoding="utf-8")
+                _, output_path = convert_review.convert_md_to_html(source)
+                html = output_path.read_text(encoding="utf-8")
+            finally:
+                convert_review.REVIEW_NOTES = original_review_notes
+
+        self.assertIn("第〇部分 · 当日操作指引", html)
+        self.assertIn("公开操作边界", html)
+
     def test_parse_s4_supports_blockquote_round_marker(self):
         markdown = """> 洋米 Round 1 — 2026-06-10 16:00
 
@@ -461,6 +494,74 @@ weekday: 周二
                 self.assertIn("公开结论保留", html)
             finally:
                 convert_review.REVIEW_NOTES = original_review_notes
+
+    def test_public_review_text_redacts_internal_entrypoints_and_receipt_labels(self):
+        text = convert_review.sanitize_public_review_text(
+            "最终交易入口仍只认下一交易日 /api/ai/context.decision_gate.allowed；"
+            "机器回执见 canonical red receipt（schema=market_watch.red_team.v2）；"
+            "状态为 round_3_submitted，授权机械finalizer收口。"
+        )
+
+        for secret in (
+            "/api/",
+            "实时执行条件.allowed",
+            "red receipt",
+            "market_watch.red_team.v2",
+            "round_3_submitted",
+            "finalizer",
+        ):
+            self.assertNotIn(secret.lower(), text.lower())
+
+    def test_public_review_text_redacts_position_prices_in_market_node_notes(self):
+        text = convert_review.sanitize_public_review_text(
+            "自选池：持仓网宿+6.58%（高点14.99回落）；长鑫+0.02%（55.00翻红，振幅53.02-56.16）；"
+            "盘中新开仓中超控股+1.41%（5.76，部分仓位）。"
+        )
+
+        for secret in ("14.99", "55.00", "53.02", "56.16", "5.76"):
+            self.assertNotIn(secret, text)
+        self.assertIn("+6.58%", text)
+        self.assertIn("+0.02%", text)
+
+    def test_public_review_text_preserves_observation_counts(self):
+        text = convert_review.sanitize_public_review_text("只观察3只；观察22.48继续验证。")
+
+        self.assertIn("只观察3只", text)
+        self.assertNotIn("22.48", text)
+
+    def test_public_review_tables_redact_generic_position_fact_cells(self):
+        html = convert_review.html_table(
+            ["标的", "当前事实", "观察问题", "今日结论"],
+            [
+                {
+                    "标的": "长鑫科技",
+                    "当前事实": "部分仓位，成本已脱敏，收盘55.00，浮盈+1.29%",
+                    "观察问题": "板块锚点能否继续承接，MA5约53.96",
+                    "今日结论": "续持风险复核，不因锚点强势机械加仓",
+                }
+            ],
+        )
+
+        for secret in ("55.00", "53.96"):
+            self.assertNotIn(secret, html)
+        self.assertIn("已脱敏", html)
+
+    def test_public_review_tables_redact_dated_holding_headers_and_evidence(self):
+        html = convert_review.html_table(
+            ["标的", "数量", "8/5理论可卖", "成本", "8/4收盘", "证据"],
+            [{
+                "标的": "长鑫科技",
+                "数量": "1900",
+                "8/5理论可卖": "1900",
+                "成本": "54.30",
+                "8/4收盘": "55.00",
+                "证据": "55.00 > MA5 53.96，浮盈+1.29%",
+            }],
+        )
+
+        for secret in ("1900", "54.30", "55.00", "53.96"):
+            self.assertNotIn(secret, html)
+        self.assertIn("+1.29%", html)
 
     def test_public_review_cells_redact_bare_position_quantities(self):
         self.assertEqual(

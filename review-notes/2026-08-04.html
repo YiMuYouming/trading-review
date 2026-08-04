@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-08-04 周二 复盘笔记</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F7F5F3;--bg2:#FFFFFF;--bg3:#FAFAF9;--bg4:#F5F2EE;--border:#E5E2DE;--text:#2D2926;--text2:#5C5652;--text3:#8A8480;--accent:#D97706;--accent-hover:#B45309;--red:#DC2626;--green:#059669;--blue:#2563EB;--purple:#7C3AED;--amber:#D97706}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{font:16px/1.7 system-ui,-apple-system,'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(247,245,243,.88);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;backdrop-filter:blur(12px)}
+.topbar .title{font-size:18px;font-weight:700;color:var(--accent);white-space:nowrap}
+.topbar .back{font-size:13px;color:var(--text2);padding:3px 10px;border-radius:6px;border:1px solid var(--border);white-space:nowrap;text-decoration:none;transition:all .12s}
+.topbar .back:hover{color:var(--accent);border-color:var(--accent);background:var(--bg4)}
+.topbar .meta{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.chip{padding:3px 11px;border-radius:12px;font-size:13px;font-weight:600;background:var(--bg3);border:1px solid var(--border);white-space:nowrap;color:var(--text2)}
+.chip.red{border-color:var(--red);color:var(--red)}
+.chip.green{border-color:var(--green);color:var(--green)}
+.chip.amber{border-color:var(--amber);color:var(--amber);background:rgba(217,119,6,.08)}
+.chip.blue{border-color:var(--blue);color:var(--blue)}
+.chip.purple{border-color:var(--purple);color:var(--purple)}
+@media(max-width:768px){.topbar .meta{width:100%;margin-left:0}.topbar .chip{white-space:normal;overflow-wrap:anywhere}}
+.layout{display:flex}
+.sidebar{width:210px;flex-shrink:0;position:sticky;top:62px;align-self:flex-start;max-height:calc(100vh - 62px);overflow-y:auto;padding:16px 0 16px 14px;border-right:1px solid var(--border);font-size:14px}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar .label{font-size:11px;text-transform:uppercase;color:var(--text3);padding:8px 10px 4px;letter-spacing:1px;font-weight:600}
+.sidebar a{display:block;padding:5px 10px;color:var(--text2);text-decoration:none;font-size:13px;border-radius:4px;margin-bottom:2px;border-left:2px solid transparent;transition:all .12s}
+.sidebar a:hover{background:var(--bg4);color:var(--text)}
+.sidebar a.s2{padding-left:24px;font-size:12px}
+.sidebar a.active{color:var(--accent);background:var(--bg4);border-left-color:var(--accent)}
+.content{flex:1;padding:24px 32px;max-width:1100px;min-width:0}
+@media(max-width:768px){.sidebar{display:none}.content{padding:16px}}
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden}
+.sh{display:flex;align-items:center;gap:10px;padding:12px 18px;font-size:16px;font-weight:700;cursor:pointer;user-select:none;border-bottom:1px solid var(--border);background:var(--bg4)}
+.sh:hover{background:var(--border)}
+.sh .tog{color:var(--text3);font-size:11px;transition:transform .15s;flex-shrink:0}
+.sh.collapsed .tog{transform:rotate(-90deg)}
+.sh .cnt{font-size:12px;font-weight:400;color:var(--text3);margin-left:auto}
+.sb{padding:0 18px 16px}
+.sb.hide{display:none}
+.si{color:var(--text2);font-size:14px;margin-bottom:12px;line-height:1.6;padding:10px 0 0}
+.tw{overflow-x:auto;margin-bottom:14px}
+.tw table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.tw thead th{position:sticky;top:0;background:var(--bg4);padding:8px 10px;text-align:left;font-weight:600;color:var(--text2);border-bottom:2px solid var(--border);font-size:12px;white-space:nowrap}
+.tw tbody td{padding:7px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tw tbody tr:hover{background:var(--bg4)}
+.tw tbody tr:nth-child(even){background:rgba(0,0,0,.015)}
+.up{color:var(--red);font-weight:600}
+.down{color:var(--green);font-weight:600}
+.dim{color:var(--text3)}
+.badge{display:inline-block;padding:2px 8px;border-radius:9px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge-red{background:rgba(220,38,38,.1);color:var(--red)}
+.badge-green{background:rgba(5,150,105,.1);color:var(--green)}
+.badge-yellow{background:rgba(217,119,6,.1);color:var(--amber)}
+.badge-blue{background:rgba(37,99,235,.08);color:var(--blue)}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:14px}
+.sc{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px}
+.sbx{padding:12px 16px;background:var(--bg4);border-left:4px solid var(--blue);border-radius:0 8px 8px 0;margin-bottom:14px;font-size:14px;line-height:1.6}
+.sbx.warn{border-left-color:var(--amber)}
+.sbx.red{border-left-color:var(--red)}
+.sbx.green{border-left-color:var(--green)}
+.sh2{font-size:17px;font-weight:700;margin:20px 0 10px;color:var(--text);padding-top:4px}
+.sh3{font-size:15px;font-weight:600;margin:14px 0 8px;color:var(--text);padding-top:2px}
+.para{font-size:14px;line-height:1.7;margin-bottom:8px;color:var(--text)}
+.tight-list{font-size:14px;line-height:1.6;margin-bottom:8px;padding-left:20px}
+.tight-list li{margin-bottom:3px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-align:center}
+.stat-card .val{font-size:22px;font-weight:700}
+.stat-card .lbl{font-size:11px;color:var(--text3);margin-top:2px}
+.stat-card .val.red{color:var(--red)}.stat-card .val.green{color:var(--green)}.stat-card .val.amber{color:var(--amber)}
+.node-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:14px}
+.node-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px}
+.node-card .nhead{font-weight:700;font-size:14px;margin-bottom:6px}
+.node-card .nbody{font-size:13px;color:var(--text2);line-height:1.6}
+.node-timeline{position:relative;display:grid;gap:14px;margin:12px 0 18px;padding-left:18px}
+.node-timeline::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,rgba(217,119,6,.55),rgba(217,119,6,.12))}
+.node-note-card{position:relative;background:linear-gradient(180deg,#fff,#FBF8F3);border:1px solid rgba(229,226,222,.95);border-radius:12px;padding:14px 16px;min-width:0;box-shadow:0 10px 26px rgba(45,41,38,.045)}
+.node-note-card::before{content:"";position:absolute;left:-19px;top:20px;width:10px;height:10px;border-radius:999px;background:#D97706;box-shadow:0 0 0 4px #F7F5F3,0 0 0 6px rgba(217,119,6,.18)}
+.node-phase{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:16px;font-weight:900;color:var(--text);margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid rgba(229,226,222,.8)}
+.node-phase span{font-family:'Noto Serif SC',serif}
+.node-phase em{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--accent);background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.18);border-radius:999px;padding:4px 8px;white-space:nowrap}
+.node-detail{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;padding:9px 0;border-top:1px solid rgba(229,226,222,.64)}
+.node-detail:first-of-type{border-top:0}
+.node-label{font-size:12px;font-weight:900;color:var(--accent);line-height:1.5}
+.node-copy{font-size:13px;color:var(--text2);line-height:1.7;word-break:break-word}
+.node-copy strong{color:var(--text)}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:12px 0 18px}
+.lesson-card{position:relative;background:linear-gradient(180deg,#fff,#FCFAF7);border:1px solid rgba(229,226,222,.96);border-radius:12px;padding:15px 15px 14px;box-shadow:0 12px 28px rgba(45,41,38,.045);overflow:hidden}
+.lesson-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}
+.lesson-card.warning::before{background:var(--red)}
+.lesson-card.topic::before{background:var(--purple)}
+.lesson-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.lesson-tag{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:900}
+.lesson-card.cognition .lesson-tag{background:rgba(37,99,235,.08);color:var(--blue)}
+.lesson-card.warning .lesson-tag{background:rgba(220,38,38,.08);color:var(--red)}
+.lesson-card.topic .lesson-tag{background:rgba(124,58,237,.08);color:var(--purple)}
+.lesson-type{font-size:11px;font-weight:900;color:var(--text3);letter-spacing:.08em;white-space:nowrap}
+.lesson-principle{font-family:'Noto Serif SC',serif;font-size:17px;line-height:1.45;font-weight:800;color:var(--text);margin-bottom:11px;word-break:break-word}
+.lesson-label{font-size:11px;font-weight:900;color:var(--accent);letter-spacing:.08em;margin-bottom:5px}
+.lesson-evidence{background:rgba(245,242,238,.72);border:1px solid rgba(229,226,222,.82);border-radius:9px;padding:10px 11px;font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:10px}
+.lesson-evidence .para{font-size:13px;margin-bottom:0;color:var(--text2)}
+.lesson-action{position:relative;background:rgba(217,119,6,.07);border:1px solid rgba(217,119,6,.18);border-radius:9px;padding:9px 11px 9px 32px;font-size:13px;line-height:1.6;color:var(--text)}
+.lesson-action::before{content:"→";position:absolute;left:12px;top:9px;color:var(--accent);font-weight:900}
+@media(max-width:520px){.lesson-grid{grid-template-columns:1fr}.lesson-head{align-items:flex-start}.lesson-type{white-space:normal;text-align:right}.lesson-principle{font-size:16px}}
+.warn-box{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.6}
+.warn-box .wtitle{font-weight:700;color:var(--red);margin-bottom:4px}
+[id]{scroll-margin-top:70px}
+.verdict{background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:14px;margin:12px 0}
+.verdict .vt{font-weight:700;color:var(--green);margin-bottom:4px;font-size:15px}
+.verdict .vb{font-size:14px;color:var(--text2);line-height:1.7}
+.debate-row{display:flex;gap:12px;margin-bottom:10px;font-size:13px;line-height:1.5}
+.debate-row .dr-label{min-width:100px;font-weight:600;color:var(--text2);text-align:right;padding-top:2px}
+.debate-row .dr-body{flex:1;padding:8px 12px;background:var(--bg3);border-radius:6px}
+.debate-row .dr-body.accept{background:rgba(5,150,105,.06);border-left:3px solid var(--green)}
+.debate-row .dr-body.partial{background:rgba(217,119,6,.04);border-left:3px solid var(--amber)}
+.emotion-board{display:grid;gap:14px;margin:10px 0 16px}
+.emotion-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.emotion-kpi{background:linear-gradient(180deg,#fff,var(--bg3));border:1px solid var(--border);border-radius:10px;padding:11px 12px;min-height:76px}
+.emotion-kpi .klabel{font-size:12px;color:var(--text3);margin-bottom:4px}
+.emotion-kpi .kval{font-size:20px;line-height:1.15;font-weight:800;color:var(--text);word-break:break-word}
+.emotion-kpi.good .kval{color:var(--red)}.emotion-kpi.warn .kval{color:var(--amber)}.emotion-kpi.bad .kval{color:var(--green)}
+.emotion-stage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.emotion-stage{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px}
+.emotion-stage .stage-title{font-size:14px;font-weight:800;color:var(--accent);margin-bottom:8px}
+.emotion-row{display:grid;grid-template-columns:82px minmax(0,1fr);gap:8px;border-top:1px solid rgba(229,226,222,.75);padding:7px 0;font-size:12px}
+.emotion-row:first-of-type{border-top:0}
+.emotion-row .rlabel{color:var(--text3);white-space:normal;line-height:1.35;min-width:0}
+.emotion-row .rval{color:var(--text2);line-height:1.45;word-break:break-word}
+.emotion-row.major{display:block;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 10px;margin-top:8px}
+.emotion-row.major .rlabel{display:block;margin-bottom:3px;font-weight:700;color:var(--text)}
+.emotion-thresholds{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.24);border-radius:10px;padding:12px}
+.emotion-thresholds .threshold-title{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:8px}
+.emotion-thresholds .threshold-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+.emotion-thresholds .threshold-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 9px;font-size:12px;line-height:1.45}
+.emotion-thresholds .threshold-item strong{color:var(--text);margin-right:6px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a id="back-home" class="back" href="../index.html#reviews">← 返回首页</a>
+  <div class="title">2026-08-04 周二 复盘笔记</div>
+  <div class="meta">
+    <span class="chip green">情绪 67.0%</span>
+    <span class="chip red">上证 3822.28 +0.33%</span>
+    <span class="chip blue">138涨停 / 0跌停</span>
+    <span class="chip purple">持仓 持仓状态已记录</span>
+    <span class="chip green">终稿 (红蓝对抗完成)</span>
+  </div>
+</div>
+
+<div class="layout">
+<div class="sidebar" id="sidebar">
+  <div class="label">导航</div>
+  <a href="#s0">第〇部分 当日操作指引</a>
+  <a href="#s1">§一 当日复盘</a>
+  <a href="#s1a" class="s2">大盘全景</a>
+  <a href="#s1b" class="s2">情绪高标</a>
+  <a href="#s1c" class="s2">节点说明</a>
+  <a href="#s1d" class="s2">涨停结构</a>
+  <a href="#s1e" class="s2">自选池表现</a>
+  <a href="#s1f" class="s2">持仓与交易</a>
+  <a href="#s1g" class="s2">风格检测</a>
+  <a href="#s1h" class="s2">趋势持仓复盘</a>
+  <a href="#s1i" class="s2">窗口操作</a>
+  <a href="#s1j" class="s2">结论</a>
+  <a href="#s2">§二 心得与教训</a>
+  <a href="#s3">§三 次日预案</a>
+  <a href="#s3a" class="s2">连板自选池</a>
+  <a href="#s3b" class="s2">趋势自选池</a>
+  <a href="#s4">§四 红方对抗</a>
+  <a href="#s4a" class="s2">Round 1 红方</a>
+  <a href="#s4b" class="s2">Round 2 蓝方</a>
+  <a href="#s4c" class="s2">Round 3 终审</a>
+  <a href="#sa">附录A 盘前速查</a>
+  <a href="#sd">数据附录</a>
+</div>
+
+<div class="content">
+
+<div class="section" id="s0">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> 第〇部分 · 当日操作指引<span class="cnt">公开操作边界</span>
+</div>
+<div class="sb"><div class="si">
+收盘后 D3 速读层。候选证据层 `数据降级，仅观察`已按 仅观察 签收；以下只定义 8/5 持仓验证、板块观察和失效条件，不构成新增买入或加仓授权。<br>
+</div>
+<div class="sh2">主标的与锚点组</div>
+<div class="tw"><table><thead><tr><th>主标的/组</th><th>当前状态</th><th>锚点组</th><th>触发条件</th><th>失效/动作边界</th></tr></thead><tbody><tr><td>长鑫科技 688825</td><td>持仓部分仓位，成本已脱敏，收盘价格已脱敏；板块爆发日相对弱</td><td>兆易创新、长电科技、通富微电</td><td>风险条件已记录（具体阈值已脱敏）</td><td>风险条件已记录（具体阈值已脱敏）</td></tr><tr><td>网宿科技 300017</td><td>持仓部分仓位，成本已脱敏，收盘价格已脱敏</td><td>美利云、天娱数科、数据港</td><td>风险条件已记录（具体阈值已脱敏）</td><td>风险条件已记录（具体阈值已脱敏）</td></tr><tr><td>中超控股 002471</td><td>持仓部分仓位，成本已脱敏，收盘价格已脱敏；三锚共振下相对滞涨</td><td>顺钠股份、中国西电、中国核建</td><td>风险条件已记录（具体阈值已脱敏）</td><td>风险条件已记录（具体阈值已脱敏）</td></tr><tr><td>CPO/光模块观察组</td><td>明日待选观察，无持仓</td><td>中际旭创、新易盛、天孚通信</td><td>三只保持容量、强度与宽度承接，次日不出现集体放量滞涨</td><td>只观察3只；不追第二日放量冲高，不生成开仓预案</td></tr><tr><td>AI应用观察组</td><td>明日独立观察，无持仓</td><td>利欧股份、蓝色光标、每日互动</td><td>至少两只延续宽度且不出现集体高开低走</td><td>与网宿解绑；不生成开仓预案</td></tr><tr><td>机器人观察组</td><td>明日待选观察，无持仓</td><td>中大力德为主，绿的谐波为正向锚，双环传动为弱势反证锚</td><td>中大保持强承接、绿的延续，双环不继续拖累</td><td>只观察3只；高开低走或宽度不跟则降为`不参与`</td></tr></tbody></table></div>
+<div class="sh2">持仓处理</div>
+<div class="tw"><table><thead><tr><th>标的</th><th>数量/收盘可卖</th><th>成本</th><th>8/4收盘</th><th>次日策略</th></tr></thead><tbody><tr><td>长鑫科技 688825</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>守MA5且锚点承接时稳着不动；共弱才降风险</td></tr><tr><td>网宿科技 300017</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>守MA5且美利云、天娱数科、数据港至少两只承接时稳着不动；不再加仓</td></tr><tr><td>中超控股 002471</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>守MA5、修复相对强度且电网/核电三锚承接时稳着不动；不以航天标签扩池</td></tr></tbody></table></div>
+<div class="sh2">连板板块→操作映射</div>
+<div class="tw"><table><thead><tr><th>板块</th><th>温度/观察标</th><th>操作标的</th><th>触发条件</th></tr></thead><tbody><tr><td>电网高度</td><td>顺钠股份</td><td>中超控股（仅持仓处理）</td><td>顺钠保持高度、中超承接时支持续持；顺钠断板负反馈则降级</td></tr></tbody></table></div>
+<div class="sh2">趋势板块→操作映射</div>
+<div class="tw"><table><thead><tr><th>板块</th><th>观察标的</th><th>操作标的</th><th>触发/失效</th></tr></thead><tbody><tr><td>半导体/存储</td><td>兆易创新、长电科技、通富微电</td><td>长鑫科技（仅持仓处理）</td><td>长鑫守MA5且至少两锚承接；共弱则风险复核</td></tr><tr><td>算力</td><td>美利云、天娱数科、数据港</td><td>网宿科技（仅持仓处理）</td><td>网宿守MA5且算力同链三锚至少两强；共弱则风险复核</td></tr><tr><td>CPO/光模块</td><td>中际旭创、新易盛、天孚通信</td><td>无</td><td>只看容量、强度与次日承接；不追第二日放量冲高</td></tr><tr><td>AI应用</td><td>利欧股份、蓝色光标、每日互动</td><td>无</td><td>独立观察宽度，不映射网宿、不生成开仓预案</td></tr><tr><td>电网/核电</td><td>顺钠股份、中国西电、中国核建</td><td>中超控股（仅持仓处理）</td><td>高度、容量、核电宽度承接；三锚共弱则风险复核</td></tr><tr><td>机器人</td><td>中大力德、绿的谐波、双环传动</td><td>无</td><td>中大为主、绿的作正向锚、双环作弱势反证；不生成开仓预案</td></tr></tbody></table></div>
+<div class="sh2">操作指南</div>
+<div class="para">- <strong>总基调</strong>：收盘仓位账户比例已脱敏，三只持仓；明日先看今日放量爆发后的缩量承接，本预案不新增仓位授权。</div>
+<div class="para">- <strong>稳着不动</strong>：持仓自身守MA5附近、板块锚点至少两只同步承接、没有放量滞涨或高开低走反证时，继续持有观察。</div>
+<div class="para">- <strong>硬执行条件</strong>：8/5任何动作必须重读 <code>内部执行入口已隐藏</code>、实际可卖量与板块资金；健康端点不能替代最终执行条件。</div>
+<div class="para">- <strong>禁止事项</strong>：不追非首日放量冲高；不把参考锚上涨自动映射为买点；机器人只观察3只；不机械补仓。</div>
+<div class="para">- <strong>数据边界</strong>：候选证据层四类 source gap 和五节点口径差已保留；降级签收、洋米红方与弈沐 resolution 前不进入终稿。</div></div>
+</div>
+<div class="section" id="s1">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> §一 · 当日复盘
+</div>
+<div class="sb"><div class="sh3" id="s1a">📊 表1：大盘全景</div><div class="tw"><table><thead><tr><th>节点</th><th>情绪</th><th>上证(%)</th><th>涨/跌停</th><th>量能</th><th>涨跌比</th><th>总竞价涨幅</th><th>关键异动</th></tr></thead><tbody><tr><td>竞价</td><td>—🔵（竞价不可用）</td><td><span class="up">+0.19%(3817.06)</span></td><td>7/1⚠️竞价快照</td><td>—</td><td>—</td><td>—</td><td>⚠️指数集体高开；美利云3板；中国核建+8.44%；长鑫低开封测止弱</td></tr><tr><td>早盘</td><td>~66%🟠（涨3367/跌1701，东财沪深）</td><td><span class="down">-0.21%(3801.76)</span></td><td>42/0</td><td>~9000亿</td><td>3367/1701</td><td>—</td><td>创业板大涨3%+；医药/算力批量涨停；传智教育7板；网宿加仓后走强</td></tr><tr><td>午盘</td><td>~70%🟠（涨3560/跌1545，东财沪深）</td><td><span class="up">+0.16%(3815.59)</span></td><td>84/0（东财涨停池）</td><td>~13600亿</td><td>3560/1545</td><td>—</td><td>创业板+4.83%大涨；涨停翻倍84家；网宿+7.16%；封测通富+6.31/长电+5.20</td></tr><tr><td>尾盘</td><td>~65%🟠（涨3333/跌1782，东财沪深）</td><td><span class="up">+0.41%(3825.37)</span></td><td>131/0（东财涨停池）</td><td>~19400亿</td><td>3333/1782</td><td>—</td><td>创业板+5.72%高位；涨停131家；通富+8.06/长电+7.36；天娱数科3板；13:23开仓中超控股</td></tr><tr><td>收盘</td><td>~67%🟠（涨3443/跌1688，东财沪深）</td><td><span class="up">+0.33%(3822.28)</span></td><td>138/0（东财涨停池）</td><td>~22100亿</td><td>3443/1688</td><td>—</td><td>创业板+5.64%强势收官；半导体全链爆发；涨停138家；传智教育7板；通富+8.30/长电+7.23</td></tr></tbody></table></div><div class="sh3" id="s1b">📈 表2：情绪高标</div><div class="emotion-board"><div class="emotion-summary-grid"><div class="emotion-kpi "><div class="klabel">赚钱效应</div><div class="kval">—</div></div><div class="emotion-kpi "><div class="klabel">涨停收益</div><div class="kval">4.77（非ST）</div></div><div class="emotion-kpi "><div class="klabel">连板收益</div><div class="kval">—</div></div><div class="emotion-kpi "><div class="klabel">封板率</div><div class="kval">—</div></div><div class="emotion-kpi "><div class="klabel">炸板率</div><div class="kval">—</div></div><div class="emotion-kpi "><div class="klabel">一进二</div><div class="kval">—</div></div><div class="emotion-kpi "><div class="klabel">三进四</div><div class="kval">—</div></div><div class="emotion-kpi "><div class="klabel">结论</div><div class="kval">—</div></div></div><div class="emotion-stage-grid"><div class="emotion-stage"><div class="stage-title">竞价</div><div class="emotion-row"><span class="rlabel">记录</span><span class="rval">—</span></div></div><div class="emotion-stage"><div class="stage-title">早盘</div><div class="emotion-row"><span class="rlabel">情绪值/区间</span><span class="rval">~66%🟠（涨3367/跌1701）</span></div><div class="emotion-row"><span class="rlabel">最高板/梯队</span><span class="rval">7(1)-3(5)-2(8)</span></div></div><div class="emotion-stage"><div class="stage-title">午盘</div><div class="emotion-row"><span class="rlabel">情绪值/区间</span><span class="rval">~70%🟠（涨3560/跌1545）</span></div><div class="emotion-row"><span class="rlabel">最高板/梯队</span><span class="rval">7(1)-3(5)-2(9)</span></div></div><div class="emotion-stage"><div class="stage-title">尾盘</div><div class="emotion-row"><span class="rlabel">情绪值/区间</span><span class="rval">~65%🟠（涨3333/跌1782）</span></div><div class="emotion-row"><span class="rlabel">最高板/梯队</span><span class="rval">7(1)-5(1)-3(6)-2(10)</span></div></div><div class="emotion-stage"><div class="stage-title">收盘</div><div class="emotion-row"><span class="rlabel">涨停收益</span><span class="rval">4.77（非ST）</span></div><div class="emotion-row"><span class="rlabel">整体晋级率</span><span class="rval">25.33⚠️手工</span></div><div class="emotion-row"><span class="rlabel">二进三晋级率</span><span class="rval">61.54⚠️手工</span></div><div class="emotion-row"><span class="rlabel">情绪值/区间</span><span class="rval">~67%🟠（涨3443/跌1688）</span></div><div class="emotion-row"><span class="rlabel">最高板/梯队</span><span class="rval">7(1)-4(1)-3(6)-2(11)-首119</span></div></div><div class="emotion-stage"><div class="stage-title">状态</div><div class="emotion-row"><span class="rlabel">涨停收益</span><span class="rval">&gt;2%低迷 / &gt;3%正常</span></div><div class="emotion-row"><span class="rlabel">整体晋级率</span><span class="rval">辅助参考（非硬卡）</span></div><div class="emotion-row"><span class="rlabel">二进三晋级率</span><span class="rval">&gt;25%开放2进3策略</span></div><div class="emotion-row"><span class="rlabel">情绪值/区间</span><span class="rval">&lt;35%关闭W1 / &gt;80%只卖不买</span></div><div class="emotion-row"><span class="rlabel">最高板/梯队</span><span class="rval">观察高度与梯队完整性</span></div></div></div></div><div class="sh3" id="s1c">🔍 节点说明</div><div class="si"><div class="para">- 竞价、早盘、午盘、尾盘、收盘均待通过对应历史/实时事实源回读后填写；不使用当前夜间 stale 值污染节点。</div>
+<div class="para"><strong>竞价</strong>：稳米已填该节点事实，详见下列说明。</div>
+<div class="para">- 说明：情绪<strong>—🔵</strong>（竞价阶段不可用）。三大指数竞价集体高开：上证+0.19%(3817.06)、深成+0.92%(13571.78)、创业板+1.59%(3355.18)，较8/3集体低开明显修复；竞价涨停7/跌停1（问财快照）、竞价强势家数17（竞价涨幅>7%非ST）；连板梯队5(1)-3(2)-2(2)：高争民爆5板、德龙汇能/恒银科技3板。自选池：持仓网宿+5.35%竞价强势红盘（算力锚云赛+3.51/数据港+1.89红盘共振）；长鑫-1.80%竞价低开（封测锚长电+0.95/通富+0.97/华天+0.47竞价止弱翻红，兆易+0.10平开）；连板标美利云+10.00%竞价涨停3板（数据中心/算力延续）、天娱数科+3.35%；核电观察组中国核建+8.44%强势、融发核电+2.54%、中国核电-0.11%平开、中国西电+1.87%，中岩大地-3.50%高开低走⚠️。</div>
+<div class="para">- 结论：以已记录节点事实为准，不另行补写盘感。</div>
+<div class="para"><strong>早盘</strong>：稳米已填该节点事实，详见下列说明。</div>
+<div class="para">- 说明：情绪<strong>~66%🟠</strong>（涨3367/跌1701，东财沪深，盘中快照）。上证-0.21%(3801.76)竞价冲高3818后回落翻绿、深成+1.69%、创业板+3.04%大涨——沪弱深强、科技成长强。涨停42/跌停0（问财），较竞价7家大幅扩散；最高板传智教育7板（教育）、次高板3板5只（德龙汇能/恒银科技/新能股份/豪尔赛等），连板14只；主线：医药生物批量涨停（药明康德/凯莱英/贝瑞基因等11只）+数据中心/算力（美利云3板/佳力图/青云科技/华胜天成）+教育（传智7板）。竞价5板的高争民爆早盘开板回落⚠️。自选池：持仓网宿+6.30%（价格已脱敏，盘中加仓部分仓位@成交价已隐藏后浮盈）🔥算力锚云赛+4.25/数据港+2.91红盘共振；长鑫-1.49%（低点关键位回升）封测锚长电+3.44/通富+3.29/华天+2.17全线上涨止弱确认、兆易+1.64%；美利云+10.00%涨停3板；核电观察组中国核建+3.45%（竞价+8.44%回落）、融发核电+2.22%、中国西电+2.01%、中国核电-1.11%转跌、中岩大地-1.70%仍弱。</div>
+<div class="para">- 结论：以已记录节点事实为准，不另行补写盘感。</div>
+<div class="para"><strong>午盘</strong>：稳米已填该节点事实，详见下列说明。</div>
+<div class="para">- 说明：情绪<strong>~70%🟠</strong>（涨3560/跌1545，东财沪深，盘中快照）。上证+0.16%(3815.59)早盘翻绿后午盘翻红、深成+2.74%、创业板+4.83%大涨加速——沪弱深强极致、科技成长全面爆发。涨停84/跌停0（东财涨停池，全非ST；早盘42家翻倍扩散）。最高板传智教育7板、次高板3板5只、连板15只。主线：医药+数据中心/算力+教育延续，<strong>封测/存储午后加速</strong>（通富+6.31/长电+5.20/华天+3.86、兆易+3.16）。自选池：持仓网宿+7.16%（价格已脱敏，加仓后持续走强浮盈）🔥算力锚云赛+4.65/数据港+3.58共振；长鑫-0.53%（54.70，低点关键位大幅回升转近平）封测锚全线大涨止弱确认；美利云+10.00%涨停3板封死；核电观察组中国核建+3.53%、中国西电+3.24%、融发核电+1.43%回落、中国核电-1.22%弱、中岩大地-2.13%仍弱。</div>
+<div class="para">- 结论：以已记录节点事实为准，不另行补写盘感。</div>
+<div class="para"><strong>尾盘</strong>：稳米已填该节点事实，详见下列说明。</div>
+<div class="para">- 说明：情绪<strong>~65%🟠</strong>（涨3333/跌1782，东财沪深，盘中快照）。上证+0.41%(3825.37)、深成+3.30%、创业板+5.72%（盘中高点价格已脱敏略回）——沪弱深强延续、创业板大涨近6%。涨停131/跌停0（东财涨停池，全非ST；午盘84家继续扩散）。最高板传智教育7板、次高板高争民爆5板（竞价开板后尾盘回封）、梯队7(1)-5(1)-3(6)-2(10)连板18只。主线：半导体封测/存储午后加速爆发（通富+8.06/长电+7.36/华天+5.28、兆易+4.57）+数据中心/算力（美利云3板封死/天娱数科3板涨停）+医药。自选池：持仓网宿+6.80%（价格已脱敏，高点价格已脱敏回落）🔥算力锚云赛+4.65/数据港+3.35；长鑫+0.02%（价格已脱敏翻红，低点关键位-高点价格已脱敏振幅巨大）封测锚全线大涨；天娱数科+10.06%涨停3板；核电观察组中国核建+5.17%、融发核电+3.17%、中国西电+2.73%、中国核电-1.22%弱、中岩大地-1.32%仍弱。<strong>盘中新开仓中超控股+1.41%（价格已脱敏，部分仓位@成交价已隐藏微亏）</strong>。</div>
+<div class="para">- 结论：以已记录节点事实为准，不另行补写盘感。</div>
+<div class="para"><strong>收盘</strong>：稳米已填该节点事实，详见下列说明。</div>
+<div class="para">- 说明：情绪<strong>~67%🟠</strong>（涨3443/跌1688，东财沪深）。上证+0.33%(3822.28)、深成+3.25%、创业板+5.64%（高点价格已脱敏）——沪弱深强、创业板大涨5.6%强势收官，两市成交约2.2万亿放量。涨停138/跌停0（东财涨停池，全非ST，与问财一致；尾盘131→收盘价格已脱敏），最高板传智教育7板、次高板神雾节能4板（高争民爆尾盘5板收盘开板⚠️）、梯队7(1)-4(1)-3(6)-2(11)-首119连板19只。主线：<strong>半导体全产业链爆发</strong>（印制电路板+7.56/元件+7.13/集成电路封测+6.96/半导体+6.0，主力净流入 PCB+137亿/元件+147亿/半导体+110亿）+通信设备（+7.44，主力+178亿）+数据中心/算力（美利云3板/天娱数科3板）+医药（医疗研发外包+8.06，药明/凯莱英涨停）+教育（传智7板）。自选池：持仓网宿+6.58%（价格已脱敏）🔥算力锚云赛+5.10/数据港+3.31；长鑫+0.02%（价格已脱敏收平，振幅关键区间巨大）封测锚大涨（通富+8.30🔥/长电+7.23🔥/华天+5.15、兆易+4.48）；美利云+10.00%涨停3板、天娱数科+10.06%涨停3板；中超控股+1.76%（价格已脱敏收盘浮盈+0.17%）；核电观察组中国核建+4.39%、融发核电+2.06%、中国西电+3.31%、中国核电-1.11%、中岩大地-1.18%。</div>
+<div class="para">- 结论：以已记录节点事实为准，不另行补写盘感。</div></div><div class="sh3" id="s1e">🎯 当日自选池表现</div><div class="sh3" id="s1f">💰 持仓与交易</div><div class="sh3" id="s1g">📐 风格检测</div><div class="tw"><table><thead><tr><th>维度</th><th>分数</th><th>明细</th></tr></thead><tbody><tr><td>量能</td><td>27/30</td><td>市场量能 22136亿；放量向上；波动率 33.18</td></tr><tr><td>连板生态</td><td>40/40</td><td>最高板 7；昨日涨停收益 4.77；昨日涨停家数 3 日均值 104；二进三近3日均值 41.68</td></tr><tr><td>趋势赚钱效应</td><td>14/30</td><td>上证20日线向下；趋势走强板块 13；大市值赚钱比例 24</td></tr><tr><td>总分</td><td>81/100</td><td>piecewise_linear_v1；连板 100%，趋势 0%；风格为连板主导</td></tr></tbody></table></div><div class="sh3" id="s1h">📈 趋势持仓复盘</div><div class="tw"><table><thead><tr><th>标的</th><th>当前事实</th><th>观察问题</th><th>今日结论</th></tr></thead><tbody><tr><td>长鑫科技</td><td>部分仓位，成本已脱敏，收盘价格已脱敏，浮盈+1.29%</td><td>兆易、长电、通富能否延续今日修复</td><td>续持风险复核；不因锚点强势机械加仓</td></tr><tr><td>网宿科技</td><td>部分仓位，成本已脱敏，收盘价格已脱敏，浮盈+3.30%</td><td>自身承接能否与美利云、天娱数科、数据港算力同链共振</td><td>续持风险复核；今日加仓部分仓位次日才可卖</td></tr><tr><td>中超控股</td><td>部分仓位，成本已脱敏，收盘价格已脱敏，浮盈+0.17%</td><td>顺钠高度、中国西电容量、中国核建核电宽度是否共振</td><td>电网/核电持仓观察；今日买入次日才可卖</td></tr></tbody></table></div><div class="sh3">🎭 预期差与盘感</div><div class="si"><div class="para">- 今日是放量普涨但结构高度分化：创业板+5.64%、半导体/通信爆发，上证仅+0.33%。两笔新增成交均为弈沐券商已成交后的事实补录，不倒写为系统事前授权。</div>
+<div class="para">- 中超的短线逻辑不是单票标签叠加，而是次日必须由顺钠高度、中国西电容量和中国核建核电宽度共同验证；三锚共弱时，电网/核电预期即失效。</div></div><div class="sh3" id="s1j">💡 一句话结论</div><div class="sbx"><div class="si">
+放量普涨由半导体、通信和算力主导，但次日更重要的是缩量承接而非继续放量冲高；三只持仓分别用半导体、算力AI、电网核电锚点验证，机器人只作待选观察。<br>
+</div></div></div>
+</div>
+<div class="section" id="s2">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> §二 · 心得与教训
+</div>
+<div class="sb"><div class="si"><div class="sh2">今日认知</div></div><div class="lesson-grid"><article class="lesson-card cognition"><div class="lesson-head"><div class="lesson-tag">认知</div><div class="lesson-type">今日提炼</div></div><div class="lesson-label">可复用原则</div><div class="lesson-principle">轮动市里，非首日的放量上涨更接近兑现而不是新起点</div><div class="lesson-label">当日证据</div><div class="lesson-evidence"><div class="para">今日半导体/通信大面积放量扩散，次日若继续放量但涨幅收窄，容易形成短线高点；更优的红利窗口是首日放量后缩量续强或缩量回踩。只有主线经两日以上确认时，连续放量或缩量涨停才可解释为一致强化；下次先看量价递进，再决定稳着不动还是降风险。</div></div><div class="lesson-label">下次动作</div><div class="lesson-action">把量价确认和承接作为前置条件，次日继续验证是否延续。</div></article><article class="lesson-card cognition"><div class="lesson-head"><div class="lesson-tag">纪律</div><div class="lesson-type">认知提炼</div></div><div class="lesson-label">可复用原则</div><div class="lesson-principle">补录成交不等于规则授权</div><div class="lesson-label">当日证据</div><div class="lesson-evidence"><div class="para">网宿与中超均已在券商成交并完成主账本补录，但当日最终执行条件仍关闭；复盘只评价事实和后果，不倒写成事前许可。</div></div><div class="lesson-label">下次动作</div><div class="lesson-action">信号触发后按预案执行，复盘只评估规则质量，不倒果为因。</div></article><article class="lesson-card cognition"><div class="lesson-head"><div class="lesson-tag">认知</div><div class="lesson-type">今日提炼</div></div><div class="lesson-label">可复用原则</div><div class="lesson-principle">持仓标签必须落到可证伪锚点</div><div class="lesson-label">当日证据</div><div class="lesson-evidence"><div class="para">中超同时有电网、核电、航天标签，明日只用顺钠、中国西电、中国核建验证电网/核电主逻辑；标签多不等于确定性高。</div></div><div class="lesson-label">下次动作</div><div class="lesson-action">下次交易前把这条转成检查项，先验信号，再决定动作。</div></article></div><div class="si"><div class="sh2">待复盘问题</div>
+<div class="para">- 收盘正式口径已裁定为正文138/0、上证+0.33%、最高板7；机器历史快照139/0、+0.37%、最高板6不得覆盖。</div>
+<div class="para">- 半导体/通信首日爆发后，明日是缩量承接、继续加速，还是放量滞涨兑现？</div>
+<div class="para">- 机器人以中大力德为主的三股观察组，是否真的形成两日观察底座？</div></div></div>
+</div>
+<div class="section" id="s3">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> §三 · 次日预案
+</div>
+<div class="sb"><div class="stats-grid"><div class="stat-card"><div class="lbl">风格</div><div class="val amber">81/100，连板100% / 趋势0%；连板生态强，但上证</div></div></div><div class="sbx warn"><strong>总基调</strong>：半导体/通信暂定“强修复、可能主线但未确认”，明日先看今日放量爆发后的缩量承接，不追第二天继续放量冲高；三只持仓分别由半导体、算力、电网核电三组锚点验证，CPO、AI应用、机器人只作待选观察。</div><div class="sh3">🔮 明日连板判定</div><div class="tw"><table><thead><tr><th>板层</th><th>晋级率</th><th>阈值</th><th>判定</th></tr></thead><tbody><tr><td>一进二</td><td>18.97%</td><td>>18%（主升）</td><td>可用</td></tr><tr><td>二进三</td><td>61.54%</td><td>>25%</td><td>可用</td></tr><tr><td>三进四+</td><td>50.0%</td><td>>35%</td><td>可用</td></tr><tr><td>大环境（二进三近3日均值）</td><td>41.68%</td><td>≥20%</td><td>连板环境开放</td></tr><tr><td>情绪</td><td>67%</td><td>60%-80%强势</td><td>理论匹配2进3/3进4；候选证据层降级与下一交易日执行条件仍阻断自动执行</td></tr></tbody></table></div><div class="sh3" id="s3a">🎯 连板自选池</div><div class="sh3" id="s3b">📈 趋势自选池</div><div class="tw"><table><thead><tr><th>层级</th><th>标的</th><th>代码</th><th>今日定位</th><th>窗口</th><th>今日检查</th><th>触发/失效</th><th>入选路径</th><th>板块状态</th><th>选入理由</th><th>数据依据</th></tr></thead><tbody><tr><td>风险观察</td><td>长鑫科技</td><td>688825</td><td>风险观察</td><td>持仓</td><td>MA5承接、三锚共振与相对强度修复</td><td>守MA5且至少两锚承接、主标的不再掉队则续持；锚强主弱或破位则降风险</td><td>持仓保底</td><td>交易复核</td><td>半导体爆发日相对弱的持仓标的</td><td>账户SSOT + stock_snapshot + 红方审阅项</td></tr><tr><td>风险锚</td><td>兆易创新</td><td>603986</td><td>观察标</td><td>观察</td><td>存储强弱</td><td>止跌给长鑫加分；转弱则减分并触发风险复核</td><td>持仓保底</td><td>交易复核</td><td>服务长鑫</td><td>收盘+4.48% + 板块复核层/人工裁决层</td></tr><tr><td>宽度锚</td><td>长电科技</td><td>600584</td><td>板块锚定</td><td>观察</td><td>封测宽度</td><td>与通富至少一只延续给长鑫加分；同步转弱则降风险</td><td>持仓保底</td><td>交易复核</td><td>服务长鑫</td><td>收盘+7.23% + 板块复核层/人工裁决层</td></tr><tr><td>强度锚</td><td>通富微电</td><td>002156</td><td>板块锚定</td><td>观察</td><td>封测强度</td><td>与长电共振给长鑫加分；放量滞涨则视为兑现风险</td><td>持仓保底</td><td>交易复核</td><td>服务长鑫</td><td>收盘+8.30% + 板块复核层/人工裁决层</td></tr><tr><td>风险观察</td><td>网宿科技</td><td>300017</td><td>风险观察</td><td>持仓</td><td>自身承接与算力同链共振</td><td>守MA5且美利云、天娱、数据港至少两只承接则续持；共弱则降风险</td><td>持仓保底</td><td>交易复核</td><td>算力持仓标的</td><td>账户SSOT + stock_snapshot + 板块复核层/人工裁决层</td></tr><tr><td>高度锚</td><td>美利云</td><td>000815</td><td>观察标</td><td>观察</td><td>算力高度</td><td>维持高度且不出现开板负反馈给网宿加分；断板退潮则减分</td><td>红方流程缺口</td><td>交易复核</td><td>网宿算力同链高度锚</td><td>+10.00% / 18.37 / MA5 15.81 / MA20 14.77 / 量比0.48</td></tr><tr><td>宽度锚</td><td>天娱数科</td><td>002354</td><td>观察标</td><td>观察</td><td>算力宽度与高度</td><td>维持承接给网宿加分；放量开板回落则减分</td><td>红方流程缺口</td><td>交易复核</td><td>网宿算力同链宽度锚</td><td>+10.06% / 7.88 / MA5 6.73 / MA20 7.04 / 量比2.13</td></tr><tr><td>容量锚</td><td>数据港</td><td>603881</td><td>观察标</td><td>观察</td><td>IDC容量与趋势</td><td>守MA5且不出现明显负反馈给网宿加分；转弱则减分</td><td>红方流程缺口</td><td>交易复核</td><td>网宿算力同链容量锚</td><td>+3.31% / 26.24 / MA5 24.61 / MA20 24.83 / 量比1.31</td></tr><tr><td>独立观察</td><td>利欧股份</td><td>002131</td><td>观察标</td><td>观察</td><td>AI应用宽度</td><td>与蓝标/每日互动至少一只共振则保留观察；孤立走强无效</td><td>持仓保底</td><td>breadth_expanding</td><td>弈沐明确保留，与网宿解绑</td><td>收盘+5.85% + 板块复核层/人工裁决层</td></tr><tr><td>独立观察</td><td>蓝色光标</td><td>300058</td><td>观察标</td><td>观察</td><td>AI应用强度</td><td>与利欧/每日互动至少一只共振；高开低走则减分</td><td>持仓保底</td><td>breadth_expanding</td><td>弈沐明确保留，与网宿解绑</td><td>收盘+6.79% + 板块复核层/人工裁决层</td></tr><tr><td>独立观察</td><td>每日互动</td><td>300766</td><td>观察标</td><td>观察</td><td>AI应用趋势</td><td>守MA5且与两锚共振；共弱则降级</td><td>持仓保底</td><td>breadth_expanding</td><td>弈沐明确保留，与网宿解绑</td><td>收盘+4.93% + 规范校验快照</td></tr><tr><td>容量主观察</td><td>中际旭创</td><td>300308</td><td>观察标</td><td>观察</td><td>CPO容量与承接</td><td>保持容量承接且两锚至少一只延续；放量冲高回落则减分</td><td>红方流程缺口</td><td>breadth_expanding</td><td>CPO三股主观察，不是买入预案</td><td>+13.24% / 1021.99 / MA5 关键位 / MA20 关键位 / 量比0.99</td></tr><tr><td>高度锚</td><td>新易盛</td><td>300502</td><td>观察标</td><td>观察</td><td>CPO高度与宽度</td><td>延续强度给全组加分；放量滞涨则减分</td><td>红方流程缺口</td><td>breadth_expanding</td><td>CPO三股观察</td><td>+13.68% / 448.00 / MA5 406.08 / MA20 485.72 / 量比1.00</td></tr><tr><td>强度锚</td><td>天孚通信</td><td>300394</td><td>观察标</td><td>观察</td><td>CPO强度</td><td>延续承接给全组加分；与两锚同步转弱则失效</td><td>红方流程缺口</td><td>breadth_expanding</td><td>CPO三股观察</td><td>+17.45% / 212.00 / MA5 181.14 / MA20 220.51 / 量比1.35</td></tr><tr><td>风险观察</td><td>中超控股</td><td>002471</td><td>风险观察</td><td>持仓</td><td>低开修复、三锚共振与相对强度</td><td>守MA5且不再明显弱于高度/容量/核电锚则续持；锚强主弱或共弱则降风险</td><td>持仓保底</td><td>交易复核</td><td>电网核电持仓标的，今日放量滞涨</td><td>账户SSOT + stock_snapshot + 红方审阅项</td></tr><tr><td>容量锚</td><td>中国西电</td><td>601179</td><td>板块锚定</td><td>观察</td><td>电网容量</td><td>与顺钠/中国核建共振给中超加分；同步转弱则降风险</td><td>持仓保底</td><td>交易复核</td><td>服务中超</td><td>收盘+3.31% + 板块复核层/人工裁决层</td></tr><tr><td>核电锚</td><td>中国核建</td><td>601611</td><td>板块锚定</td><td>观察</td><td>核电宽度</td><td>保持承接给中超加分；与电网锚共弱则失效</td><td>持仓保底</td><td>交易复核</td><td>服务中超</td><td>收盘+4.39% + 板块复核层/人工裁决层</td></tr><tr><td>主观察</td><td>中大力德</td><td>002896</td><td>观察标</td><td>观察</td><td>机器人高度与承接</td><td>保持强承接且两锚形成宽度则维持观察；高开低走则失效</td><td>趋势异动</td><td>breadth_expanding</td><td>机器人主观察，不是买入预案</td><td>收盘+6.06% + 板块复核层/人工裁决层</td></tr><tr><td>趋势锚</td><td>绿的谐波</td><td>688017</td><td>观察标</td><td>观察</td><td>机器人趋势承接</td><td>与中大/双环共振则维持观察；转弱则减分</td><td>趋势异动</td><td>breadth_expanding</td><td>服务机器人观察</td><td>收盘+4.50% + 板块复核层/人工裁决层</td></tr><tr><td>宽度锚</td><td>双环传动</td><td>002472</td><td>观察标</td><td>观察</td><td>传动宽度与反证</td><td>转强给机器人加分；继续横弱且中大回落则全组失效</td><td>趋势异动</td><td>breadth_expanding</td><td>服务机器人观察</td><td>收盘-0.03% + 规范校验快照</td></tr></tbody></table></div><div class="sh3">🚫 不碰</div><div class="si"><div class="para">- 今日放量爆发后次日继续放量但涨幅收窄的追高。</div>
+<div class="para">- 消费物业、化工材料、城建数据、医疗防御、汽车次新、ST家居六个 <code>不参与</code> 组。</div>
+<div class="para">- 机器人三股只是待选观察；中大力德强势也不自动升级为买点。</div>
+<div class="para">- 任何未经下一交易日最终执行条件允许的新增、加仓或锚点替换开仓。</div></div><div class="sh3">📏 Rules 校验</div><div class="si"><div class="para">- 可卖状态以账户事实为准。</div>
+<div class="para">- 情绪：67%属强势，分层晋级率满足连板打法门槛；候选证据层降级和下一交易日执行条件优先级更高。</div>
+<div class="para">- 仓位规则：本预案没有新增首笔、二笔或三笔授权；不把观察池转为仓位目标。</div>
+<div class="para">- 最终交易入口仍只认下一交易日 <code>内部执行入口已隐藏</code>；本次未调用券商接口。</div></div></div>
+</div>
+<div class="section" id="s4">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> §四 · 红方对抗<span class="cnt">3轮辩论</span>
+</div>
+<div class="sb"><div class="sh3" id="s4a">🔴 Round 1：洋米红方质疑</div><div class="si">
+独立数据时间 2026-08-04 16:36-16:40（YM-data-pipeline 规范校验），机器回执见 frontmatter 的 规范校验 对抗回执已脱敏（schema=对抗记录已脱敏；Round 1审查身份仍为洋米，当前回执已机械叠加蓝方Round 2与弈沐明确裁决）。共 14 条 finding：critical 1 / high 2 / medium 4 / low 7。<br>
+</div>
+<div class="sh3">数据基础</div>
+<div class="para">- Q1 热度 TOP50：已跑（iwencai_openapi success 16:36）</div>
+<div class="para">- Q2 板块扫描：已跑（半导体2/通信设备9/数据中心关键位/医药关键位/机器人关键位/电网6/CPO21/光模块关键位/通信13，概念口径）</div>
+<div class="para">- Q3 中军扫描：已跑（100只）</div>
+<div class="para">- Q5 持仓复核：已跑（长鑫+0.02%换手11.29%、网宿+6.58%换手8.86%、中超+1.76%换手12.89%）</div>
+<div class="para">- Q6 板块资金：已跑（个股主力字段缺，用同花顺行业级主力净买入替代；通信设备+199.9亿/半导体+173.6亿）</div>
+<div class="para">- Q7/Q8 趋势复核：部分（板块指数对核电named_entity_missing；持仓MA用数据附录pytdx快照）</div>
+<div class="sh3">五维强制清单</div>
+<div class="para"><strong>1. 定性校准</strong>："放量普涨由半导体/通信/算力主导"定性准确，但存在两个矛盾：①今日是"非首日放量上涨"（8/3已启动），按 §二认知1 应"接近兑现不追"，§三却又当持仓验证主线（审阅项）；②当日最强资金方向是光模块/CPO（中际旭创单日497.9亿/+13.24%），正文/板块复核层 完全未提（审阅项）。</div>
+<div class="para"><strong>2. 操作漏判</strong>：长鑫在半导体板块+6.02%爆发日仅+0.02%收平、量比0.615缩量，是板块内掉队者而非"锚点承接"（审阅项）；中超三锚共振但仅+1.76%、量比2.18放量、换手12.89%高换手滞涨（审阅项）。</div>
+<div class="para"><strong>3. 规则执行</strong>：五节点收盘口径正文正确、机器历史快照错误（上证+0.33/涨停138/最高板7 vs 机器+0.37/139/6，审阅项）；网宿加仓与盘中AI建议方向相反（盘中"四只都不动"→盘中弈沐加仓，审阅项）；rotation_board_scan 股票行冒充板块行直接导致光模块/CPO 线索未被板块复核层归类（审阅项）。</div>
+<div class="para"><strong>4. 反向情景</strong>：半导体是8/3重挫后V形反转还是超跌反弹，需次日缩量承接验证；长鑫两日累计跑输板块，是组合中风险最高持仓（审阅项）。</div>
+<div class="para"><strong>5. 盲区扫描</strong>：光模块/CPO 涨停21只、中际旭创497.9亿成交零覆盖（审阅项）；医药外包+8.2%涨幅第一（药明/凯莱英）与板块复核层"医疗防御不参与"不同链（审阅项）；机器人涨停30只但观察池仅3只且双环-0.03%横弱（审阅项）。</div>
+<div class="sh3">自选池对抗</div>
+<div class="tw"><table><thead><tr><th>挑战类型</th><th>蓝方原判</th><th>红方质疑</th><th>数据依据</th></tr></thead><tbody><tr><td>忽略板块</td><td>光模块/CPO 未进入 板块复核层</td><td>当日最强资金方向（CPO涨停21只/光模块11只），中际旭创+13.24%单日成交497.9亿、天孚+17.45%、新易盛+13.68%</td><td>问财 盘中：CPO概念涨停21只；中际旭创497.9亿成交</td></tr><tr><td>忽略板块</td><td>医药外包未观察</td><td>医疗研发外包+8.2%涨幅第一（药明/凯莱英/贝瑞等11只涨停），与板块复核层"医疗防御不参与"（减肥药/器械）不同链</td><td>行业榜：医疗研发外包+8.2%主力净买6.5亿；医药涨停12只</td></tr><tr><td>遗漏标的</td><td>网宿锚组=利欧/蓝标/每日互动（AI应用异链）</td><td>8/3锚组是美利云/天娱/云赛/数据港（算力同链），8/4更换后最强算力高度锚美利云（3板涨停）不在锚组；每日互动成交仅9.6亿流动性弱</td><td>问财 盘中：美利云+10%（3板）、天娱+10.06%（3板）均涨停；每日互动+4.93%成交9.6亿</td></tr><tr><td>事实错误</td><td>机器盘中快照：上证+0.37%/涨停139/最高板6</td><td>三处均错，正文正确（上证+0.33/涨停138/最高板7传智教育）</td><td>问财 16:36：上证3822.28/+0.3313%、非ST涨停138只、传智7板</td></tr><tr><td>排除有误</td><td>双环传动为机器人宽度锚</td><td>-0.03%横弱，机器人涨停30只（宽度扩大）但观察池仅3只含横弱锚</td><td>问财 16:37：机器人概念涨停30只；双环-0.03%</td></tr></tbody></table></div><div class="sh3" id="s4b">🔵 Round 2：蓝方回应（稳米）</div><div class="tw"><table><thead><tr><th>Finding</th><th>蓝方裁决</th><th>回应与落地</th></tr></thead><tbody><tr><td>审阅项</td><td>接受</td><td>正式收盘SSOT采用上证+0.33%、非ST涨停138、最高板7；机器15:00的+0.37%/139/6标为错误源。涨跌家数采用东财沪深3443/1688。</td></tr><tr><td>审阅项</td><td>接受，流程缺陷</td><td>CPO/光模块零覆盖是候选证据层→板块复核层归类断层；已补中际旭创、新易盛、天孚通信三只，全部`流程缺口 + 观察`。</td></tr><tr><td>审阅项</td><td>接受</td><td>长鑫在半导体爆发日明显相对弱；若锚组延续而长鑫仍不能修复MA5/VWAP与相对强度，进入单独降险复核。</td></tr><tr><td>审阅项</td><td>接受，暂定性</td><td>半导体/通信暂定“强修复、可能主线但未确认”；次日缩量承接才升级，继续放量冲高不追，转弱按轮动高潮处理。</td></tr><tr><td>审阅项</td><td>接受</td><td>中超在三锚共振下放量滞涨、相对弱；锚组强而中超不修复，或跌破MA5时优先降险复核。</td></tr><tr><td>审阅项</td><td>接受</td><td>网宿加仓是弈沐券商端手动成交，与盘中 AI不追高建议相反；只事后补录，不倒写成系统授权，收盘仓位账户比例已脱敏。</td></tr><tr><td>审阅项</td><td>接受，流程缺陷</td><td>网宿只对算力同链：美利云、天娱数科、数据港；利欧、蓝标、每日互动保留为独立AI应用观察组。</td></tr><tr><td>审阅项</td><td>接受</td><td>rotation_board_scan语义降级确实影响板块完整性；CPO已作流程缺口回填，其他盲区继续保留数据缺口，降级接纳尚未授权。</td></tr><tr><td>审阅项</td><td>接受</td><td>正文采用东财沪深3443/1688；问财3642/1747是全市场含北交所的交叉口径。</td></tr><tr><td>审阅项</td><td>接受，数据缺口</td><td>未取得可验证的个股主力净流入字段；只保留同花顺行业级资金证据并标口径，不补猜。</td></tr><tr><td>审阅项</td><td>接受</td><td>半导体先按强修复待验证，不直接认定V形反转；承接失败且长鑫继续掉队时，长鑫单独降险复核。</td></tr><tr><td>审阅项</td><td>记录</td><td>核电`named_entity_missing`保留；中超仅用顺钠、中国西电、中国核建人工映射观察。</td></tr><tr><td>审阅项</td><td>部分接受</td><td>机器人仍按弈沐指定的中大力德、绿的谐波、双环传动三只观察；双环改作弱势反证锚，不视为宽度正证。</td></tr><tr><td>审阅项</td><td>接受但不新增</td><td>医药外包与医疗防御不同链，属于降级盲区；本轮弈沐只确认补CPO，医药保留次日补查且无买入授权。</td></tr></tbody></table></div>
+<div class="si">
+弈沐已明确接受6只流程缺陷回填：网宿算力三锚（美利云、天娱数科、数据港）与CPO三股（中际旭创、新易盛、天孚通信）。机器预案层/人工裁决层现为21只`观察`；蓝方回复完成，停在洋米Round 3之前。<br>
+</div><div class="sh3" id="s4c">🟢 Round 3：洋米终审</div><div class="si">
+独立复核时间 2026-08-04 17:38；机器回执见 frontmatter 的 规范校验 对抗回执已脱敏，状态为 `对抗状态已记录`，叠加弈沐resolution后 回执哈希=`哈希已隐藏`。哈希链自洽已验证：候选记录=`918e3573` / 机器预案层=`3bf32dbb` / 人工裁决层=`b49bb161`。<br>
+</div>
+<ol class="tight-list">
+<li><strong>候选证据层 降级签收</strong>：接受 focus `named_entity_missing`、pullback覆盖不足、rotation语义与行形降级、trend anomaly覆盖不足四类缺口，仅允许 `观察/排除/不参与`。</li>
+<li><strong>补漏责任</strong>：CPO/光模块已补入中际旭创、新易盛、天孚通信三只观察并负责次日承接复核；医药外包方向列为次日补查责任，不新增候选、不授予买入。</li>
+<li><strong>仍存分歧</strong>：无。21只终稿池与弈沐resolution均已就绪，授权机械终稿流程收口。</li>
+</ol>
+<div class="para"><strong>红方结论</strong>：本日红方对抗闭环（Round1 14 条质疑 → Round2 蓝方全部回应 → Round3 红方确认 → 弈沐resolution）。21 只 <code>观察</code> 集合、五节点 SSOT 与候选守恒均已独立核验；不构成新增买入或加仓授权。阶段C=<code>降级流程已记录</code>、阶段D/红方=<code>done</code>，终稿由终稿流程机械收口。</div><div class="verdict"><div class="vt">终审定论</div><div class="vb"><div class="para">- 蓝方 Round2 对 14 条质询的回应全部合理，红方确认闭环：<strong>14 条全部确认</strong>（11 条采纳、2 条流程缺陷回填、1 条记录缺口）。</div>
+<div class="para">- <strong>候选集合由 15 只扩至 21 只 观察</strong>，弈沐已裁决 6 只 流程缺口 回填：</div>
+<div class="para">- 网宿算力同链三锚回填：美利云 000815、天娱数科 002354、数据港 603881</div>
+<div class="para">- CPO/光模块三股补入：中际旭创 300308、新易盛 300502、天孚通信 300394</div>
+<div class="para">- 原 15 只全部 <code>observe_no_change</code>；新增 6 只 <code>observe_added_process_defect</code>；守恒通过（候选记录 21 = 机器预案层 21 = 人工裁决层 21，unmapped=[]、unresolved=[]）。</div>
+<div class="para">- <strong>关键修正已核验</strong>：①网宿锚组回填算力同链、AI 应用三锚解绑为独立观察组；②CPO 当日最强资金方向（中际旭创成交 497.9 亿）补入观察；③长鑫/中超在板块相对弱背景下新增"修复相对强度"降险线；④双环传动改弱势反证锚；⑤半导体/通信暂定"强修复、可能主线未确认"，次日缩量承接才升级。</div>
+<div class="para">- 收盘 SSOT 已定：上证 +0.33%、非ST 涨停 138、最高板 7（传智教育）、涨跌家数东财沪深 3443/1688。</div>
+<div class="para">- 红方不新增/不改变 人工裁决层 已裁决集合外的任何候选；全部仍为 <code>观察</code>，无买入授权。</div></div></div></div>
+</div>
+<div class="section" id="sa">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> 附录A · 盘前速查<span class="cnt">周一开盘只看这里</span>
+</div>
+<div class="sb"><div class="sh3">📋 持仓处理</div><div class="tw"><table><thead><tr><th>标的</th><th>数量</th><th>8/5理论可卖</th><th>成本</th><th>8/4收盘</th><th>浮盈亏</th><th>次日验证</th><th>动作边界</th></tr></thead><tbody><tr><td>长鑫科技 688825</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>+1.29%</td><td>兆易、长电、通富至少两只承接，且长鑫修复相对强度、守MA5约关键位</td><td>持有复核；不补仓</td></tr><tr><td>网宿科技 300017</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>+3.30%</td><td>美利云、天娱数科、数据港至少两只承接，网宿守MA5约关键位</td><td>当日已加仓；不再扩仓</td></tr><tr><td>中超控股 002471</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>+0.17%</td><td>顺钠高度、中国西电容量、中国核建宽度承接，且中超修复相对强度、守MA5约关键位</td><td>持有复核；不以多标签加仓</td></tr></tbody></table></div><div class="sh3">📋 操作指南</div><div class="si"><div class="para">- 先回读实时行情、情绪、可卖数量、baseline 与最终执行条件，再讨论任何持仓风险动作。</div>
+<div class="sh2">rules 校验</div>
+<div class="para">- 观察-only；未调用券商交易接口；候选证据层 source gaps 显式保留。</div>
+<div class="para">- 8/5 的真实可卖数量、行情 freshness 和最终执行条件必须在盘前重读。</div></div></div>
+</div>
+<div class="section" id="sd">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> 数据附录<span class="cnt">机器解析用</span>
+</div>
+<div class="sb"><div class="sh3">持仓明细</div><div class="tw"><table><thead><tr><th>标的</th><th>代码</th><th>方向</th><th>数量</th><th>成本</th><th>现价</th><th>浮盈%</th><th>止损</th><th>可卖状态已记录</th><th>状态</th></tr></thead><tbody><tr><td>长鑫科技</td><td>688825</td><td>持仓</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td><span class="up">+1.29%</span></td><td>关键风险位（已脱敏）</td><td>按账户事实复核</td><td>持有（收盘）</td></tr><tr><td>网宿科技</td><td>300017</td><td>持仓</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td><span class="up">+3.30%</span></td><td>关键风险位（已脱敏）</td><td>按账户事实复核</td><td>部分仓位当日买入锁定</td></tr><tr><td>中超控股</td><td>002471</td><td>持仓</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td><span class="up">+0.17%</span></td><td>关键风险位（已脱敏）</td><td>按账户事实复核</td><td>部分仓位当日买入锁定</td></tr></tbody></table></div><div class="sh3">连板自选池</div><div class="tw"><table><thead><tr><th>标的</th><th>代码</th><th>板块</th><th>今日定位</th><th>窗口</th><th>今日检查</th><th>触发/失效</th><th>涨幅</th><th>收盘价</th><th>MA5</th><th>量比</th><th>换手</th><th>备注</th></tr></thead><tbody><tr><td>顺钠股份</td><td>000533</td><td>电网</td><td>高度锚</td><td>观察</td><td>2板高度与封板承接</td><td>续强给中超加分；断板负反馈则失效</td><td><span class="up">+10.04%</span></td><td>12.60</td><td>11.50</td><td>0.91</td><td>—</td><td>持仓验证锚，不是独立买点</td></tr></tbody></table></div><div class="sh3">趋势自选池</div><div class="tw"><table><thead><tr><th>标的</th><th>代码</th><th>今日定位</th><th>窗口</th><th>今日检查</th><th>触发/失效</th><th>入选路径</th><th>板块状态</th><th>选入理由</th><th>数据依据</th></tr></thead><tbody><tr><td>长鑫科技</td><td>688825</td><td>半导体/存储持仓风险观察</td><td>持仓</td><td>MA5、三锚与相对强度</td><td>守MA5、两锚承接且个股不再掉队；锚强主弱或破位则降风险</td><td>持仓保底</td><td>交易复核</td><td>半导体爆发日相对弱</td><td>+0.02% / 价格已脱敏 / MA5 关键位 / MA2关键位缺失 / 量比价格已脱敏</td></tr><tr><td>兆易创新</td><td>603986</td><td>存储风险锚</td><td>观察</td><td>是否收复MA5</td><td>止跌给长鑫加分；继续弱于MA5则减分</td><td>持仓保底</td><td>交易复核</td><td>服务长鑫持仓验证</td><td>+4.48% / 356.02 / MA5 362.10 / MA20 474.25 / 量比0.79</td></tr><tr><td>长电科技</td><td>600584</td><td>封测宽度锚</td><td>观察</td><td>强度延续</td><td>与通富至少一只承接；同步转弱则失效</td><td>持仓保底</td><td>交易复核</td><td>服务长鑫持仓验证</td><td>+7.23% / 65.41 / MA5 65.66 / MA20 83.02 / 量比0.94</td></tr><tr><td>通富微电</td><td>002156</td><td>封测强度锚</td><td>观察</td><td>强度延续</td><td>与长电共振；放量滞涨则视为兑现</td><td>持仓保底</td><td>交易复核</td><td>服务长鑫持仓验证</td><td>+8.30% / 55.60 / MA5 56.33 / MA20 68.21 / 量比0.84</td></tr><tr><td>网宿科技</td><td>300017</td><td>算力持仓风险观察</td><td>持仓</td><td>自身承接与算力同链共振</td><td>守MA5且美利云、天娱、数据港至少两只承接；共弱则降风险</td><td>持仓保底</td><td>交易复核</td><td>网宿只对算力同链</td><td>+6.58% / 价格已脱敏 / MA5 关键位 / MA20 关键位 / 量比价格已脱敏</td></tr><tr><td>美利云</td><td>000815</td><td>算力高度锚</td><td>观察</td><td>3板高度与封板反馈</td><td>延续高度给网宿加分；断板退潮则减分</td><td>红方流程缺口</td><td>交易复核</td><td>网宿算力同链高度锚</td><td>+10.00% / 18.37 / MA5 15.81 / MA20 14.77 / 量比0.48</td></tr><tr><td>天娱数科</td><td>002354</td><td>算力宽度锚</td><td>观察</td><td>3板宽度与高度</td><td>延续承接给网宿加分；放量开板回落则减分</td><td>红方流程缺口</td><td>交易复核</td><td>网宿算力同链宽度锚</td><td>+10.06% / 7.88 / MA5 6.73 / MA20 7.04 / 量比2.13</td></tr><tr><td>数据港</td><td>603881</td><td>算力容量锚</td><td>观察</td><td>IDC容量与趋势</td><td>守MA5且不出现明显负反馈给网宿加分；转弱则减分</td><td>红方流程缺口</td><td>交易复核</td><td>网宿算力同链容量锚</td><td>+3.31% / 26.24 / MA5 24.61 / MA20 24.83 / 量比1.31</td></tr><tr><td>利欧股份</td><td>002131</td><td>AI应用宽度观察</td><td>观察</td><td>与蓝标/每日互动共振</td><td>至少一锚同强则保留AI应用观察；孤立强无效</td><td>持仓保底</td><td>breadth_expanding</td><td>弈沐明确保留，与网宿解绑</td><td>+5.85% / 5.43 / MA5 4.71 / MA20 4.24 / 量比1.52</td></tr><tr><td>蓝色光标</td><td>300058</td><td>AI应用强度观察</td><td>观察</td><td>强度和宽度</td><td>与利欧/每日互动共振；高开低走则减分</td><td>持仓保底</td><td>breadth_expanding</td><td>弈沐明确保留，与网宿解绑</td><td>+6.79% / 15.72 / MA5 13.71 / MA20 12.72 / 量比1.39</td></tr><tr><td>每日互动</td><td>300766</td><td>AI应用趋势观察</td><td>观察</td><td>趋势承接</td><td>守MA5且与两锚共振；共弱则失效</td><td>持仓保底</td><td>breadth_expanding</td><td>弈沐明确保留，与网宿解绑</td><td>+4.93% / 24.28 / MA5 22.45 / MA20 21.72 / 量比1.00</td></tr><tr><td>中际旭创</td><td>300308</td><td>CPO容量主观察</td><td>观察</td><td>容量与承接</td><td>保持容量承接且两锚至少一只延续；放量冲高回落则减分</td><td>红方流程缺口</td><td>breadth_expanding</td><td>CPO三股主观察</td><td>+13.24% / 1021.99 / MA5 928.30 / MA20 1045.89 / 量比0.99</td></tr><tr><td>新易盛</td><td>300502</td><td>CPO高度与宽度锚</td><td>观察</td><td>强度延续</td><td>延续强度给全组加分；放量滞涨则减分</td><td>红方流程缺口</td><td>breadth_expanding</td><td>CPO三股观察</td><td>+13.68% / 448.00 / MA5 406.08 / MA20 485.72 / 量比1.00</td></tr><tr><td>天孚通信</td><td>300394</td><td>CPO强度锚</td><td>观察</td><td>强度延续</td><td>延续承接给全组加分；与两锚同步转弱则失效</td><td>红方流程缺口</td><td>breadth_expanding</td><td>CPO三股观察</td><td>+17.45% / 212.00 / MA5 181.14 / MA20 220.51 / 量比1.35</td></tr><tr><td>中超控股</td><td>002471</td><td>电网/核电持仓风险观察</td><td>持仓</td><td>低开修复、三锚与相对强度</td><td>守MA5且不再明显弱于三锚；锚强主弱或共弱则降风险</td><td>持仓保底</td><td>交易复核</td><td>电网与核电双映射，今日放量滞涨</td><td>+1.76% / 价格已脱敏 / MA5 关键位 / MA20 关键位 / 量比价格已脱敏</td></tr><tr><td>中国西电</td><td>601179</td><td>电网容量锚</td><td>观察</td><td>容量承接</td><td>与顺钠/中国核建共振；同步转弱则失效</td><td>持仓保底</td><td>交易复核</td><td>服务中超</td><td>+3.31% / 14.37 / MA5 13.68 / MA20 13.02 / 量比1.37</td></tr><tr><td>中国核建</td><td>601611</td><td>核电宽度锚</td><td>观察</td><td>核电宽度</td><td>保持承接给中超加分；与电网锚共弱则失效</td><td>持仓保底</td><td>交易复核</td><td>服务中超</td><td>+4.39% / 12.12 / MA5 11.06 / MA20 10.30 / 量比2.50</td></tr><tr><td>中大力德</td><td>002896</td><td>机器人主观察</td><td>观察</td><td>高度与承接</td><td>强承接且两锚形成宽度；高开低走则失效</td><td>趋势异动</td><td>breadth_expanding</td><td>主观察，不是买入预案</td><td>+6.06% / 76.11 / MA5 关键位 / MA20 关键位 / 量比2.30</td></tr><tr><td>绿的谐波</td><td>688017</td><td>机器人趋势锚</td><td>观察</td><td>趋势承接</td><td>与中大/双环共振；转弱则减分</td><td>趋势异动</td><td>breadth_expanding</td><td>服务机器人观察</td><td>+4.50% / 326.00 / MA5 297.25 / MA20 335.00 / 量比0.96</td></tr><tr><td>双环传动</td><td>002472</td><td>机器人宽度/反证锚</td><td>观察</td><td>传动宽度</td><td>转强给机器人加分；横弱且中大回落则失效</td><td>趋势异动</td><td>breadth_expanding</td><td>机器人第三只正式观察标的</td><td>-0.03% / 38.84 / MA5 37.60 / MA20 38.88 / 量比0.82</td></tr></tbody></table></div><div class="sh3">板块状态</div><div class="tw"><table><thead><tr><th>板块</th><th>类型</th><th>梯队</th><th>主标的</th><th>参考标的</th><th>板块涨跌幅</th><th>主力净流入</th><th>5日线位置</th><th>状态</th></tr></thead><tbody><tr><td>半导体/存储</td><td>持仓验证</td><td>长鑫+存储+封测</td><td>长鑫科技</td><td>兆易创新、长电科技、通富微电</td><td>半导体约+6.02%</td><td>未取</td><td>个股分化</td><td>交易复核</td></tr><tr><td>算力</td><td>持仓验证</td><td>网宿+算力同链三锚</td><td>网宿科技</td><td>美利云、天娱数科、数据港</td><td>约+4.12%</td><td>未取</td><td>四只均在MA5上</td><td>交易复核</td></tr><tr><td>AI应用</td><td>明日待选观察</td><td>利欧+蓝标+每日互动</td><td>每日互动</td><td>利欧股份、蓝色光标</td><td>约+2.95%</td><td>未取</td><td>三只均在MA5上</td><td>breadth_expanding / 与网宿解绑</td></tr><tr><td>CPO/光模块</td><td>明日待选观察</td><td>中际+新易盛+天孚</td><td>中际旭创</td><td>新易盛、天孚通信</td><td>CPO涨停21只/光模块11只（问财概念口径）</td><td>通信设备行业级+199.9亿</td><td>三只在MA5上、仍低于MA20</td><td>breadth_expanding / 流程缺口</td></tr><tr><td>电网/核电</td><td>持仓验证</td><td>顺钠高度+西电容量+核建宽度</td><td>中超控股</td><td>顺钠股份、中国西电、中国核建</td><td>未取完整板块序列</td><td>未取</td><td>四只均在MA5上</td><td>交易复核 / focus缺口</td></tr><tr><td>机器人</td><td>明日待选观察</td><td>中大+绿的+双环</td><td>中大力德</td><td>绿的谐波、双环传动</td><td>约+2.70%</td><td>未取</td><td>三只均在MA5上</td><td>breadth_expanding / 只观察</td></tr></tbody></table></div><div class="sh3">今日操作</div><div class="tw"><table><thead><tr><th>时间</th><th>标的</th><th>方向</th><th>数量</th><th>价格</th><th>原因</th><th>事实来源</th></tr></thead><tbody><tr><td>盘中</td><td>网宿科技 300017</td><td>买入</td><td>已脱敏</td><td>已脱敏</td><td>算力走强、龙头封涨停、其他个股跟随、市场整体环境较好，适度提升仓位（弈沐口述补录）</td><td>hermes 内部账户记录 交易流水已隐藏</td></tr><tr><td>盘中</td><td>中超控股 002471</td><td>买入</td><td>已脱敏</td><td>已脱敏</td><td>昨日放量涨停后炸板、今日低开后逐步修复，兼具电网/航天/核电方向预期（弈沐口述补录）</td><td>hermes 内部账户记录 交易流水已隐藏</td></tr></tbody></table></div><div class="sh3">锚定股状态</div><div class="tw"><table><thead><tr><th>标的</th><th>窗口</th><th>影响</th><th>证据</th><th>状态</th></tr></thead><tbody><tr><td>长鑫科技 688825</td><td>持仓</td><td>半导体主标的</td><td>价格已脱敏 > MA5 关键位，三锚分化</td><td>观察</td></tr><tr><td>兆易创新 603986</td><td>观察</td><td>存储风险锚</td><td>356.02 < MA5 362.10</td><td>观察</td></tr><tr><td>长电科技 600584</td><td>观察</td><td>封测宽度</td><td>+7.23%，略低于MA5</td><td>观察</td></tr><tr><td>通富微电 002156</td><td>观察</td><td>封测强度</td><td>+8.30%，低于MA5</td><td>观察</td></tr><tr><td>网宿科技 300017</td><td>持仓</td><td>算力主标的</td><td>价格已脱敏 > MA5 关键位</td><td>观察</td></tr><tr><td>美利云 000815</td><td>观察</td><td>算力高度</td><td>+10.00%，3板</td><td>观察</td></tr><tr><td>天娱数科 002354</td><td>观察</td><td>算力宽度与高度</td><td>+10.06%，3板，量比2.13</td><td>观察</td></tr><tr><td>数据港 603881</td><td>观察</td><td>算力IDC容量</td><td>+3.31%，守MA5</td><td>观察</td></tr><tr><td>利欧股份 002131</td><td>观察</td><td>AI宽度</td><td>+5.85%，量比1.52</td><td>观察</td></tr><tr><td>蓝色光标 300058</td><td>观察</td><td>AI强度</td><td>+6.79%，量比1.39</td><td>观察</td></tr><tr><td>每日互动 300766</td><td>观察</td><td>AI趋势</td><td>+4.93%，守MA5</td><td>观察</td></tr><tr><td>中际旭创 300308</td><td>观察</td><td>CPO容量主观察</td><td>+13.24%，守MA5、低于MA20</td><td>观察</td></tr><tr><td>新易盛 300502</td><td>观察</td><td>CPO高度与宽度</td><td>+13.68%，守MA5、低于MA20</td><td>观察</td></tr><tr><td>天孚通信 300394</td><td>观察</td><td>CPO强度</td><td>+17.45%，守MA5、低于MA20</td><td>观察</td></tr><tr><td>中超控股 002471</td><td>持仓</td><td>电网/核电主标的</td><td>价格已脱敏 > MA5 关键位</td><td>观察</td></tr><tr><td>顺钠股份 000533</td><td>观察</td><td>电网高度</td><td>2板涨停</td><td>观察</td></tr><tr><td>中国西电 601179</td><td>观察</td><td>电网容量</td><td>+3.31%，守MA5</td><td>观察</td></tr><tr><td>中国核建 601611</td><td>观察</td><td>核电宽度</td><td>+4.39%，量比2.50</td><td>观察</td></tr><tr><td>中大力德 002896</td><td>观察</td><td>机器人主观察</td><td>+6.06%，量比2.30</td><td>观察</td></tr><tr><td>绿的谐波 688017</td><td>观察</td><td>机器人趋势</td><td>+4.50%，守MA5</td><td>观察</td></tr><tr><td>双环传动 002472</td><td>观察</td><td>机器人宽度反证</td><td>-0.03%，守MA5</td><td>观察</td></tr></tbody></table></div></div>
+</div>
+
+</div>
+</div>
+
+<script>
+const io=new IntersectionObserver(e=>{e.forEach(e=>{const l=document.querySelector(`a[href="#${e.target.id}"]`);if(l&&e.isIntersecting){document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));l.classList.add('active')}})},{rootMargin:'-100px 0px -70% 0px'});
+document.querySelectorAll('.section[id]').forEach(s=>io.observe(s));
+</script>
+<script>
+(function(){
+  var from = new URLSearchParams(location.search).get('from');
+  if (from && /^[A-Za-z0-9_-]+$/.test(from)) {
+    document.getElementById('back-home').href = '../index.html#' + from;
+  }
+})();
+</script>
+</body>
+</html>

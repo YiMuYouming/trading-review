@@ -323,6 +323,26 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         '降级流程已记录', cleaned, flags=re.I,
     )
     cleaned = re.sub(
+        r'(?<![A-Za-z0-9_.-])market_watch\.red_team\.v\d+(?![A-Za-z0-9_.-])',
+        '对抗记录已脱敏', cleaned, flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])red[_ -]?receipt(?![A-Za-z0-9_])',
+        '对抗回执已脱敏', cleaned, flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])red[_-]?team(?![A-Za-z0-9_])',
+        '对抗记录', cleaned, flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])round_\d+_submitted(?![A-Za-z0-9_])',
+        '对抗状态已记录', cleaned, flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])finalizer(?![A-Za-z0-9_])',
+        '终稿流程', cleaned, flags=re.I,
+    )
+    cleaned = re.sub(
         r'(?<![A-Za-z0-9_])observation[_-]?only(?![A-Za-z0-9_])',
         '仅观察', cleaned, flags=re.I,
     )
@@ -411,6 +431,12 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         r'/Users/[A-Za-z0-9._-]+/[^\s`<>|，。；]+',
         '内部审计记录（路径已隐藏）',
         cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])/?api/[^\s`<>|，。；]+',
+        '内部执行入口已隐藏',
+        cleaned,
+        flags=re.I,
     )
     cleaned = re.sub(r'receipt_sha256=[0-9a-f]{64}', 'receipt_sha256=已隐藏', cleaned, flags=re.I)
     cleaned = re.sub(
@@ -569,7 +595,7 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     )
     cleaned = re.sub(
         r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|上方|看|观察|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
-        r'\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*',
+        r'\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*(?!\s*(?:只|家|个|人|条))',
         r'\1关键位',
         cleaned,
     )
@@ -756,6 +782,34 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         )
         if re.search(r'盈亏|浮盈|亏损|浮亏|盈利|实现|成交|买入|加仓|减仓|清仓|卖出|仓位|账户|试仓|暴露', line):
             line = re.sub(r'(?<!\d)\d{1,2}:\d{2}(?::\d{2})?', '盘中', line)
+            if re.search(r'自选池|持仓|新开仓|加仓', line):
+                line = re.sub(
+                    r'((?:振幅)[：:]?\s*)[-+]?\d+(?:\.\d+)?\s*[-~—]\s*[-+]?\d+(?:\.\d+)?',
+                    r'\1关键区间',
+                    line,
+                )
+                line = re.sub(
+                    r'((?:高点|低点|收盘|现价|当前价)[：:]?\s*)[-+]?\d+(?:\.\d+)?(?![\d.%/])',
+                    r'\1价格已脱敏',
+                    line,
+                )
+                line = re.sub(
+                    r'[-+]?\d+(?:\.\d+)?(?=\s*(?:收(?:平|盘)|翻(?:红|绿)))',
+                    '价格已脱敏',
+                    line,
+                )
+                line = re.sub(
+                    r'((?:新开仓|加仓|买入)[^，。；|]{0,24}[（(]\s*)'
+                    r'[-+]?\d+(?:\.\d+)?(?![\d.%/])',
+                    r'\1价格已脱敏',
+                    line,
+                )
+            line = re.sub(
+                r'((?:持仓|加仓|买入|卖出|成交)[^，。；|]{0,32}[-+]?\d+(?:\.\d+)?%\s*[（(]\s*)'
+                r'\d+(?:\.\d+)?(?=\s*[，,）)])',
+                r'\1价格已脱敏',
+                line,
+            )
             line = re.sub(
                 r'((?:午盘|尾盘|日内低点|买入后(?:五分钟K线)?最低(?:跌至)?|成交后最低)[：:]?\s*)'
                 r'(?!(?:\d{2,4}(?:\.\d+)?)(?:%|家|只|/|→|飙至))'
@@ -810,7 +864,7 @@ def public_position_summary(position):
     return '持仓状态已记录'
 
 
-def sanitize_public_review_cell(header, value):
+def sanitize_public_review_cell(header, value, position_row=False):
     """Apply header-aware redaction to sensitive review table fields."""
     header = str(header or '')
     raw_value = str(value or '')
@@ -839,6 +893,10 @@ def sanitize_public_review_cell(header, value):
         return '已脱敏'
     if 'T+1可卖' in header or '可卖状态' in header:
         return '按账户事实复核'
+    if re.search(r'(?:理论)?可卖|可卖(?:数量|量)', header):
+        return '已脱敏'
+    if re.search(r'\d{1,2}/\d{1,2}[^|]{0,12}收盘|收盘[^|]{0,12}\d{1,2}/\d{1,2}', header):
+        return '已脱敏'
     if '止损' in header:
         return '关键风险位（已脱敏）'
     if any(key in header for key in ('触发', '失效')) and (
@@ -850,7 +908,28 @@ def sanitize_public_review_cell(header, value):
         r'\d{2,3}\.\d+[^，。；|]{0,12}(?:突破|收复|失守|守住|回踩)', raw_value
     ):
         return '价格/结构确认条件已记录（具体阈值已脱敏）'
-    return sanitize_public_review_text(value)
+    contextual_value = f'持仓复核：{raw_value}' if position_row else raw_value
+    sanitized = sanitize_public_review_text(contextual_value)
+    if position_row:
+        sanitized = re.sub(r'^持仓复核：', '', sanitized)
+        sanitized = re.sub(
+            r'((?:收盘|收盘价|现价|当前价|成交价|买入价|卖出价)'
+            r'(?:约|为|≈|[：:]|\s)*)[-+]?\d+(?:\.\d+)?(?![\d.%/])',
+            r'\1价格已脱敏',
+            sanitized,
+        )
+        sanitized = re.sub(
+            r'(MA\d+\s*(?:约|=|:|：)?\s*)\d+(?:\.\d+)?(?![\d.%/])',
+            r'\1关键位',
+            sanitized,
+        )
+        if header not in ('标的', '代码', '名称', '板块', '方向', '窗口', '今日定位', '阶段', '角色'):
+            sanitized = re.sub(
+                r'(?<![\d.])[-+]?\d{1,4}\.\d+(?![\d.%/])',
+                '价格已脱敏',
+                sanitized,
+            )
+    return sanitized
 
 
 # ── HTML generators ──
@@ -888,19 +967,26 @@ def html_table(headers, rows, cell_fn=None):
     """Render a table. cell_fn(key, value) can transform cell content."""
     if not headers or not rows:
         return ""
+    position_table = any(
+        re.search(r'数量|成本|现持仓|持仓数量|(?:理论)?可卖|可卖(?:数量|量)', str(header))
+        for header in headers
+    )
     thead = '<thead><tr>' + ''.join(f'<th>{h}</th>' for h in headers) + '</tr></thead>'
     tbody = '<tbody>'
     for row in rows:
+        position_row = any(
+            '持仓' in str(row.get(key, ''))
+            for key in ('窗口', '今日定位', '方向', '阶段', '角色')
+        ) or any(
+            re.search(r'(?:持仓\s*\d|成本\s*\d|收盘\s*\d)', str(value))
+            for value in row.values()
+        ) or ('当前事实' in headers and '今日结论' in headers) or position_table
         tbody += '<tr>'
         for h in headers:
-            position_row = any(
-                '持仓' in str(row.get(key, ''))
-                for key in ('窗口', '今日定位', '方向', '阶段', '角色')
-            )
             if h == '收盘价' and position_row:
                 v = '已脱敏'
             else:
-                v = sanitize_public_review_cell(h, row.get(h, ''))
+                v = sanitize_public_review_cell(h, row.get(h, ''), position_row=position_row)
             if cell_fn:
                 v = cell_fn(h, v)
             tbody += f'<td>{v}</td>'
@@ -1450,9 +1536,10 @@ def split_red_team_rounds(text):
 
 # ── Section parsers ──
 
-def parse_s0(text):
-    """Parse §〇 昨日预案."""
-    html = html_section_header("s0", "第〇部分 · 昨日预案", "昨日终审定稿")
+def parse_s0(text, label='昨日预案'):
+    """Parse §〇 plan or operation-guide content."""
+    subtitle = '昨日终审定稿' if label == '昨日预案' else '公开操作边界'
+    html = html_section_header("s0", f"第〇部分 · {label}", subtitle)
     html += md_text_with_tables_to_html(text)
     html += html_section_footer()
     return html
@@ -1821,11 +1908,11 @@ def parse_data_appendix(text):
     return html
 
 
-def generate_sidebar(fm):
+def generate_sidebar(fm, s0_label='昨日预案'):
     """Generate sidebar navigation."""
     return f"""<div class="sidebar" id="sidebar">
   <div class="label">导航</div>
-  <a href="#s0">第〇部分 昨日预案</a>
+  <a href="#s0">第〇部分 {s0_label}</a>
   <a href="#s1">§一 当日复盘</a>
   <a href="#s1a" class="s2">大盘全景</a>
   <a href="#s1b" class="s2">情绪高标</a>
@@ -1874,8 +1961,12 @@ def convert_md_to_html(md_path):
 
     # §〇
     s0_text, rest = extract_section(content, '第〇部分：昨日预案')
+    s0_label = '昨日预案'
+    if not s0_text:
+        s0_text, rest = extract_section(content, '第〇部分：当日操作指引')
+        s0_label = '当日操作指引'
     if s0_text:
-        sections_html.append(parse_s0(s0_text))
+        sections_html.append(parse_s0(s0_text, label=s0_label))
 
     # §一
     s1_text, rest = extract_section(content, '一、当日复盘')
@@ -1923,7 +2014,7 @@ def convert_md_to_html(md_path):
 {html_topbar(fm)}
 
 <div class="layout">
-{generate_sidebar(fm)}
+{generate_sidebar(fm, s0_label)}
 
 <div class="content">
 
