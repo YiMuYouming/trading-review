@@ -380,6 +380,43 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(r'(?<![A-Za-z0-9_])observe(?![A-Za-z0-9_])', '观察', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])exclude(?![A-Za-z0-9_])', '排除', cleaned, flags=re.I)
     cleaned = re.sub(r'human_required\s*=\s*[A-Z0-9_]+', '需人工复核', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<!\d)8088(?!\d)', '盘前数据入口已隐藏', cleaned)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])available_add_pct\s*=\s*[-+]?\d+(?:\.\d+)?',
+        '新增仓位条件已脱敏',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])execution_card(?![A-Za-z0-9_])',
+        '规则条件记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])review_source_packet(?![A-Za-z0-9_])',
+        '来源记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])source_gaps?(?![A-Za-z0-9_])',
+        '数据缺口',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:c15|d0|d1|d2)_[A-Za-z0-9_]+(?:\s*=\s*[^\s，。；|]+)?',
+        '内部校验字段',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])SIG-\d{8}-[A-Za-z0-9]+(?![A-Za-z0-9_])',
+        '候选记录',
+        cleaned,
+        flags=re.I,
+    )
     cleaned = re.sub(
         r'(?:added|changed)_candidate_ids\s*=\s*\[[^\]]*\]|changes\s*=\s*\[[^\]]*\]',
         '候选变更已记录', cleaned, flags=re.I,
@@ -789,6 +826,11 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
                     line,
                 )
                 line = re.sub(
+                    r'([-+]?\d+(?:\.\d+)?%)[（(]\s*[-+]?\d+(?:\.\d+)?',
+                    r'\1（价格已脱敏',
+                    line,
+                )
+                line = re.sub(
                     r'((?:高点|低点|收盘|现价|当前价)[：:]?\s*)[-+]?\d+(?:\.\d+)?(?![\d.%/])',
                     r'\1价格已脱敏',
                     line,
@@ -804,6 +846,35 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
                     r'\1价格已脱敏',
                     line,
                 )
+                line = re.sub(
+                    r'(?<![A-Za-z0-9_])T\s*出\s*'
+                    r'(?:\d{1,3}(?:,\d{3})+|\d+)(?![\d.])',
+                    'T 出部分仓位',
+                    line,
+                )
+                line = re.sub(
+                    r'(@成交价已隐藏)\s*[-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?![\d.])',
+                    r'\1 部分仓位',
+                    line,
+                )
+                line = re.sub(
+                    r'(?<![\u4e00-\u9fffA-Za-z])持仓\s*'
+                    r'(?:数量|股数)?\s*\d+(?![\d.%])',
+                    '持仓数量已脱敏',
+                    line,
+                )
+                line = re.sub(
+                    r'((?:突破|跌破|站稳|站上|失守|收复|守住|考验)\s*)'
+                    r'[-+]?\d+(?:\.\d+)?(?=\s*(?:后|回踩|附近|上方|下方|未破|失守))',
+                    r'\1关键位',
+                    line,
+                )
+            line = re.sub(
+                r'(?:当前|目前|盘后仓位|账户比例|仓位比例)\s*'
+                r'(?:约|为|当前)?\s*[-+]?\d+(?:\.\d+)?%',
+                '账户比例已脱敏',
+                line,
+            )
             line = re.sub(
                 r'((?:持仓|加仓|买入|卖出|成交)[^，。；|]{0,32}[-+]?\d+(?:\.\d+)?%\s*[（(]\s*)'
                 r'\d+(?:\.\d+)?(?=\s*[，,）)])',

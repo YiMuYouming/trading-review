@@ -512,6 +512,52 @@ weekday: 周二
         ):
             self.assertNotIn(secret.lower(), text.lower())
 
+    def test_public_review_text_redacts_runtime_field_aliases_and_candidate_ids(self):
+        text = convert_review.sanitize_public_review_text(
+            "8088盘前只读事实；系统 available_add_pct=0；"
+            "execution_card 盘中是否有授权窗口；source_gaps=[quotes_stale]；"
+            "review_source_packet；SIG-20260805-4746ae91e411；"
+            "d0_input_source_date=2026-08-05。"
+        )
+
+        for secret in (
+            "8088",
+            "available_add_pct=0",
+            "execution_card",
+            "source_gaps",
+            "review_source_packet",
+            "SIG-20260805-4746ae91e411",
+            "d0_input_source_date",
+        ):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertIn("盘前数据入口已隐藏", text)
+        self.assertIn("新增仓位条件已脱敏", text)
+        self.assertIn("规则条件记录", text)
+        self.assertIn("数据缺口", text)
+        self.assertIn("候选记录", text)
+
+    def test_public_review_text_redacts_spaced_execution_prices_quantities_and_exposure(self):
+        text = convert_review.sanitize_public_review_text(
+            "自选池：网宿 +1.70%(14.98，弈沐两笔加仓后 T 出 2000，持仓 8000)。"
+            "突破 14.99 后回踩未破；仓位/连亏：当前约39.18%，下一交易日前重新读取执行条件。"
+        )
+
+        for secret in ("14.98", "2000", "8000", "14.99", "39.18%"):
+            self.assertNotIn(secret, text)
+        self.assertIn("+1.70%", text)
+        self.assertIn("价格已脱敏", text)
+        self.assertIn("部分仓位", text)
+        self.assertIn("账户比例已脱敏", text)
+
+    def test_public_review_text_redacts_quantities_after_hidden_execution_price(self):
+        text = convert_review.sanitize_public_review_text(
+            "自选池：网宿 +3.19% 走强（弈沐 盘中@成交价已隐藏 +2000、"
+            "盘中@成交价已隐藏 +2000 两笔加仓，合计部分仓位）。"
+        )
+
+        self.assertNotIn("+2000", text)
+        self.assertIn("@成交价已隐藏 部分仓位", text)
+
     def test_public_review_text_redacts_position_prices_in_market_node_notes(self):
         text = convert_review.sanitize_public_review_text(
             "自选池：持仓网宿+6.58%（高点14.99回落）；长鑫+0.02%（55.00翻红，振幅53.02-56.16）；"
