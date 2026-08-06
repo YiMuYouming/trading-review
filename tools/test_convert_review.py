@@ -569,6 +569,62 @@ weekday: 周二
         self.assertIn("+6.58%", text)
         self.assertIn("+0.02%", text)
 
+    def test_public_review_text_redacts_position_prices_without_pool_label(self):
+        text = convert_review.sanitize_public_review_text(
+            "早盘网宿+0.07%守住14.99结构线；"
+            "午盘网宿-1.74%跌破14.99结构线（现价14.72）；"
+            "尾盘三持仓全线跑输，网宿-1.87%（14.70）全天未收复14.99结构线；"
+            "利欧加仓后走弱（午盘 -3.88%、5.45）。"
+        )
+
+        for secret in ("14.99", "14.72", "14.70", "5.45"):
+            self.assertNotIn(secret, text)
+        self.assertIn("+0.07%", text)
+        self.assertIn("-1.74%", text)
+        self.assertIn("价格已脱敏", text)
+
+    def test_public_review_text_redacts_account_reconciliation_quantities(self):
+        text = convert_review.sanitize_public_review_text(
+            "Q5 持仓复核：position_lots + trade_records SSH 回读；"
+            "长鑫关键位/利欧15000（10000+5000锁8/7）；网宿全清归零。"
+        )
+
+        for secret in ("position_lots", "trade_records", "15000", "10000", "5000", "8/7"):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertIn("内部账户记录", text)
+        self.assertIn("仓位数量已脱敏", text)
+
+    def test_public_review_text_redacts_position_ratio_after_rule_record(self):
+        text = convert_review.sanitize_public_review_text(
+            "仓位：规则条件记录盘后约39.18%；当前无新增仓位授权。"
+        )
+
+        self.assertNotIn("39.18%", text)
+        self.assertIn("账户比例已脱敏", text)
+
+    def test_public_review_text_redacts_position_price_before_recovery_action(self):
+        text = convert_review.sanitize_public_review_text(
+            "三持仓仍弱：网宿14.70未收复关键位；盘中网宿14.70未收复关键位。"
+        )
+
+        self.assertNotIn("14.70", text)
+
+    def test_public_review_text_redacts_lock_dates_without_t1_label(self):
+        text = convert_review.sanitize_public_review_text(
+            "持仓：可卖状态 部分仓位锁8/7。"
+        )
+
+        self.assertNotIn("8/7", text)
+
+    def test_public_review_tables_redact_anchor_risk_thresholds(self):
+        html = convert_review.html_table(
+            ["主标的", "锚点用途"],
+            [{"主标的": "网宿科技", "锚点用途": "验证14.99附近结构与算力同链承接"}],
+        )
+
+        self.assertNotIn("14.99", html)
+        self.assertIn("关键位", html)
+
     def test_public_review_text_preserves_observation_counts(self):
         text = convert_review.sanitize_public_review_text("只观察3只；观察22.48继续验证。")
 

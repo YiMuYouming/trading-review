@@ -412,6 +412,12 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         flags=re.I,
     )
     cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:position_lots|trade_records)(?![A-Za-z0-9_])',
+        '内部账户记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
         r'(?<![A-Za-z0-9_])SIG-\d{8}-[A-Za-z0-9]+(?![A-Za-z0-9_])',
         '候选记录',
         cleaned,
@@ -574,6 +580,11 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         flags=re.I,
     )
     cleaned = re.sub(
+        r'(?<![\d/])锁(?:定)?\s*\d{1,2}/\d{1,2}(?![\d/])',
+        '可卖状态已记录',
+        cleaned,
+    )
+    cleaned = re.sub(
         r'((?:先|再|计划)?(?:买入|卖出|加仓|减仓|清仓|买|卖|减))\s*\d+(?![\d.%])',
         r'\1部分仓位',
         cleaned,
@@ -593,7 +604,7 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     )
     cleaned = re.sub(
         r'(?<=[\u4e00-\u9fff])\d{2,4}(?:\.\d+)?'
-        r'(?=\s*(?:下方|修复(?:受阻|条件|彻底|判断)?|风险区|止损线))',
+        r'(?=\s*(?:下方|修复(?:受阻|条件|彻底|判断)?|风险区|止损线|未收复|收复|失守|守住))',
         '关键位',
         cleaned,
     )
@@ -625,13 +636,13 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         cleaned,
     )
     cleaned = re.sub(
-        r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|上方|看|观察|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
+        r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|验证|上方|看|观察|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
         r'\d+(?:\.\d+)?\s*[—~-]\s*\d+(?:\.\d+)?',
         r'\1关键区间',
         cleaned,
     )
     cleaned = re.sub(
-        r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|上方|看|观察|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
+        r'((?:跌破|破|击穿|站稳|站上|收复|守住|守|不站回|未站|失守|考验|识别|验证|上方|看|观察|复核|等待|低于|高于|突破|低点)(?:MA\d+=)?)'
         r'\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*(?!\s*(?:只|家|个|人|条))',
         r'\1关键位',
         cleaned,
@@ -639,6 +650,11 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(
         r'(关键位)\s*[<>]\s*\d+(?:\.\d+)?',
         r'\1附近',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:现价|当前价)[：:]?\s*)[-+]?\d+(?:\.\d+)?(?![\d.%/])',
+        r'\1价格已脱敏',
         cleaned,
     )
     cleaned = re.sub(
@@ -817,9 +833,31 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
             line,
             flags=re.I,
         )
-        if re.search(r'盈亏|浮盈|亏损|浮亏|盈利|实现|成交|买入|加仓|减仓|清仓|卖出|仓位|账户|试仓|暴露', line):
+        if re.search(r'盈亏|浮盈|亏损|浮亏|盈利|实现|成交|买入|加仓|减仓|清仓|卖出|持仓|仓位|账户|试仓|暴露', line):
             line = re.sub(r'(?<!\d)\d{1,2}:\d{2}(?::\d{2})?', '盘中', line)
+            line = re.sub(
+                r'((?:盘前|盘后)?仓位[^：:]{0,20}[：:][^，。；|]{0,24}?)(?:约|为|当前)?[-+]?\d+(?:\.\d+)?%',
+                r'\1账户比例已脱敏',
+                line,
+            )
+            if re.search(r'内部账户记录|持仓复核|SSOT', line, flags=re.I):
+                line = re.sub(
+                    r'(?<![\d.])\d{1,6}(?:\s*\+\s*\d{1,6})+(?=\s*(?:锁|解锁|[）)]))',
+                    '仓位数量已脱敏',
+                    line,
+                )
+                line = re.sub(
+                    r'(?<![\d.])\d{2,6}(?=\s*[（(])',
+                    '部分仓位',
+                    line,
+                )
+                line = re.sub(r'(?<![\d.])\d{1,2}/\d{1,2}(?![\d/])', '次日状态', line)
             if re.search(r'自选池|持仓|新开仓|加仓', line):
+                line = re.sub(
+                    r'((?:午盘|尾盘|收盘)[：:\s]*[-+]?\d+(?:\.\d+)?%[、,]\s*)[-+]?\d+(?:\.\d+)?',
+                    r'\1价格已脱敏',
+                    line,
+                )
                 line = re.sub(
                     r'((?:振幅)[：:]?\s*)[-+]?\d+(?:\.\d+)?\s*[-~—]\s*[-+]?\d+(?:\.\d+)?',
                     r'\1关键区间',
