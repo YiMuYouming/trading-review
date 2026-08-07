@@ -727,6 +727,16 @@ weekday: 周二
         self.assertIn("按成交价已隐藏卖出", text)
         self.assertIn("清仓价已脱敏", text)
 
+    def test_public_review_text_redacts_w32_prose_price_and_amount_aliases(self):
+        text = convert_review.sanitize_public_review_text(
+            "清仓后卖在5.24，止损 -5050；长鑫清仓，收盘 52.48（+1.00%）。"
+        )
+
+        for secret in ("5.24", "5050", "52.48"):
+            self.assertNotIn(secret, text)
+        self.assertIn("价格已脱敏", text)
+        self.assertIn("金额已脱敏", text)
+
     def test_public_review_text_redacts_time_at_price_without_corrupting_time(self):
         text = convert_review.sanitize_public_review_text(
             "瑞芯微早盘两笔降险（10:15@198.71/10:29@199.38）"
@@ -1085,6 +1095,39 @@ weekday: 周二
         ):
             self.assertNotIn(secret.lower(), text.lower())
         self.assertIn("哈希已隐藏", text)
+
+    def test_public_review_text_redacts_w32_internal_aliases(self):
+        text = convert_review.sanitize_public_review_text(
+            "红方receipt与弈沐resolution已记录；"
+            "focus_sectors/rotation_board_scan字段存在语义降级，candidate仍需回链；"
+            "本周继续使用SSOT；baseline已发布且execution_plan_valid=true；"
+            "最终状态为MARKET_SESSION_CLOSED，行情stale，lots=0；"
+            "NeoData查询缺失，保留semiconductor_index_exact_close_unverified和"
+            "quotes_stale_preopen、account_position_reconciliation_mismatch_300017。"
+        )
+
+        for secret in (
+            "receipt",
+            "resolution",
+            "focus_sectors",
+            "rotation_board_scan",
+            "candidate",
+            "ssot",
+            "baseline",
+            "execution_plan_valid",
+            "market_session_closed",
+            "stale",
+            "lots=0",
+            "neodata",
+            "semiconductor_index_exact_close_unverified",
+            "quotes_stale_preopen",
+            "account_position_reconciliation_mismatch_300017",
+        ):
+            self.assertNotIn(secret, text.lower())
+        self.assertIn("来源记录", text)
+        self.assertIn("裁决记录", text)
+        self.assertIn("板块扫描字段", text)
+        self.assertIn("候选记录", text)
 
     def test_public_review_text_redacts_plan_price_shorthand(self):
         text = convert_review.sanitize_public_review_text(

@@ -441,6 +441,46 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(r'(?<![A-Za-z0-9_])canonical(?![A-Za-z0-9_])', '规范校验', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])', '哈希已隐藏', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])d2_receipt(?![A-Za-z0-9_])', '裁决记录', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])receipt(?![A-Za-z0-9_])', '来源记录', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])resolution(?![A-Za-z0-9_])', '裁决记录', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:focus_sectors|rotation_board_scan)(?![A-Za-z0-9_])',
+        '板块扫描字段',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])candidate(?![A-Za-z0-9_])', '候选记录', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])SSOT(?![A-Za-z0-9_])', '规则源', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:neodata_query_script_missing|'
+        r'semiconductor_index_exact_close_unverified|asia_snapshot_session_scope|'
+        r'domestic_high_impact_event_unverified|account_position_reconciliation_mismatch_\d+|'
+        r'quotes_stale_preopen)(?![A-Za-z0-9_])',
+        '数据缺口',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])execution_plan_valid\s*=\s*(?:true|false)(?![A-Za-z0-9_])',
+        '规则条件已脱敏',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])MARKET_SESSION_CLOSED(?![A-Za-z0-9_])',
+        '市场状态已记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])lots\s*=\s*[-+]?\d+(?![A-Za-z0-9_])', '账户批次已隐藏', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])NeoData(?![A-Za-z0-9_])', '外部数据源', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])baseline(?![A-Za-z0-9_])', '盘前基准', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:stale|dead|missing)(?![A-Za-z0-9_])',
+        '数据状态已记录',
+        cleaned,
+        flags=re.I,
+    )
     cleaned = re.sub(r'(?<![A-Za-z0-9_])ledger(?![A-Za-z0-9_])', '候选记录', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])source_gap(?![A-Za-z0-9_])', '数据缺口', cleaned, flags=re.I)
     cleaned = re.sub(r'缺源(?:脚本)?占位', '数据缺口估算', cleaned)
@@ -730,6 +770,17 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         cleaned,
     )
     cleaned = re.sub(
+        r'((?:买|卖)(?:在|于)\s*)[-+]?\d+(?:\.\d+)?(?![\d.%/])',
+        r'\1价格已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:清仓|卖出)[^，。；\n|]{0,24}[，,]\s*收盘[：:\s]+)'
+        r'[-+]?\d+(?:\.\d+)?(?![\d.%/])',
+        r'\1价格已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
         r'(买入|卖出|买|卖)\s*\d{2,3}\.\d+',
         lambda match: '买入价已脱敏' if match.group(1).startswith('买') else '卖出价已脱敏',
         cleaned,
@@ -833,7 +884,7 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
             line,
             flags=re.I,
         )
-        if re.search(r'盈亏|浮盈|亏损|浮亏|盈利|实现|成交|买入|加仓|减仓|清仓|卖出|持仓|仓位|账户|试仓|暴露', line):
+        if re.search(r'盈亏|浮盈|亏损|浮亏|盈利|实现|成交|买入|加仓|减仓|清仓|卖出|止损|持仓|仓位|账户|试仓|暴露', line):
             line = re.sub(r'(?<!\d)\d{1,2}:\d{2}(?::\d{2})?', '盘中', line)
             line = re.sub(
                 r'((?:盘前|盘后)?仓位[^：:]{0,20}[：:][^，。；|]{0,24}?)(?:约|为|当前)?[-+]?\d+(?:\.\d+)?%',
@@ -869,7 +920,7 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
                     line,
                 )
                 line = re.sub(
-                    r'((?:高点|低点|收盘|现价|当前价)[：:]?\s*)[-+]?\d+(?:\.\d+)?(?![\d.%/])',
+                    r'((?:高点|低点|收盘价|收盘|现价|当前价)[：:]?\s*)[-+]?\d+(?:\.\d+)?(?![\d.%/])',
                     r'\1价格已脱敏',
                     line,
                 )
@@ -957,8 +1008,8 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
                 line,
             )
             line = re.sub(
-                r'((?:浮盈|锁盈|已?实现|盈亏|亏损|盈利)(?:为|约|[:：=])?\s*[（(]?)'
-                r'[-+]?\d{1,3}(?:,\d{3})+(?!\d)',
+                r'((?:浮盈|锁盈|已?实现|盈亏|亏损|盈利|止损)(?:为|约|[:：=])?\s*[（(]?)'
+                r'[-+]?(?:\d{1,3}(?:,\d{3})+|\d{4,})(?!\d)',
                 r'\1金额已脱敏',
                 line,
             )

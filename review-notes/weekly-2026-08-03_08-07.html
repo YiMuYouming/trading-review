@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W32 周复盘 · 弈沐资本</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#F7F5F3;--paper:#fff;--soft:#F5F2EE;--line:#E5E2DE;--text:#2D2926;--muted:#5C5652;--faint:#8A8480;--accent:#D97706;--red:#DC2626;--green:#059669}html{scroll-behavior:smooth}body{font:15px/1.7 system-ui,-apple-system,"Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;min-height:54px;padding:10px 22px;background:rgba(247,245,243,.92);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.back{border:1px solid var(--line);border-radius:7px;padding:4px 10px;font-size:13px;color:var(--muted);background:#fff}.title{font-weight:900}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.chip{border:1px solid var(--line);border-radius:999px;padding:2px 9px;background:#fff;font-size:11px;font-weight:800;color:var(--muted)}.chip.up{color:var(--red);background:rgba(220,38,38,.06)}.chip.down{color:var(--green);background:rgba(5,150,105,.06)}.layout{display:flex;max-width:1320px;margin:0 auto}.sidebar{position:sticky;top:54px;width:224px;height:calc(100vh - 54px);padding:20px 14px;border-right:1px solid var(--line)}.sidebar .label{padding:0 10px 8px;color:var(--faint);font-size:11px;font-weight:900;letter-spacing:.12em}.sidebar a{display:block;border-left:3px solid transparent;border-radius:0 8px 8px 0;padding:7px 10px;color:var(--muted);font-size:12px}.sidebar a:hover,.sidebar a.active{background:var(--soft);color:var(--accent);border-left-color:var(--accent)}.content{width:min(1080px,calc(100% - 224px));padding:24px 32px 64px}.hero{background:linear-gradient(145deg,#fff,#FBF8F3);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:18px;box-shadow:0 16px 40px rgba(45,41,38,.05)}.hero h1{font-family:"Noto Serif SC",Georgia,serif;font-size:31px;line-height:1.25;margin-bottom:8px}.hero p{color:var(--muted)}.kpis,.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.kpi,.metric-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;min-width:0}.kpi span,.metric-card span{display:block;font-size:11px;color:var(--faint);font-weight:900;margin-bottom:3px}.kpi strong{font-size:22px}.metric-card strong{display:block;font-size:16px}.metric-card em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:3px}.up{color:var(--red)}.down{color:var(--green)}.note{border-left:4px solid var(--accent);border-radius:0 10px 10px 0;background:rgba(217,119,6,.07);padding:12px 14px;margin-bottom:18px;color:var(--muted)}.section{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:18px;overflow:hidden}.sh{width:100%;display:flex;align-items:center;gap:9px;border:0;border-bottom:1px solid var(--line);background:var(--soft);padding:13px 18px;text-align:left;font:inherit;font-weight:900;color:var(--text);cursor:pointer}.sh .tog{font-size:11px;color:var(--faint);transition:transform .15s}.sh.collapsed .tog{transform:rotate(-90deg)}.sb{padding:16px 18px 18px}.sb.hide{display:none}p{margin:8px 0}ul,ol{padding-left:22px;margin:9px 0}li{margin:4px 0}.tw{overflow:auto;max-width:100%;margin:12px 0 15px;border:1px solid var(--line);border-radius:10px;-webkit-overflow-scrolling:touch}.tw:before{content:"左右滑动查看完整表格";display:block;padding:5px 10px;background:#FCFBFA;border-bottom:1px solid var(--line);font-size:11px;font-weight:900;color:var(--faint)}table{width:100%;border-collapse:collapse;font-size:13px;background:#fff}th{background:var(--soft);text-align:left;white-space:nowrap;color:var(--muted);font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line)}td{padding:8px 10px;border-bottom:1px solid #F0EEEC;vertical-align:top;min-width:86px}tr:nth-child(even) td{background:#FCFBFA}.flow-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:14px 0}.flow-card{border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#fff,#FCFBFA);padding:12px;min-width:0}.flow-card .day{font-size:12px;color:var(--faint);font-weight:900}.flow-card strong{display:block;margin:4px 0 6px;color:var(--accent)}.flow-card p{font-size:12px;color:var(--muted);line-height:1.55;margin:0}.insight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.insight-card{border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:14px;padding:14px;background:linear-gradient(180deg,#fff,#FCFBFA)}.insight-card h3{font-size:16px;margin:0 0 6px}.insight-card p{color:var(--muted);line-height:1.65}@media(max-width:980px){.flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:820px){.sidebar{display:none}.content{width:100%;padding:16px}.title{white-space:normal}.meta{margin-left:0}.hero h1{font-size:25px}}@media(max-width:620px){.flow-grid,.kpis,.metric-grid,.insight-grid{grid-template-columns:1fr}.topbar{padding:10px 14px;flex-wrap:wrap}.content{padding:14px}}
+</style>
+</head>
+<body>
+<div class="topbar"><a id="back-home" class="back" href="../index.html#reviews">← 平台</a><div class="title">W32 周复盘（2026-08-03 至 2026-08-07）</div><div class="meta"><span class="chip">8/3-8/7 · 5天</span><span class="chip down">周度 -0.78%</span><span class="chip up">上证 +2.82%</span><span class="chip">W32</span></div></div>
+<div class="layout">
+  <nav class="sidebar"><div class="label">目录</div><a href="#s0">核心发现</a><a href="#s1">本周概览</a><a href="#s2">节奏打法</a><a href="#s3">主线板块</a><a href="#s4">盈亏归因</a><a href="#s5">认知迭代</a><a href="#s6">下周基调</a><a href="#s7">来源边界</a></nav>
+  <main class="content">
+    <section class="hero"><h1>W32 周复盘</h1><p>账户周度回撤 0.7808%，落后上证 3.6000 个百分点。前半周主要靠存量风险管理保持正收益，后半周因弱证据加仓、替代交易和窗口外动作形成负阿尔法；本周最需要修复的是买入证据与执行纪律。</p><div class="kpis"><div class="kpi"><span>周度收益</span><strong class="down">-0.7808%</strong></div><div class="kpi"><span>交易日</span><strong>5天</strong></div><div class="kpi"><span>相对上证</span><strong class="down">-3.6000pp</strong></div><div class="kpi"><span>风控事件</span><strong>5日观察收口</strong></div></div></section>
+    <div class="note"><strong>报告状态</strong>：五篇日复盘均已完成，周级事实与账户复核已收口，查询覆盖、实体匹配与收盘后 freshness 等数据缺口继续保留。<br><strong>闭环说明</strong>：本周五个交易日均以观察级口径处理，不把事后结果追认成事前授权。<br><strong>公开边界</strong>：精确股数、成本、成交金额、内部路径和记录编号均已省略；本页只描述事实、认知与观察变量。</div>
+
+    <section class="section" id="s0"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>核心发现（先看这里）</button><div class="sb"><div class="tw"><table><thead><tr><th>维度</th><th>结论</th></tr></thead><tbody>
+      <tr><td>盈亏</td><td>账户周度 <strong class="down">-0.7808%</strong>，同期上证 <strong class="up">+2.8192%</strong>；相对收益落后 3.6000 个百分点。</td></tr>
+      <tr><td>节奏</td><td>5 个交易日没有一天完整执行事前计划；新增端反复出现替代、轮动、板块承接和修复预期，卖出端则能在证据失效后结束错误链。</td></tr>
+      <tr><td>主线</td><td>周初核电/算力，周中半导体与通信，周四煤炭/电子化学品/通信，周五医药/CXO 与 PCB 扩散；AI 应用后半周明显走弱。</td></tr>
+      <tr><td>梯队</td><td>最高板由 6 → 7 → 8 → 10 → 4，周四高度高潮后快速压缩；高标断板后的缩量不能直接解释为修复。</td></tr>
+      <tr><td>赚钱效应</td><td>情绪路径为 73.0 → 67.0 → 68.1 → 52.0 → 52.7；指数上涨不能替代持仓选择与交易节奏。</td></tr>
+      <tr><td>证据边界</td><td>周级复核不做估算；广筛覆盖、实体匹配、管道质量与实时 freshness 缺口均保留，观察结论不产生新增权限。</td></tr>
+    </tbody></table></div><p><strong>下周目标</strong>：新开或加仓必须同时有事前计划、板块宽度和标的自身强度；第二笔证据必须强于第一笔，缺任一项就降级为观察。</p></div></section>
+
+    <section class="section" id="s1"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>〇、本周概览</button><div class="sb"><div class="flow-grid">
+      <article class="flow-card"><div class="day">周一 8/3</div><strong>结构轮动</strong><p>核电、算力出现宽度；强势锚点只能提供线索，不能替代目标标的确认。</p></article>
+      <article class="flow-card"><div class="day">周二 8/4</div><strong>科技爆发</strong><p>半导体、通信与算力扩散；结果走强不能倒写成规则授权。</p></article>
+      <article class="flow-card"><div class="day">周三 8/5</div><strong>强势分化</strong><p>半导体最强但部分持仓锚点主弱；新增端继续暴露独立证据不足。</p></article>
+      <article class="flow-card"><div class="day">周四 8/6</div><strong>高度高潮</strong><p>煤炭、电子化学品和通信接力；断板后的缩量更应先视为风险状态。</p></article>
+      <article class="flow-card"><div class="day">周五 8/7</div><strong>高度压缩</strong><p>医药/CXO 与 PCB 扩散，AI 应用走弱；清理旧风险正确，但替代与越窗动作仍需纠偏。</p></article>
+    </div><div class="metric-grid"><div class="metric-card"><span>情绪路径</span><strong>73.0 → 52.7</strong><em>周中后段明显降温</em></div><div class="metric-card"><span>日收益胜率</span><strong>60%</strong><em>3 盈 2 亏</em></div><div class="metric-card"><span>计划完整执行</span><strong>0/5 天</strong><em>买入端是主要缺口</em></div><div class="metric-card"><span>周后段拖累</span><strong class="down">周四 + 周五</strong><em>持仓选择弱于指数</em></div></div></div></section>
+
+    <section class="section" id="s2"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>一、节奏与打法回顾</button><div class="sb"><ol><li><strong>结果与执行质量分开评价。</strong>持仓收盘盈利或形态成立，都不能覆盖缺少事前计划、独立证据或窗口条件。</li><li><strong>第二笔必须出现更强证据。</strong>加仓是对正确的确认，不是对成本或错失感受的修复；证据变弱时只能观察或减风险。</li><li><strong>替代交易必须重新验证。</strong>错过 A 后买 B，不等于获得同一机会；目标标的仍要独立通过板块、个股和失效点检查。</li><li><strong>风险卖出和新增风险不能互相抵消。</strong>组合表面降风险时，要同时检查是否只是换了风险载体。</li></ol><p><strong>本周进步</strong>：卖出端能在逻辑失效、锚组共弱或结构破坏后结束错误链。</p><p><strong>本周问题</strong>：买入端仍把板块映射、缩量修复和低开补涨当作独立确认，导致后半周负阿尔法集中释放。</p></div></section>
+
+    <section class="section" id="s3"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>二、主线与板块</button><div class="sb"><div class="tw"><table><thead><tr><th>阶段</th><th>市场演变</th><th>公开结论</th></tr></thead><tbody>
+      <tr><td>周初</td><td>核电、算力与结构性科技方向形成宽度，指数与情绪并不完全同步。</td><td>高潮或轮动阶段优先验证，不做错失后的补偿性追涨。</td></tr>
+      <tr><td>周中</td><td>半导体、通信和算力扩散，随后出现锚点强、持仓标的弱的分化。</td><td>单一先锋只能提供线索，不能代表板块或目标标的完成修复。</td></tr>
+      <tr><td>周四</td><td>连板高度继续抬升，煤炭、电子化学品、通信接力；持仓方向出现负阿尔法。</td><td>承接不等于反转；缩量必须与关键位、宽度和共振一起验证。</td></tr>
+      <tr><td>周五</td><td>医药/CXO 与 PCB 扩散，半导体午后修复，AI 应用仍弱。</td><td>所有方向都只保留下一交易日观察资格，不能由周报延续新增权限。</td></tr>
+    </tbody></table></div><p><strong>结构结论</strong>：本周是高速轮动而非单一主线稳定上行；医药/CXO、PCB 与半导体容量修复是线索，不是预先确认的买点。</p></div></section>
+
+    <section class="section" id="s4"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>三、盈亏归因</button><div class="sb"><div class="tw"><table><thead><tr><th>归因项</th><th>本周表现</th><th>判断</th></tr></thead><tbody>
+      <tr><td>存量兑现</td><td>强势存量仓分批兑现，逻辑失效的旧风险及时退出。</td><td>卖出纪律是本周正向样本，但不追认原始买入流程。</td></tr>
+      <tr><td>锚点映射</td><td>把关联方向强势外推到目标标的，独立强度和宽度证据不足。</td><td>关联关系只提供候选，不提供买点。</td></tr>
+      <tr><td>缩量修复</td><td>在板块与个股同步转弱时仍把缩量解释为抛压衰竭。</td><td>缩量没有方向，买盘缺失也会表现为缩量。</td></tr>
+      <tr><td>替代与越窗</td><td>错失后的替代交易、窗口外加仓和弱证据扩大风险集中出现在周后半段。</td><td>新增风险的赔率明显差于存量持仓管理。</td></tr>
+    </tbody></table></div><p><strong>模式识别</strong>：赚钱来自强势或失效后的兑现；亏损来自先有情绪或叙事，再寻找锚点、缩量和低开为动作解释。</p></div></section>
+
+    <section class="section" id="s5"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>四、认知迭代</button><div class="sb"><div class="insight-grid">
+      <article class="insight-card"><h3>关联股强势不能代替标的自身证据</h3><p>板块关系只提供候选；替代标的仍须独立验证预案、板块宽度、个股强度与失效点。</p></article>
+      <article class="insight-card"><h3>第二笔证据必须强于第一笔</h3><p>加仓是对正确的确认，不是对成本或错失感受的修复；证据变弱时只能观察或减风险。</p></article>
+      <article class="insight-card"><h3>缩量本身没有方向</h3><p>断板或板块走弱后的缩量可能只是买盘缺失；修复必须同时看到关键位、锚组与宽度改善。</p></article>
+      <article class="insight-card"><h3>低位试错可以小，但不能扩大错误</h3><p>首笔试错与后续确认分开评价；原假设弱化后，不因价格更便宜或结果未定而继续扩大风险。</p></article>
+      <article class="insight-card"><h3>形态买点和流程授权是两条线</h3><p>形态成立只能说明技术事实，不能覆盖事前计划、允许窗口与最终执行条件。</p></article>
+      <article class="insight-card"><h3>止损只负责终止错误链</h3><p>风险动作可以结束错误链，但不能用亏损否定全部方法，也不能用卖出后的空缺驱动下一笔。</p></article>
+    </div><p><strong>周级判断</strong>：现有规则语义足以覆盖主要错误，本周不改规则源，也不扩写其他认知或反馈源；仅同步 8/7 日复盘的认知条目。</p></div></section>
+
+    <section class="section" id="s6"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>五、下周基调</button><div class="sb"><p><strong>方向判断</strong>：不确定。医药/CXO、PCB 与半导体形成修复线索，但连板高度已从 10 压至 4，AI 应用仍弱；下周必须用新鲜宽度、容量锚、资金与目标标的自身承接重新确认。</p><ul><li>任何方向先观察宽度、容量和目标强度是否同步改善，不用周五指数上涨直接外推下一交易日动作。</li><li>同一逻辑的第二笔必须有新的、更强的独立证据；缩量只记录为事实，不直接写成修复。</li><li>卖出后先完成独立重评，不因踏空、痛苦或账户空位立即寻找替代仓。</li><li>本页只提供观察变量，不构成投资建议或新增交易授权。</li></ul></div></section>
+
+    <section class="section" id="s7"><button class="sh" onclick="toggleSection(this)"><span class="tog">▼</span>六、来源审计与边界</button><div class="sb"><div class="tw"><table><thead><tr><th>项目</th><th>采用口径</th><th>缺口与处理</th></tr></thead><tbody>
+      <tr><td>周收益与指数</td><td>Hermes 收盘快照与上证日收益序列复合。</td><td>周度结果与相对收益保留；不把实现损益、期末浮动变化和 NAV 混算。</td></tr>
+      <tr><td>日复盘覆盖</td><td>8/3—8/7 五篇日复盘均已收口。</td><td>五日均有广筛覆盖、实体匹配、管道质量或等价性缺口，观察结论不升级。</td></tr>
+      <tr><td>市场结构</td><td>每日涨停梯队、情绪、板块宽度与容量线索。</td><td>周五收盘后 freshness 已转为非实时状态，不用于下一交易日实时判断。</td></tr>
+      <tr><td>公开内容</td><td>Vault W32 周复盘的脱敏蒸馏。</td><td>精确仓位、成本、数量、成交金额、内部路径与记录编号均已省略。</td></tr>
+    </tbody></table></div><p class="note">本页为个人交易系统的阶段复盘与认知记录，不构成投资建议，也不产生任何交易授权。目标交易日仍须以新鲜事实、完整证据和弈沐明确的人工指令共同决定。</p></div></section>
+  </main>
+</div>
+<script>function toggleSection(btn){btn.classList.toggle('collapsed');btn.nextElementSibling.classList.toggle('hide')}const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));const a=document.querySelector('.sidebar a[href="#'+e.target.id+'"]');if(a)a.classList.add('active')}})},{rootMargin:'-90px 0px -72% 0px'});document.querySelectorAll('.section[id]').forEach(s=>io.observe(s));(function(){const from=new URLSearchParams(location.search).get('from');if(from&&/^[A-Za-z0-9_-]+$/.test(from)){document.getElementById('back-home').href='../index.html#'+from}})();</script>
+</body>
+</html>
