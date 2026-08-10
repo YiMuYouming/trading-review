@@ -145,6 +145,7 @@ def sanitize_public_text(text: str) -> str:
         line = re.sub(r"\s*`?WEEK_STOP`?", "周回撤门禁", line, flags=re.I)
         line = re.sub(r"\s*`?LOSS_STREAK`?", "连亏门禁", line, flags=re.I)
         line = re.sub(r"\s*`?W1_PROMOTION`?", "窗口门禁", line, flags=re.I)
+        line = re.sub(r"门禁\s+门禁", "门禁", line)
         line = re.sub(r"`?no_touch`?", "暂不参与", line, flags=re.I)
         line = re.sub(r"`?observation-only`?", "仅观察", line, flags=re.I)
         line = line.replace("`", "")

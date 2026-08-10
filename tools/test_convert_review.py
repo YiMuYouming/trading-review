@@ -1096,6 +1096,16 @@ weekday: 周二
             self.assertNotIn(secret.lower(), text.lower())
         self.assertIn("哈希已隐藏", text)
 
+    def test_public_review_text_redacts_spaced_artifact_hash_audit_language(self):
+        text = convert_review.sanitize_public_review_text(
+            "回执审计：artifact hash 与回执自哈希均匹配。"
+        )
+
+        for secret in ("回执审计", "artifact hash", "回执自哈希"):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertIn("复核说明", text)
+        self.assertIn("复核记录一致", text)
+
     def test_public_review_text_redacts_w32_internal_aliases(self):
         text = convert_review.sanitize_public_review_text(
             "红方receipt与弈沐resolution已记录；"

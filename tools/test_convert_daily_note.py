@@ -485,6 +485,13 @@ class ConvertDailyNoteTest(unittest.TestCase):
             ["先看市场承接与风险门禁是否恢复，不以盘中强势替代收盘确认。"],
         )
 
+    def test_daily_note_collapses_gate_word_after_internal_token_translation(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "明日仍受 `LOSS_STREAK` 门禁约束。"
+        )
+
+        self.assertEqual(public_text, "明日仍受连亏门禁约束。")
+
     def test_updates_daily_notes_archive_and_home_without_review_count_drift(self):
         convert_daily_note.convert_review_to_daily_note(self.review_note)
         convert_daily_note.convert_review_to_daily_note(self.review_note)

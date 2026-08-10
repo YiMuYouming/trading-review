@@ -436,6 +436,15 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         '候选裁决记录', cleaned, flags=re.I,
     )
     cleaned = re.sub(r'scripts\.selection_closure\.artifact_sha256', '内部校验工具', cleaned, flags=re.I)
+    cleaned = re.sub(r'回执审计', '复核说明', cleaned)
+    cleaned = re.sub(
+        r'artifact\s+hash\s+与\s*回执自哈希\s*均匹配',
+        '复核记录一致',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])artifact\s+hash(?![A-Za-z0-9_])', '校验记录', cleaned, flags=re.I)
+    cleaned = re.sub(r'回执自哈希', '校验记录', cleaned)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])receipt_sha256(?![A-Za-z0-9_])', '回执哈希', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])artifact_sha256(?![A-Za-z0-9_])', '记录哈希', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])canonical(?![A-Za-z0-9_])', '规范校验', cleaned, flags=re.I)
