@@ -737,6 +737,33 @@ weekday: 周二
         self.assertIn("价格已脱敏", text)
         self.assertIn("金额已脱敏", text)
 
+    def test_public_review_text_redacts_spaced_execution_price_before_pnl(self):
+        text = convert_review.sanitize_public_review_text(
+            "尾盘持仓：利通电子 -5.21%续弱（今日加仓 122.20 浮亏扩大至约 -2.95 元/股）。"
+        )
+
+        self.assertNotIn("122.20", text)
+        self.assertNotIn("-2.95", text)
+        self.assertIn("成交价已隐藏", text)
+        self.assertIn("金额已脱敏", text)
+
+    def test_public_review_table_redacts_signed_pnl_without_currency_suffix(self):
+        html = convert_review.html_table(
+            ["标的", "成本", "现价", "浮盈率", "仓位", "评价"],
+            [{
+                "标的": "利通电子",
+                "成本": "125.06",
+                "现价": "118.22",
+                "浮盈率": "-5.47%",
+                "仓位": "17.04%",
+                "评价": "今日 +745；今日 -6,507；收盘",
+            }],
+        )
+
+        for secret in ("125.06", "118.22", "+745", "-6,507"):
+            self.assertNotIn(secret, html)
+        self.assertIn("金额已脱敏", html)
+
     def test_public_review_text_redacts_time_at_price_without_corrupting_time(self):
         text = convert_review.sanitize_public_review_text(
             "瑞芯微早盘两笔降险（10:15@198.71/10:29@199.38）"

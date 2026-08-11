@@ -601,6 +601,12 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     )
     cleaned = re.sub(r'\d+\s*股', '部分仓位', cleaned)
     cleaned = re.sub(
+        r'((?:先|再|计划)?(?:买入|卖出|加仓|减仓|清仓|买|卖|减)\s+)'
+        r'[-+]?\d{2,4}(?:\.\d+)?(?=\s*(?:浮亏|浮盈|亏损|盈利|成交|买入|卖出|加仓|减仓|清仓|扩大|缩小|$))',
+        r'\1成交价已隐藏',
+        cleaned,
+    )
+    cleaned = re.sub(
         r'(?:全部|新?部分仓位)?\s*T\+1\s*锁(?:定)?至\s*(?:\d{1,2}月\d{1,2}日|\d{1,2}/\d{1,2})',
         'T+1状态已记录',
         cleaned,
@@ -1096,6 +1102,12 @@ def sanitize_public_review_cell(header, value, position_row=False):
             sanitized = re.sub(
                 r'(?<![\d.])[-+]?\d{1,4}\.\d+(?![\d.%/])',
                 '价格已脱敏',
+                sanitized,
+            )
+            sanitized = re.sub(
+                r'((?:今日|当日|日内|浮盈|浮亏|盈亏|实现|亏损|盈利)[^，。；|]{0,16}?)'
+                r'[-+]?(?:\d{1,3}(?:,\d{3})+|\d{3,})(?![\d.%])',
+                r'\1金额已脱敏',
                 sanitized,
             )
     return sanitized
