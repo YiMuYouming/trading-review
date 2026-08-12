@@ -435,6 +435,47 @@ weekday: 周二
         self.assertIn("规则教训", html)
         self.assertNotIn("<ol class=\"tight-list\">", html.split("规则教训", 1)[0])
 
+    def test_parse_s2_renders_plain_numbered_sentence_cognitions_as_cards(self):
+        markdown = """### 今日认知
+
+1. 市场强不等于持仓强。今日情绪与涨停数量明显修复，但持仓仍弱于同链锚点；板块繁荣只能用于风险判断，不能替持仓结构辩护。
+2. 没有盘中盯盘会话时，复盘只能基于五节点事实、收盘数据与结构化回执；以“无盘中盘感记录”明确留缺，不用收盘结果伪造当时判断。
+"""
+
+        html = convert_review.parse_s2(markdown)
+
+        self.assertEqual(html.count('class="lesson-card cognition"'), 2)
+        self.assertIn("市场强不等于持仓强", html)
+        self.assertIn("板块繁荣只能用于风险判断", html)
+        self.assertIn("没有盘中盯盘会话时，复盘只能基于五节点事实", html)
+        self.assertIn("明确留缺", html)
+        self.assertNotIn("<ol class=\"tight-list\">", html)
+
+    def test_redacts_account_total_close_prices_and_unmarked_unlock_quantities(self):
+        raw = (
+            "持仓：深信服 -3.23% 收 121.50，利通电子 +0.96% 收 119.36；"
+            "账户：总资产 693178.47、仓位25.98%。"
+            "利通电子1000股（新300解锁8/12），收盘回红，新300已解锁。"
+        )
+
+        text = convert_review.sanitize_public_review_text(raw)
+
+        for secret in ("121.50", "119.36", "693178.47", "1000股", "新300", "8/12"):
+            self.assertNotIn(secret, text)
+        self.assertIn("价格已脱敏", text)
+        self.assertIn("总资产已脱敏", text)
+        self.assertIn("新增批次可卖状态已记录", text)
+
+    def test_translates_executable_ticket_and_trade_watch_labels(self):
+        text = convert_review.sanitize_public_review_text(
+            "不创建 executable ticket；两只持仓均进入 trade_watch。"
+        )
+
+        self.assertNotIn("executable", text)
+        self.assertNotIn("trade_watch", text)
+        self.assertIn("内部执行记录", text)
+        self.assertIn("持仓复核", text)
+
     def test_convert_md_to_html_redacts_public_execution_details(self):
         markdown = """---
 date: 2026-07-14

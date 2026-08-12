@@ -428,6 +428,33 @@ class ConvertDailyNoteTest(unittest.TestCase):
         self.assertNotIn("23.4", html)
         self.assertIn("降低部分风险", html)
 
+    def test_extracts_plain_numbered_sentence_cognition(self):
+        section = """### 今日认知
+
+1. 市场强不等于持仓强。今日情绪与涨停数量明显修复，但持仓仍弱于同链锚点；板块繁荣只能用于风险判断，不能替持仓结构辩护。
+2. 没有盘中盯盘会话时不倒推盘感。复盘只使用五节点事实和收盘数据。
+"""
+
+        title, body, _action = convert_daily_note.extract_first_cognition(section)
+
+        self.assertEqual(title, "市场强不等于持仓强")
+        self.assertIn("板块繁荣只能用于风险判断", body)
+        self.assertNotIn("没有盘中盯盘会话", body)
+
+    def test_watch_items_hide_internal_gate_path_and_account_availability(self):
+        section = """### D3 观察终稿预案
+
+1. **先看门禁**：开盘前回读 `/api/ai/context.decision_gate.allowed`、账户持仓与可卖量；只要 LOSS_STREAK 未解除，新增和加仓保持 0。
+"""
+
+        items = convert_daily_note.extract_watch_items(section)
+        text = " ".join(items)
+
+        self.assertNotIn("/api/", text)
+        self.assertNotIn("decision_gate", text)
+        self.assertNotIn("账户持仓与可卖量", text)
+        self.assertIn("实时风险状态", text)
+
     def test_daily_note_splits_plain_bracket_cognition_on_dash(self):
         section = """### 今日认知
 

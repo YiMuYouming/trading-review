@@ -145,6 +145,14 @@ def sanitize_public_text(text: str) -> str:
         line = re.sub(r"\s*`?WEEK_STOP`?", "周回撤门禁", line, flags=re.I)
         line = re.sub(r"\s*`?LOSS_STREAK`?", "连亏门禁", line, flags=re.I)
         line = re.sub(r"\s*`?W1_PROMOTION`?", "窗口门禁", line, flags=re.I)
+        line = re.sub(
+            r"`?/?api/[^\s`<>|，。；]+`?[、,]\s*账户持仓与可卖量",
+            "实时风险状态",
+            line,
+            flags=re.I,
+        )
+        line = re.sub(r"`?/?api/[^\s`<>|，。；]+`?", "内部执行入口已隐藏", line, flags=re.I)
+        line = re.sub(r"账户持仓与可卖量", "实时风险状态", line)
         line = re.sub(r"门禁\s+门禁", "门禁", line)
         line = re.sub(r"`?no_touch`?", "暂不参与", line, flags=re.I)
         line = re.sub(r"`?observation-only`?", "仅观察", line, flags=re.I)
@@ -340,6 +348,13 @@ def extract_first_cognition(s2_text: str) -> tuple[str, str, str]:
         title = clean_cognition_title(plain_numbered.group("title"))
         body = sanitize_cognition_evidence(plain_numbered.group("body").strip())
         return title, body or title, convert_review.infer_lesson_action("认知", title, body)
+
+    plain_sentence_items = convert_review.parse_plain_numbered_sentence_lessons(s2_text)
+    if plain_sentence_items:
+        first = plain_sentence_items[0]
+        title = clean_cognition_title(first["title"])
+        body = sanitize_cognition_evidence(first["body"])
+        return title, body, convert_review.infer_lesson_action("认知", title, body)
 
     untagged = re.search(
         r"(?:^###\s+今日认知\s*)?\*\*\d+\.\s+(?P<title>.+?)\*\*\s*\n+(?P<body>.*?)(?=^(?:\*\*\d+\.|###)|\Z)",

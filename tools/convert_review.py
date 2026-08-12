@@ -287,7 +287,7 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     )
     cleaned = re.sub(r'TICKET-[A-Za-z0-9_-]+', '交易记录', cleaned, flags=re.I)
     cleaned = re.sub(
-        r'(?<![A-Za-z0-9_])(?:execution\s+)?ticket',
+        r'(?<![A-Za-z0-9_])(?:(?:execution|executable)\s+)?ticket',
         '内部执行记录',
         cleaned,
         flags=re.I,
@@ -373,6 +373,12 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(
         r'(?<![A-Za-z0-9_])trade_review(?![A-Za-z0-9_])',
         '交易复核',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])trade_watch(?![A-Za-z0-9_])',
+        '持仓复核',
         cleaned,
         flags=re.I,
     )
@@ -600,6 +606,12 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         cleaned,
     )
     cleaned = re.sub(r'\d+\s*股', '部分仓位', cleaned)
+    cleaned = re.sub(
+        r'新\s*\d+(?:\s*股)?\s*(?:已)?解锁(?:日)?\s*'
+        r'(?:\d{1,2}月\d{1,2}日|\d{1,2}/\d{1,2})?',
+        '新增批次可卖状态已记录',
+        cleaned,
+    )
     cleaned = re.sub(
         r'((?:先|再|计划)?(?:买入|卖出|加仓|减仓|清仓|买|卖|减)\s+)'
         r'[-+]?\d{2,4}(?:\.\d+)?(?=\s*(?:浮亏|浮盈|亏损|盈利|成交|买入|卖出|加仓|减仓|清仓|扩大|缩小|$))',
@@ -901,6 +913,16 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         )
         if re.search(r'盈亏|浮盈|亏损|浮亏|盈利|实现|成交|买入|加仓|减仓|清仓|卖出|止损|持仓|仓位|账户|试仓|暴露', line):
             line = re.sub(r'(?<!\d)\d{1,2}:\d{2}(?::\d{2})?', '盘中', line)
+            line = re.sub(
+                r'总资产\s*[-+]?\d+(?:\.\d+)?',
+                '总资产已脱敏',
+                line,
+            )
+            line = re.sub(
+                r'(?<![\u4e00-\u9fffA-Za-z])收\s+[-+]?\d{2,4}(?:\.\d+)?(?![\d.%/])',
+                '收 价格已脱敏',
+                line,
+            )
             line = re.sub(
                 r'((?:盘前|盘后)?仓位[^：:]{0,20}[：:][^，。；|]{0,24}?)(?:约|为|当前)?[-+]?\d+(?:\.\d+)?%',
                 r'\1账户比例已脱敏',
@@ -1524,6 +1546,27 @@ def html_node_notes(body):
     return html
 
 
+def parse_plain_numbered_sentence_lessons(text):
+    """Parse `1. 原则。证据` cognition items used by finalized ReviewNotes."""
+    items = []
+    for match in re.finditer(
+        r'^\d+\.\s+(?P<item>.*?)(?=^\d+\.\s+|^#{2,5}\s+|^---\s*$|\Z)',
+        text,
+        re.MULTILINE | re.DOTALL,
+    ):
+        raw = match.group("item").strip()
+        sentence = re.match(r'(?P<title>[^。！？\n]+)[。！？]\s*(?P<body>.*)', raw, re.DOTALL)
+        if not sentence or not sentence.group("body").strip():
+            sentence = re.match(r'(?P<title>[^；;\n]+)[；;]\s*(?P<body>.*)', raw, re.DOTALL)
+        if not sentence:
+            continue
+        title = sentence.group("title").strip()
+        body = sentence.group("body").strip()
+        if title and body:
+            items.append({"kind": "认知", "title": title, "body": body})
+    return items
+
+
 def html_lesson_cards(text):
     """Render §二 心得与教训 as type-coded cards."""
     item_re = re.compile(
@@ -1576,6 +1619,9 @@ def html_lesson_cards(text):
             if after:
                 html += f'<div class="si">{md_text_to_html(after)}</div>'
             return html
+        plain_numbered = parse_plain_numbered_sentence_lessons(text)
+        if plain_numbered:
+            return render_lesson_card_grid(plain_numbered)
         return f'<div class="si">{md_text_to_html(text.strip())}</div>'
 
     return render_lesson_card_grid([
