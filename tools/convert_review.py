@@ -2388,11 +2388,24 @@ def extract_close_ratio(date_str):
     cells = re.findall(r"<td.*?>(.*?)</td>", rows[-1], flags=re.S)
     if len(cells) < 6:
         return "--"
-    ratio = re.sub(r"<.*?>", "", cells[5]).strip()
-    m = re.match(r"^(\d+)\s*/\s*(\d+)$", ratio)
-    if m:
-        return f'<b class="upnum">{m.group(1)}</b>/<b class="dnnum">{m.group(2)}</b>'
-    return ratio or "--"
+    plain_cells = [re.sub(r"<.*?>", "", cell).strip() for cell in cells]
+
+    # Newer review tables may fold the ratio into the sentiment/width cell
+    # and append source-gap columns after the market facts.
+    for cell in plain_cells:
+        labeled = re.search(
+            r"(?:涨跌比|涨跌|上涨\s*/\s*下跌)\s*[:：]?\s*(\d+)\s*/\s*(\d+)",
+            cell,
+        )
+        if labeled:
+            return f'<b class="upnum">{labeled.group(1)}</b>/<b class="dnnum">{labeled.group(2)}</b>'
+
+    # Preserve the established six-column layout, where the ratio is cell 6.
+    legacy_ratio = re.fullmatch(r"(\d+)\s*/\s*(\d+)", plain_cells[5])
+    if legacy_ratio:
+        return f'<b class="upnum">{legacy_ratio.group(1)}</b>/<b class="dnnum">{legacy_ratio.group(2)}</b>'
+
+    return "--"
 
 
 def strip_html_tags(value):

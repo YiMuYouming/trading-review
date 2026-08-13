@@ -125,6 +125,31 @@ class ConvertReviewTest(unittest.TestCase):
                 convert_review.PORTAL = original_portal
                 convert_review.REVIEW_NOTES = original_review_notes
 
+    def test_extract_close_ratio_reads_expanded_close_row(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            original_review_notes = convert_review.REVIEW_NOTES
+            convert_review.REVIEW_NOTES = Path(tmp)
+            try:
+                (Path(tmp) / "2026-08-13.html").write_text(
+                    """<table><tr><td>收盘</td>
+<td>上证-0.50%</td>
+<td>情绪21.2%；规范校验涨跌1192/4021；涨停59/跌停4</td>
+<td>医药逆势收涨</td>
+<td>持仓相对表现</td>
+<td>来源记录</td>
+<td>数据缺口</td></tr></table>""",
+                    encoding="utf-8",
+                )
+
+                ratio = convert_review.extract_close_ratio("2026-08-13")
+            finally:
+                convert_review.REVIEW_NOTES = original_review_notes
+
+        self.assertEqual(
+            ratio,
+            '<b class="upnum">1192</b>/<b class="dnnum">4021</b>',
+        )
+
     def test_extract_period_metric_accepts_classed_strong(self):
         html = '<span>周度收益</span><strong class="gain">+3.08%</strong>'
 
