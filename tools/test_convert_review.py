@@ -299,6 +299,48 @@ weekday: 周二
         self.assertIn("&lt;30%(W1追涨)/&lt;40%(W2冰点)", table2)
         self.assertNotIn("<th>指标</th>", table2)
 
+    def test_parse_s1_renders_observation_dimension_as_metric_column(self):
+        markdown = """### 表2：情绪高标
+
+| 观察维度 | 竞价 | 收盘 |
+| --- | --- | --- |
+| 最高板/晋级 | 最高5板 | 最高5板 |
+| 涨跌停与炸板 | 涨停8/跌停1 | 涨停63/跌停10 |
+"""
+
+        html = convert_review.parse_s1(markdown)
+        table2 = html.split("📈 表2：情绪高标", 1)[1]
+
+        self.assertIn('<div class="stage-title">竞价</div>', table2)
+        self.assertIn('<span class="rlabel">最高板/晋级</span>', table2)
+        self.assertIn('<span class="rval">最高5板</span>', table2)
+        self.assertNotIn('<div class="stage-title">观察维度</div>', table2)
+        self.assertNotIn('<span class="rlabel">—</span>', table2)
+
+    def test_parse_s1_uses_frontmatter_for_missing_emotion_summary_rows(self):
+        markdown = """### 表2：情绪高标
+
+| 观察维度 | 竞价 | 收盘 |
+| --- | --- | --- |
+| 最高板/晋级 | 最高5板 | 最高5板 |
+| 涨跌停与炸板 | 涨停8/跌停1 | 涨停63/跌停10 |
+"""
+        frontmatter = {
+            "赚钱效应": "差",
+            "昨日涨停收益": "0.06",
+            "昨日连板收益": "-0.42",
+            "封板率": "⚠️需复核（数据源脏）",
+            "炸板率": "⚠️需复核（数据源脏）",
+            "一进二晋级率": "13.51",
+            "三进四晋级率": "11.11",
+        }
+
+        html = convert_review.parse_s1(markdown, frontmatter)
+        table2 = html.split("📈 表2：情绪高标", 1)[1]
+
+        for value in ("差", "0.06", "-0.42", "⚠️需复核", "13.51", "11.11"):
+            self.assertIn(value, table2)
+
     def test_parse_s1_renders_all_node_notes_as_cards(self):
         markdown = """### 节点说明
 
@@ -741,6 +783,14 @@ weekday: 周二
             "已脱敏",
         )
         self.assertEqual(
+            convert_review.sanitize_public_review_cell("盘前数量", "800"),
+            "已脱敏",
+        )
+        self.assertEqual(
+            convert_review.sanitize_public_review_cell("收盘数量", "800"),
+            "已脱敏",
+        )
+        self.assertEqual(
             convert_review.sanitize_public_review_cell("T+1可卖数量", "4000"),
             "已脱敏",
         )
@@ -949,6 +999,51 @@ weekday: 周二
         self.assertNotIn("stage_C", text)
         self.assertIn("终稿结论（终稿）", text)
         self.assertIn("流程状态已确认", text)
+
+    def test_public_review_text_redacts_runtime_handoff_labels_and_iso_timestamps(self):
+        text = convert_review.sanitize_public_review_text(
+            "状态为 ready_with_warnings，昨日 blocked，PLAN_NOT_CURRENT 不再阻断；"
+            "机器预案层/人工裁决层/D3 已收口。"
+            "原记录为 degraded acceptance，candidate_id=abc，候选 backfill 见 "
+            "yimu_resolution_handoff.md；post_trade_reconciliation 已完成。"
+            "lot_reconciliation_ok=true；valuation_complete=true；"
+            "scheduled_review_fill；rotation_decisions；round_3_resolved；"
+            "yangmi_red_team_round3。"
+            "内部执行记录_id: TICKET-20260814-002792-0001。"
+            "已于 2026-08-14T18:10:00+08:00 完成成交事实核对。"
+        )
+
+        for secret in (
+            "ready_with_warnings",
+            "blocked",
+            "PLAN_NOT_CURRENT",
+            "机器预案层",
+            "人工裁决层",
+            "degraded acceptance",
+            "candidate_id",
+            "backfill",
+            "yimu_resolution_handoff.md",
+            "post_trade_reconciliation",
+            "lot_reconciliation_ok",
+            "valuation_complete",
+            "scheduled_review_fill",
+            "rotation_decisions",
+            "round_3_resolved",
+            "yangmi_red_team_round3",
+            "内部执行记录_id",
+            "TICKET-20260814-002792-0001",
+            "2026-08-14T18:10:00+08:00",
+            "2026-08-14T盘中+盘中",
+        ):
+            self.assertNotIn(secret.lower(), text.lower())
+        self.assertNotRegex(text, r"(?<![A-Za-z0-9_])D3(?![A-Za-z0-9_])")
+        self.assertIn("日期已记录", text)
+        self.assertEqual(
+            convert_review.sanitize_public_review_cell(
+                "性质", "post_trade_reconciliation"
+            ),
+            "成交事实核对",
+        )
 
     def test_public_review_text_preserves_gap_without_placeholder_wording(self):
         text = convert_review.sanitize_public_review_text(

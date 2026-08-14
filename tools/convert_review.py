@@ -266,6 +266,12 @@ def numeric_value(value):
 def sanitize_public_review_text(text, redact_internal_labels=True):
     """Redact account-specific execution details from the public review layer."""
     cleaned = str(text or '')
+    cleaned = re.sub(
+        r'\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:[+-]\d{2}:\d{2}|Z)?',
+        '日期已记录',
+        cleaned,
+        flags=re.I,
+    )
     cleaned = re.sub(r'(?<![A-Za-z0-9_])pnl\.db(?![A-Za-z0-9_])', '内部账户记录', cleaned, flags=re.I)
     cleaned = re.sub(
         r'(?<![A-Za-z0-9_])c15_signal_ledger(?![A-Za-z0-9_])',
@@ -310,6 +316,69 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         r'(?<![A-Za-z0-9_])blocked[_-]?degraded(?![A-Za-z0-9_])',
         '数据降级，仅观察', cleaned, flags=re.I,
     )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])ready_with_warnings(?![A-Za-z0-9_])',
+        '复核状态已记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])PLAN_NOT_CURRENT(?![A-Za-z0-9_])',
+        '计划状态已记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])blocked(?![A-Za-z0-9_])',
+        '状态受限',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])degraded[ _-]?acceptance(?![A-Za-z0-9_])',
+        '数据缺口确认',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])candidate_id(?![A-Za-z0-9_])',
+        '候选记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])backfill(?![A-Za-z0-9_])', '补录', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])yimu_resolution_handoff\.md(?![A-Za-z0-9_])',
+        '交接记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])post_trade_reconciliation(?![A-Za-z0-9_])',
+        '成交事实核对',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])lot_reconciliation_ok\s*=\s*(?:true|false)(?![A-Za-z0-9_])',
+        '账户事实已复核',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])valuation_complete\s*=\s*(?:true|false)(?![A-Za-z0-9_])',
+        '估值状态已记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:scheduled_review_fill|rotation_decisions|'
+        r'round_3_resolved|yangmi_red_team_round3)(?![A-Za-z0-9_])',
+        '复核记录已脱敏',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(r'内部执行记录[_＿]id', '记录', cleaned, flags=re.I)
     cleaned = re.sub(
         r'(?<![A-Za-z0-9_])stage_final\s*[:=]\s*done(?![A-Za-z0-9_])',
         '终稿', cleaned, flags=re.I,
@@ -506,8 +575,11 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(r'(?<![A-Za-z0-9_])W1_[A-Z0-9_]+(?![A-Za-z0-9_])', '窗口条件', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])C1\.5(?![A-Za-z0-9_])', '候选证据层', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])C2(?![A-Za-z0-9_])', '板块复核层', cleaned, flags=re.I)
-    cleaned = re.sub(r'(?<![A-Za-z0-9_])D1(?![A-Za-z0-9_])', '机器预案层', cleaned, flags=re.I)
-    cleaned = re.sub(r'(?<![A-Za-z0-9_])D2(?![A-Za-z0-9_])', '人工裁决层', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])D1(?![A-Za-z0-9_])', '系统复核层', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])D2(?![A-Za-z0-9_])', '人工复核层', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])D3(?![A-Za-z0-9_])', '阶段复核', cleaned, flags=re.I)
+    cleaned = re.sub(r'机器预案层', '系统复核层', cleaned)
+    cleaned = re.sub(r'人工裁决层', '人工复核层', cleaned)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])F-\d{3}(?![A-Za-z0-9_])', '审阅项', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])fail[-_ ]closed(?![A-Za-z0-9_])', '证据不足则关闭', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])(?:added_at_)?peak_risk(?![A-Za-z0-9_])', '高位风险标记', cleaned, flags=re.I)
@@ -1082,7 +1154,7 @@ def sanitize_public_review_cell(header, value, position_row=False):
             return raw_value
         if re.search(r'\d', raw_value):
             return '金额已脱敏'
-    if header in ('数量', '现持仓', '持仓数量') or any(
+    if header in ('数量', '现持仓', '持仓数量') or header.endswith('数量') or any(
         key in header for key in ('股数', '可卖数量', '可卖量')
     ):
         return '已脱敏'
@@ -1198,13 +1270,17 @@ def html_table(headers, rows, cell_fn=None):
     return f'<div class="tw"><table>{thead}{tbody}</table></div>'
 
 
-def html_emotion_board(headers, rows):
+def html_emotion_board(headers, rows, fm=None):
     """Render 表2 情绪高标 as scan-friendly cards instead of a very wide table."""
     if not headers or not rows:
         return ""
 
-    stages = [h for h in headers if h not in ("指标", "门槛")]
-    row_by_metric = {row.get("指标", ""): row for row in rows}
+    metric_header = next(
+        (h for h in headers if h in ("指标", "观察维度")),
+        headers[0],
+    )
+    stages = [h for h in headers if h not in (metric_header, "门槛")]
+    row_by_metric = {row.get(metric_header, ""): row for row in rows}
 
     def clean(value):
         s = str(value or "").strip().replace("**", "")
@@ -1220,6 +1296,20 @@ def html_emotion_board(headers, rows):
         row = row_by_metric.get(metric, {})
         for stage in stage_preference:
             value = row.get(stage)
+            if meaningful(value):
+                return clean(value)
+        fm_keys = {
+            "赚钱效应": ("赚钱效应",),
+            "涨停收益": ("昨日涨停收益",),
+            "连板收益": ("昨日连板收益",),
+            "封板率": ("封板率",),
+            "炸板率": ("炸板率",),
+            "一进二晋级率": ("一进二晋级率",),
+            "三进四晋级率": ("三进四晋级率",),
+            "竞价验证结论": ("竞价验证结论",),
+        }.get(metric, ())
+        for key in fm_keys:
+            value = (fm or {}).get(key)
             if meaningful(value):
                 return clean(value)
         return "—"
@@ -1259,7 +1349,7 @@ def html_emotion_board(headers, rows):
         html += f'<div class="emotion-stage"><div class="stage-title">{stage}</div>'
         stage_has_data = False
         for row in rows:
-            metric = row.get("指标", "")
+            metric = row.get(metric_header, "")
             value = row.get(stage, "")
             if not meaningful(value):
                 continue
@@ -1274,7 +1364,7 @@ def html_emotion_board(headers, rows):
         html += '</div>'
     html += '</div>'
 
-    thresholds = [(row.get("指标", ""), clean(row.get("门槛", ""))) for row in rows if meaningful(row.get("门槛", ""))]
+    thresholds = [(row.get(metric_header, ""), clean(row.get("门槛", ""))) for row in rows if meaningful(row.get("门槛", ""))]
     if thresholds:
         html += '<div class="emotion-thresholds"><div class="threshold-title">门槛速查</div><div class="threshold-grid">'
         for metric, threshold in thresholds:
@@ -1800,7 +1890,7 @@ def heading_has(heading, keyword):
     return keyword in heading
 
 
-def parse_s1(text):
+def parse_s1(text, fm=None):
     """Parse §一 当日复盘."""
     html = html_section_header("s1", "§一 · 当日复盘", "")
 
@@ -1836,7 +1926,7 @@ def parse_s1(text):
         elif heading_has(h, '情绪高标') or heading_has(h, '表2'):
             if tables:
                 html += html_subheading("📈 表2：情绪高标", "s1b")
-                html += html_emotion_board(*tables[0])
+                html += html_emotion_board(*tables[0], fm=fm)
 
         elif heading_has(h, '节点说明'):
             html += html_subheading("🔍 节点说明", "s1c")
@@ -2198,7 +2288,7 @@ def convert_md_to_html(md_path):
     # §一
     s1_text, rest = extract_section(content, '一、当日复盘')
     if s1_text:
-        sections_html.append(parse_s1(s1_text))
+        sections_html.append(parse_s1(s1_text, fm))
 
     # §二
     s2_text, rest = extract_section(content, '二、心得与教训')

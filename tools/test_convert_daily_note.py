@@ -519,6 +519,18 @@ class ConvertDailyNoteTest(unittest.TestCase):
 
         self.assertEqual(public_text, "明日仍受连亏门禁约束。")
 
+    def test_daily_note_sanitizer_preserves_compound_exposure_phrasing(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "第二笔及以后加仓必须增加仓位上下文；"
+            "通宇通讯逆势加仓暴露出证据确认和加仓位置、层级与额度必须分开判断。"
+        )
+
+        self.assertIn("第二笔及以后提高暴露必须增加仓位上下文", public_text)
+        self.assertIn("逆势提高仓位暴露出", public_text)
+        self.assertIn("提高暴露位置、层级与额度", public_text)
+        self.assertNotIn("增提高暴露位", public_text)
+        self.assertNotIn("提高暴露暴露", public_text)
+
     def test_updates_daily_notes_archive_and_home_without_review_count_drift(self):
         convert_daily_note.convert_review_to_daily_note(self.review_note)
         convert_daily_note.convert_review_to_daily_note(self.review_note)

@@ -275,11 +275,26 @@ def resolve_meta(data, existing_data_list):
 
 
 def sanitize_public_pnl_data(data):
-    """Keep public PnL chart data while dropping account/trade detail from summary."""
+    """Keep chart inputs while dropping account and runtime details from public HTML."""
     public = dict(data or {})
     summary = public.get("summary") or {}
-    safe_summary_keys = {"last_nav", "last_date", "daily_count", "today_snapshots", "_updated", "pnl_pct"}
+    safe_summary_keys = {"last_nav", "last_date", "daily_count", "today_snapshots", "pnl_pct"}
     public["summary"] = {k: summary[k] for k in safe_summary_keys if k in summary}
+    safe_series_keys = {
+        "type",
+        "data_date",
+        "is_fallback",
+        "labels",
+        "dates",
+        "portfolio",
+        "benchmark",
+        "position",
+        "nav",
+    }
+    for key, value in list(public.items()):
+        if key in {"summary", "meta"} or not isinstance(value, dict):
+            continue
+        public[key] = {k: value[k] for k in safe_series_keys if k in value}
     return public
 
 

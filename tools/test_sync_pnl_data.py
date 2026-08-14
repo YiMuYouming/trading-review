@@ -104,6 +104,63 @@ class ResolveMetaTest(unittest.TestCase):
         self.assertNotIn("药明康德", public_json)
         self.assertNotIn("成本", public_json)
 
+    def test_public_pnl_data_drops_runtime_overlay_fields_from_series(self):
+        data = {
+            "today_sh": {
+                "type": "intraday",
+                "data_date": "2026-08-14",
+                "is_fallback": False,
+                "labels": ["09:30"],
+                "portfolio": [1.2],
+                "benchmark": [0.4],
+                "position": [34.5],
+                "nav": [1.012],
+                "_updated": "2026-08-14T15:09:56+08:00",
+                "is_live_overlay": True,
+                "overlay_source": "account_ssot",
+                "snapshot_authority": "temporary_live_overlay",
+                "valuation_complete": True,
+                "quote_status": "close_snapshot",
+                "_freshness": {"level": "stale"},
+            },
+            "summary": {
+                "last_nav": 1.012,
+                "last_date": "2026-08-14",
+                "_updated": "2026-08-14T15:09:56+08:00",
+            },
+            "meta": {"total_asset": 100, "total_deposit": 100},
+        }
+
+        public = sync_pnl_data.sanitize_public_pnl_data(data)
+
+        self.assertEqual(
+            public["today_sh"],
+            {
+                "type": "intraday",
+                "data_date": "2026-08-14",
+                "is_fallback": False,
+                "labels": ["09:30"],
+                "portfolio": [1.2],
+                "benchmark": [0.4],
+                "position": [34.5],
+                "nav": [1.012],
+            },
+        )
+        self.assertNotIn("_updated", public["summary"])
+        public_json = str(public)
+        for secret in (
+            "is_live_overlay",
+            "overlay_source",
+            "snapshot_authority",
+            "valuation_complete",
+            "quote_status",
+            "_freshness",
+            "account_ssot",
+            "temporary_live_overlay",
+            "2026-08-14T15:09:56+08:00",
+        ):
+            self.assertNotIn(secret, public_json)
+
     def test_extract_existing_pnl_data_from_index_html(self):
         html = '<!-- PNL_DATA_START --><script>\nvar PNL_DATA = {"meta":{"total_asset":1}};\n</script>'
 
