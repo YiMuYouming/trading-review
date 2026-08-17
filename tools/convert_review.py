@@ -293,7 +293,13 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     )
     cleaned = re.sub(r'TICKET-[A-Za-z0-9_-]+', '交易记录', cleaned, flags=re.I)
     cleaned = re.sub(
-        r'(?<![A-Za-z0-9_])(?:(?:execution|executable)\s+)?ticket',
+        r'(?<![A-Za-z0-9_])tickets?\s*=\s*\d+(?![A-Za-z0-9_])',
+        '交易记录数量已隐藏',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:(?:execution|executable)\s+)?tickets?\b',
         '内部执行记录',
         cleaned,
         flags=re.I,
@@ -551,6 +557,18 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         flags=re.I,
     )
     cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])add_allowed\s*=\s*(?:true|false)(?![A-Za-z0-9_])',
+        '新增仓位条件已脱敏',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])freshness\s*=\s*`?[A-Za-z][A-Za-z0-9_-]*`?(?![A-Za-z0-9_])',
+        '行情时效已记录',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
         r'(?<![A-Za-z0-9_])MARKET_SESSION_CLOSED(?![A-Za-z0-9_])',
         '市场状态已记录',
         cleaned,
@@ -560,7 +578,7 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(r'(?<![A-Za-z0-9_])NeoData(?![A-Za-z0-9_])', '外部数据源', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])baseline(?![A-Za-z0-9_])', '盘前基准', cleaned, flags=re.I)
     cleaned = re.sub(
-        r'(?<![A-Za-z0-9_])(?:stale|dead|missing)(?![A-Za-z0-9_])',
+        r'(?<![A-Za-z0-9_])(?:stale|delayed|dead|missing)(?![A-Za-z0-9_])',
         '数据状态已记录',
         cleaned,
         flags=re.I,
@@ -991,7 +1009,7 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
                 line,
             )
             line = re.sub(
-                r'(?<![\u4e00-\u9fffA-Za-z])收\s+[-+]?\d{2,4}(?:\.\d+)?(?![\d.%/])',
+                r'收\s*[-+]?\d{2,4}(?:\.\d+)?(?![\d.%/])',
                 '收 价格已脱敏',
                 line,
             )

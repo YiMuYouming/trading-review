@@ -533,6 +533,16 @@ weekday: 周二
         self.assertIn("总资产已脱敏", text)
         self.assertIn("新增批次可卖状态已记录", text)
 
+    def test_public_review_text_redacts_compact_holding_close_prices(self):
+        text = convert_review.sanitize_public_review_text(
+            "收盘：深信服收123.13(-0.76%)、通宇收36.30(-0.11%)，均跑输市场；"
+            "利通收142.84(+3.88%)，已清仓。"
+        )
+
+        for secret in ("123.13", "36.30", "142.84"):
+            self.assertNotIn(secret, text)
+        self.assertIn("收 价格已脱敏", text)
+
     def test_translates_executable_ticket_and_trade_watch_labels(self):
         text = convert_review.sanitize_public_review_text(
             "不创建 executable ticket；两只持仓均进入 trade_watch。"
@@ -999,6 +1009,25 @@ weekday: 周二
         self.assertNotIn("stage_C", text)
         self.assertIn("终稿结论（终稿）", text)
         self.assertIn("流程状态已确认", text)
+
+    def test_public_review_text_redacts_boolean_gate_and_freshness_fields(self):
+        text = convert_review.sanitize_public_review_text(
+            "add_allowed=false；freshness=`delayed`；问财delayed。"
+        )
+
+        self.assertNotIn("add_allowed", text.lower())
+        self.assertNotIn("freshness", text.lower())
+        self.assertNotIn("delayed", text.lower())
+        self.assertIn("新增仓位条件已脱敏", text)
+        self.assertIn("行情时效已记录", text)
+        self.assertIn("问财数据状态已记录", text)
+
+    def test_public_review_text_redacts_plural_ticket_field(self):
+        text = convert_review.sanitize_public_review_text("tickets=0。")
+
+        self.assertNotIn("tickets", text.lower())
+        self.assertNotIn("内部执行记录s", text)
+        self.assertIn("交易记录数量已隐藏", text)
 
     def test_public_review_text_redacts_runtime_handoff_labels_and_iso_timestamps(self):
         text = convert_review.sanitize_public_review_text(
