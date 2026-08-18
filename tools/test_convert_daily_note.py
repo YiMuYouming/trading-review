@@ -526,10 +526,22 @@ class ConvertDailyNoteTest(unittest.TestCase):
         )
 
         self.assertIn("第二笔及以后提高暴露必须增加仓位上下文", public_text)
+        self.assertNotIn("通宇通讯", public_text)
         self.assertIn("逆势提高仓位暴露出", public_text)
         self.assertIn("提高暴露位置、层级与额度", public_text)
         self.assertNotIn("增提高暴露位", public_text)
         self.assertNotIn("提高暴露暴露", public_text)
+
+    def test_daily_note_redacts_current_position_aliases_and_new_entry_language(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "两只老持仓通宇、深信服继续走弱，仅今日新买入的机器人中大力德逆势浮盈；"
+            "观察京东方A关键位置条件是否满足。"
+        )
+
+        for secret in ("通宇", "深信服", "中大力德", "京东方A"):
+            self.assertNotIn(secret, public_text)
+        self.assertNotIn("今日开仓", public_text)
+        self.assertNotIn("持仓持仓", public_text)
 
     def test_updates_daily_notes_archive_and_home_without_review_count_drift(self):
         convert_daily_note.convert_review_to_daily_note(self.review_note)
