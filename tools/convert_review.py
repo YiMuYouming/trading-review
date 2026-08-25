@@ -90,6 +90,9 @@ body{font:16px/1.7 system-ui,-apple-system,'Noto Sans SC',sans-serif;background:
 .sbx.green{border-left-color:var(--green)}
 .sh2{font-size:17px;font-weight:700;margin:20px 0 10px;color:var(--text);padding-top:4px}
 .sh3{font-size:15px;font-weight:600;margin:14px 0 8px;color:var(--text);padding-top:2px}
+#s1b,.section#s3>.sh{font-family:"Noto Serif SC","Noto Serif","Songti SC",serif}
+#s1b + .emotion-board .emotion-kpi .klabel,#s1b + .emotion-board .emotion-kpi .kval,#s1b + .emotion-board .emotion-conclusion,#s3>.sb>.stats-grid .stat-card .lbl,#s3>.sb>.stats-grid .stat-card .val,#s3>.sb>.sbx{font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB",system-ui,sans-serif}
+#s1b + .emotion-board .emotion-kpi .kval,#s3>.sb>.stats-grid .stat-card .val{font-weight:700;letter-spacing:-.01em}
 .para{font-size:14px;line-height:1.7;margin-bottom:8px;color:var(--text)}
 .tight-list{font-size:14px;line-height:1.6;margin-bottom:8px;padding-left:20px}
 .tight-list li{margin-bottom:3px}
@@ -149,6 +152,8 @@ body{font:16px/1.7 system-ui,-apple-system,'Noto Sans SC',sans-serif;background:
 .emotion-kpi .klabel{font-size:12px;color:var(--text3);margin-bottom:4px}
 .emotion-kpi .kval{font-size:20px;line-height:1.15;font-weight:800;color:var(--text);word-break:break-word}
 .emotion-kpi.good .kval{color:var(--red)}.emotion-kpi.warn .kval{color:var(--amber)}.emotion-kpi.bad .kval{color:var(--green)}
+.emotion-conclusion{display:flex;align-items:baseline;gap:8px;margin:0 0 14px;padding:3px 0 3px 10px;border-left:3px solid var(--red);font-size:14px;line-height:1.6;flex-wrap:wrap}
+.emotion-conclusion-label{font-weight:700;color:var(--red);white-space:nowrap}.emotion-conclusion-text{color:var(--text);font-weight:600;word-break:break-word}
 .emotion-stage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
 .emotion-stage{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px}
 .emotion-stage .stage-title{font-size:14px;font-weight:800;color:var(--accent);margin-bottom:8px}
@@ -1350,8 +1355,8 @@ def html_emotion_board(headers, rows, fm=None):
         ("炸板率", metric_value("炸板率")),
         ("一进二", metric_value("一进二晋级率")),
         ("三进四", metric_value("三进四晋级率")),
-        ("结论", metric_value("竞价验证结论")),
     ]
+    conclusion = metric_value("竞价验证结论")
     html = '<div class="emotion-board">'
     html += '<div class="emotion-summary-grid">'
     for label, value in kpis:
@@ -1360,13 +1365,21 @@ def html_emotion_board(headers, rows, fm=None):
             f'<div class="klabel">{safe(label)}</div><div class="kval">{cell_color(label, safe(value))}</div></div>'
         )
     html += '</div>'
+    if meaningful(conclusion):
+        html += (
+            f'<div class="emotion-conclusion">'
+            f'<span class="emotion-conclusion-label">结论：</span>'
+            f'<span class="emotion-conclusion-text">{safe(conclusion)}</span>'
+            f'</div>'
+        )
 
+    display_rows = [row for row in rows if row.get(metric_header, "") != "竞价验证结论"]
     major_metrics = {"梯队", "最高板/次高板"}
     html += '<div class="emotion-stage-grid">'
     for stage in stages:
         html += f'<div class="emotion-stage"><div class="stage-title">{stage}</div>'
         stage_has_data = False
-        for row in rows:
+        for row in display_rows:
             metric = row.get(metric_header, "")
             value = row.get(stage, "")
             if not meaningful(value):
@@ -1382,7 +1395,7 @@ def html_emotion_board(headers, rows, fm=None):
         html += '</div>'
     html += '</div>'
 
-    thresholds = [(row.get(metric_header, ""), clean(row.get("门槛", ""))) for row in rows if meaningful(row.get("门槛", ""))]
+    thresholds = [(row.get(metric_header, ""), clean(row.get("门槛", ""))) for row in display_rows if meaningful(row.get("门槛", ""))]
     if thresholds:
         html += '<div class="emotion-thresholds"><div class="threshold-title">门槛速查</div><div class="threshold-grid">'
         for metric, threshold in thresholds:
@@ -2380,13 +2393,8 @@ def convert_md_to_html(md_path):
 
 
 def shorten_pos(pos_raw):
-    """Shorten position string for card display: '北华+领益+海光'."""
-    if not pos_raw or pos_raw == '空仓':
-        return '空仓'
-    # Extract stock abbreviations
-    names = [n for n in re.findall(r'([一-鿿]+)', pos_raw) if n not in ('股', '空仓')]
-    short = '+'.join(n[:2] for n in names[:3])
-    return short if short else pos_raw[:10]
+    """Expose only the redacted public position state in archive cards."""
+    return public_position_summary(pos_raw)
 
 
 def desc_from_fm(fm):

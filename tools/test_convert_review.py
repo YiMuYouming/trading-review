@@ -296,6 +296,9 @@ weekday: 周二
         self.assertIn('class="emotion-board"', table2)
         self.assertIn("3(4非ST+2ST)-2(8非ST+3ST)", table2)
         self.assertIn("A好+B差", table2)
+        self.assertIn('<div class="emotion-conclusion">', table2)
+        self.assertNotIn('<div class="emotion-kpi "><div class="klabel">结论</div>', table2)
+        self.assertNotIn('<span class="rlabel">竞价验证结论</span>', table2)
         self.assertIn("&lt;30%(W1追涨)/&lt;40%(W2冰点)", table2)
         self.assertNotIn("<th>指标</th>", table2)
 
