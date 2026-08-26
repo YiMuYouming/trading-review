@@ -543,6 +543,13 @@ class ConvertDailyNoteTest(unittest.TestCase):
         self.assertNotIn("今日开仓", public_text)
         self.assertNotIn("持仓持仓", public_text)
 
+    def test_daily_note_redacts_current_review_position_alias(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "盘中仍新增东信和平，账户风险未处理。"
+        )
+
+        self.assertNotIn("东信和平", public_text)
+
     def test_updates_daily_notes_archive_and_home_without_review_count_drift(self):
         convert_daily_note.convert_review_to_daily_note(self.review_note)
         convert_daily_note.convert_review_to_daily_note(self.review_note)
