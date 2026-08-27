@@ -550,6 +550,13 @@ class ConvertDailyNoteTest(unittest.TestCase):
 
         self.assertNotIn("东信和平", public_text)
 
+    def test_daily_note_redacts_new_current_review_position_alias(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "开仓紫光，当前持仓风险仍需复核。"
+        )
+
+        self.assertNotIn("紫光", public_text)
+
     def test_updates_daily_notes_archive_and_home_without_review_count_drift(self):
         convert_daily_note.convert_review_to_daily_note(self.review_note)
         convert_daily_note.convert_review_to_daily_note(self.review_note)
