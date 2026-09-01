@@ -814,6 +814,57 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         r'\1附近',
         cleaned,
     )
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])rule_state(?![A-Za-z0-9_])', '运行规则', cleaned, flags=re.I)
+    cleaned = re.sub(r'(?<![A-Za-z0-9_])entry_leg(?![A-Za-z0-9_])', '建仓层级', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?:减至\s*)?(?:≤|不高于)\s*\d+(?:\.\d+)?%',
+        '降低至内部集中度上限',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:[\u4e00-\u9fffA-Za-z]{1,12})(?:虽)?收)\s*\d+(?:\.\d+)?',
+        r'\1 价格已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(未完成\s*)\d+(?:\.\d+)?(?=\s*修复)',
+        r'\1关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(为\s*)\d+(?:\.\d+)?\s*[-~—]\s*\d+(?:\.\d+)?(?=\s*一字板)',
+        r'\1关键区间',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(冲高\s*)\d+(?:\.\d+)?',
+        r'\1关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:尚未|未)?(?:收复|收回|站稳|站上|守住|失守|跌破|破|看|观察|校准)\s*)'
+        r'\d+(?:\.\d+)?(?:\s*(?:[-~/、]|和|与)\s*\d+(?:\.\d+)?)*(?!\s*(?:只|家|个|人|条))',
+        r'\1关键位',
+        cleaned,
+    )
+
+    def redact_calibration_clause(match):
+        return re.sub(r'(?<![\d.])\d+\.\d+(?![\d.])', '关键位', match.group(0))
+
+    cleaned = re.sub(
+        r'明日以[^。；\n]{0,180}?校准',
+        redact_calibration_clause,
+        cleaned,
+    )
+    cleaned = re.sub(r'清仓建议', '降低风险建议', cleaned)
+    cleaned = re.sub(r'禁止补仓', '不提高风险暴露', cleaned)
+    cleaned = re.sub(
+        r'(?:(?:不高于|上限(?:显示|要求)?|要求)\s*)\d+(?:\.\d+)?%',
+        '内部集中度上限',
+        cleaned,
+    )
+    cleaned = re.sub(r'(?:不高于)?关键位%', '内部集中度上限', cleaned)
+    cleaned = cleaned.replace('降至降低至内部集中度上限', '降至内部集中度上限')
     cleaned = re.sub(
         r'((?:现价|当前价)[：:]?\s*)[-+]?\d+(?:\.\d+)?(?![\d.%/])',
         r'\1价格已脱敏',
@@ -1239,8 +1290,9 @@ def sanitize_public_review_cell(header, value, position_row=False):
         or re.search(r'\d+(?:\.\d+)', raw_value)
     ):
         return '风险条件已记录（具体阈值已脱敏）'
-    if header == '今日检查' and re.search(
-        r'\d{2,3}\.\d+[^，。；|]{0,12}(?:突破|收复|失守|守住|回踩)', raw_value
+    if header == '今日检查' and (
+        re.search(r'\d{1,3}\.\d+[^，。；|]{0,12}(?:突破|收复|失守|守住|回踩)', raw_value)
+        or len(re.findall(r'\d+(?:\.\d+)', raw_value)) >= 2
     ):
         return '价格/结构确认条件已记录（具体阈值已脱敏）'
     contextual_value = f'持仓复核：{raw_value}' if position_row else raw_value

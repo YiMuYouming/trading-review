@@ -1530,6 +1530,75 @@ weekday: 周二
             ),
         )
 
+    def test_public_review_text_redacts_spaced_single_digit_risk_levels(self):
+        text = convert_review.sanitize_public_review_text(
+            "中安科尚未收复 3.49、3.58 和 3.62-3.63；"
+            "明日以紫光动态 MA20 约 37.31、通宇 32.5、中安科 3.36/3.28 校准。"
+        )
+
+        for secret in ("3.49", "3.58", "3.62", "3.63", "37.31", "32.5", "3.36", "3.28"):
+            self.assertNotIn(secret, text)
+        self.assertIn("关键位", text)
+
+    def test_public_review_text_softens_precise_account_actions(self):
+        text = convert_review.sanitize_public_review_text(
+            "通宇未收回 32.5，维持清仓建议，禁止补仓；"
+            "紫光先降至不高于 25%，若规则要求 20% 继续从严处理。"
+        )
+
+        for secret in ("32.5", "清仓建议", "禁止补仓", "25%", "20%"):
+            self.assertNotIn(secret, text)
+        self.assertIn("降低风险建议", text)
+        self.assertIn("不提高风险暴露", text)
+
+    def test_public_review_text_redacts_plan_close_prices_and_confirmation_levels(self):
+        text = convert_review.sanitize_public_review_text(
+            "为什么：通宇收 30.17，未完成 32.5 修复；"
+            "中安科虽收 3.49，但只站上第一确认位。"
+        )
+
+        for secret in ("30.17", "32.5", "3.49"):
+            self.assertNotIn(secret, text)
+        self.assertIn("关键位", text)
+
+    def test_public_review_text_redacts_one_word_price_evidence_and_account_caps(self):
+        text = convert_review.sanitize_public_review_text(
+            "8/28 为 3.62-3.63 一字板，9/1 早盘冲高 3.58 后回落；"
+            "按实时价减至 ≤25%，持有/先降至不高于25%。"
+        )
+
+        for secret in ("3.62", "3.63", "3.58", "25%", "关键位%"):
+            self.assertNotIn(secret, text)
+        self.assertIn("关键区间", text)
+        self.assertIn("内部集中度上限", text)
+
+    def test_public_review_text_redacts_internal_runtime_labels(self):
+        text = convert_review.sanitize_public_review_text(
+            "当前 rule_state 单票上限更严，entry_leg 记为计划外。"
+        )
+
+        self.assertNotIn("rule_state", text)
+        self.assertNotIn("entry_leg", text)
+        self.assertIn("运行规则", text)
+        self.assertIn("建仓层级", text)
+
+    def test_public_review_cell_redacts_single_digit_composite_check_levels(self):
+        text = convert_review.sanitize_public_review_cell(
+            "今日检查", "3.49/3.58/3.62-3.63", position_row=True
+        )
+
+        for secret in ("3.49", "3.58", "3.62", "3.63"):
+            self.assertNotIn(secret, text)
+        self.assertIn("具体阈值已脱敏", text)
+
+    def test_public_review_text_avoids_duplicate_concentration_wording(self):
+        text = convert_review.sanitize_public_review_text(
+            "至少先降至不高于 25%，不新增。"
+        )
+
+        self.assertNotIn("降至降低至", text)
+        self.assertIn("降至内部集中度上限", text)
+
 
 if __name__ == "__main__":
     unittest.main()

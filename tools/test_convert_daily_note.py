@@ -577,6 +577,28 @@ class ConvertDailyNoteTest(unittest.TestCase):
         self.assertNotIn("+关键比例", public_text)
         self.assertNotIn("-关键比例", public_text)
 
+    def test_daily_note_redacts_new_holding_alias_and_collapses_duplicate_placeholders(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "账户因通宇与紫光回撤收跌 -0.95%；"
+            "深信服分批兑现并清仓，中安科只验证到弱修复。"
+        )
+
+        for secret in ("通宇", "紫光", "深信服", "中安科"):
+            self.assertNotIn(secret, public_text)
+        self.assertNotIn("标的与标的", public_text)
+        self.assertIn("账户因持仓回撤", public_text)
+        self.assertIn("新增持仓只验证到弱修复", public_text)
+
+    def test_daily_note_redacts_decimal_price_ranges_as_one_placeholder(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "一字区为 3.62-3.63，回落后尚未收复 3.49。"
+        )
+
+        for secret in ("3.62", "3.63", "3.49"):
+            self.assertNotIn(secret, public_text)
+        self.assertIn("关键区间", public_text)
+        self.assertNotIn("关键位置-", public_text)
+
     def test_updates_daily_notes_archive_and_home_without_review_count_drift(self):
         convert_daily_note.convert_review_to_daily_note(self.review_note)
         convert_daily_note.convert_review_to_daily_note(self.review_note)
