@@ -1166,6 +1166,38 @@ weekday: 周二
         self.assertIn("锁盈金额已脱敏", text)
         self.assertIn("已实现金额已脱敏", text)
 
+    def test_public_review_text_redacts_table_pnl_without_currency_suffix(self):
+        text = convert_review.sanitize_public_review_text(
+            "| 当日盈亏 | **+22,534（+3.36%）** | -3% 熔断 |"
+        )
+
+        self.assertNotIn("22,534", text)
+        self.assertIn("金额已脱敏", text)
+        self.assertIn("+3.36%", text)
+
+    def test_public_review_text_redacts_multiplication_style_position_quantities(self):
+        text = convert_review.sanitize_public_review_text(
+            "盘中 @成交价已隐藏×1000、盘中 @成交价已隐藏×800，均为事后补录。"
+        )
+
+        self.assertNotIn("1000", text)
+        self.assertNotIn("800", text)
+        self.assertEqual(text.count("部分仓位"), 2)
+
+    def test_public_review_text_redacts_execution_cost_comparisons(self):
+        text = convert_review.sanitize_public_review_text(
+            "浮盈垫 36.874 > 加仓前成本 **36.32**、站回昨日预案硬卡 **36.82**；"
+            "今日 MA20 = 37.11，37.56 在其上。"
+            "必须记录：站回 **36.82** 则继续减；"
+            "成本口径 36.55 = 4900股加权成本，36.32 = 加仓前 3100股加权成本，"
+            "此前误填 36.32。"
+        )
+
+        for secret in ("36.874", "36.55", "36.32", "36.82", "37.11", "37.56"):
+            self.assertNotIn(secret, text)
+        self.assertIn("浮盈垫已核对", text)
+        self.assertIn("关键位", text)
+
     def test_public_review_text_redacts_inline_execution_terms_and_exposure_thresholds(self):
         text = convert_review.sanitize_public_review_text(
             "明日按T+1与算力扩散验证处理；最终门禁关闭；依据来自执行卡。"

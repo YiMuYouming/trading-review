@@ -827,6 +827,11 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(r'受\d+(?:\.\d+)?前高', '受前高', cleaned)
     cleaned = re.sub(r'@\s*\d+(?:\.\d+)?', '@成交价已隐藏', cleaned)
     cleaned = re.sub(
+        r'(@成交价已隐藏)\s*[×xX*]\s*\d+(?![\d.])',
+        r'\1 部分仓位',
+        cleaned,
+    )
+    cleaned = re.sub(
         r'(@成交价已隐藏)(?:\s*/\s*\d+(?:\.\d+)?)+',
         r'\1',
         cleaned,
@@ -900,6 +905,44 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         r'((?:清仓|卖出)[^，。；\n|]{0,24}[，,]\s*收盘[：:\s]+)'
         r'[-+]?\d+(?:\.\d+)?(?![\d.%/])',
         r'\1价格已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(\|\s*(?:当日|账户|月度|周度)?(?:盈亏|损益)\s*\|\s*)'
+        r'(\*{0,2})[-+]?(?:\d{1,3}(?:,\d{3})+|\d{4,})(?=\s*[（(])',
+        r'\1\2金额已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'浮盈垫\s*\d+(?:\.\d+)?\s*[><=]+\s*(?:加仓前)?成本\s*'
+        r'\*{0,2}\d+(?:\.\d+)?\*{0,2}',
+        '浮盈垫已核对',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?:预案)?硬卡\s*\*{0,2}\d+(?:\.\d+)?\*{0,2}',
+        '预案关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:未)?站回\s*)\*{0,2}\d+(?:\.\d+)?\*{0,2}',
+        r'\1关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<![\d.])\d+(?:\.\d+)?'
+        r'(?=\s*=\s*(?:加仓前\s*)?部分仓位加权成本)',
+        '成本已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:误填|原填|更正自)\s*)\d+(?:\.\d+)?',
+        r'\1成本已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<![\d.])\d+(?:\.\d+)?(?=\s*在其(?:上|下))',
+        '价格已脱敏',
         cleaned,
     )
     cleaned = re.sub(

@@ -557,6 +557,26 @@ class ConvertDailyNoteTest(unittest.TestCase):
 
         self.assertNotIn("紫光", public_text)
 
+    def test_daily_note_redacts_exact_account_pnl_amounts(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "账户今日的 +22,534 元来自尾盘板块资金回流。"
+        )
+
+        self.assertEqual(public_text, "账户今日的收益变化来自尾盘板块资金回流。")
+        self.assertNotIn("22,534", public_text)
+
+    def test_daily_note_redacts_signed_percentages_without_orphan_signs(self):
+        public_text = convert_daily_note.sanitize_public_text(
+            "昨日涨停股今日平均只有 +0.68%，账户回撤为 -1.25%。"
+        )
+
+        self.assertEqual(
+            public_text,
+            "昨日涨停股今日平均只有关键比例，账户回撤为关键比例。",
+        )
+        self.assertNotIn("+关键比例", public_text)
+        self.assertNotIn("-关键比例", public_text)
+
     def test_updates_daily_notes_archive_and_home_without_review_count_drift(self):
         convert_daily_note.convert_review_to_daily_note(self.review_note)
         convert_daily_note.convert_review_to_daily_note(self.review_note)

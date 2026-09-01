@@ -174,7 +174,17 @@ def sanitize_public_text(text: str) -> str:
         line = re.sub(r"站上\s*[0-9.]+", "站上关键确认位", line)
         line = re.sub(r"低开超过\s*[0-9]+(?:\.[0-9]+)?%", "低开明显", line)
         line = re.sub(r"[0-9]+(?:\.[0-9]+)?\s*以上", "关键位以上", line)
-        line = re.sub(r"\d+(?:\.\d+)?\s*%", "关键比例", line)
+        line = re.sub(
+            r"(账户(?:今日|当日)?的?)\s*[+-]?\d+(?:,\d{3})*(?:\.\d+)?\s*元",
+            r"\1收益变化",
+            line,
+        )
+        line = re.sub(
+            r"(?<![\d.])[+-]?\d+(?:,\d{3})*(?:\.\d+)?\s*元(?:/股)?",
+            "金额已隐藏",
+            line,
+        )
+        line = re.sub(r"[+-]?\d+(?:\.\d+)?\s*%", "关键比例", line)
         line = re.sub(r"(?<![\d.-])\d{1,4}\.\d+(?!\s*%)", "关键位置", line)
         line = re.sub(r"明日买入", "明日观察", line)
         line = re.sub(r"今日新买入的|新买入的", "今日新增的", line)
