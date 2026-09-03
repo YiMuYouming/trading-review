@@ -590,11 +590,29 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     )
     cleaned = re.sub(r'(?<![A-Za-z0-9_])ledger(?![A-Za-z0-9_])', '候选记录', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])source_gap(?![A-Za-z0-9_])', '数据缺口', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])AI\s+context(?![A-Za-z0-9_])',
+        '系统判断',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])limit_up_detail\s+returned\s*=\s*(\d+)(?![A-Za-z0-9_])',
+        lambda match: '连板明细数据缺失' if match.group(1) == '0' else '连板明细数据已记录',
+        cleaned,
+        flags=re.I,
+    )
     cleaned = re.sub(r'缺源(?:脚本)?占位', '数据缺口估算', cleaned)
     cleaned = re.sub(r'占位内容', '临时内容', cleaned)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])radarsignal(?![A-Za-z0-9_])', '观察信号', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])decision_gate(?![A-Za-z0-9_])', '实时门禁', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])POS-SIZE-\d+(?![A-Za-z0-9_])', '仓位规则', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])WIN-[A-Za-z0-9_-]+(?![A-Za-z0-9_])',
+        '窗口规则',
+        cleaned,
+        flags=re.I,
+    )
     cleaned = re.sub(r'(?<![A-Za-z0-9_])W1_[A-Z0-9_]+(?![A-Za-z0-9_])', '窗口条件', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])C1\.5(?![A-Za-z0-9_])', '候选证据层', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])C2(?![A-Za-z0-9_])', '板块复核层', cleaned, flags=re.I)
@@ -812,6 +830,17 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(
         r'(关键位)\s*[<>]\s*\d+(?:\.\d+)?',
         r'\1附近',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:持续|仍|未站稳|不站稳)\s*)[<>≤≥]\s*\d+(?:\.\d+)?',
+        r'\1关键位',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<=[（(])\s*[<>≤≥]\s*\d+(?:\.\d+)?'
+        r'(?=\s*(?:清仓|卖出|减仓|降低风险|降风险|风险|建议|[）)]))',
+        '关键位',
         cleaned,
     )
     cleaned = re.sub(r'(?<![A-Za-z0-9_])rule_state(?![A-Za-z0-9_])', '运行规则', cleaned, flags=re.I)
@@ -1060,6 +1089,13 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     if redact_internal_labels:
         cleaned = re.sub(r'门禁', '执行条件', cleaned)
         cleaned = re.sub(r'执行卡', '规则条件', cleaned)
+    cleaned = re.sub(
+        r'(?:票据|来源记录)\s*[:：=]?\s*\d+',
+        '成交细节已隐藏',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(r'未获弈沐指令', '执行原因未公开', cleaned)
     cleaned = re.sub(r'票据交易记录', '成交细节已隐藏', cleaned)
     cleaned = re.sub(r'票据读取', '来源记录已隐藏', cleaned)
     cleaned = re.sub(r'票据', '来源记录', cleaned)
@@ -1070,6 +1106,19 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(
         r'(成交细节已隐藏)(?:[，,；;、]\s*\1)+',
         r'\1',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:单票|总仓|总仓位|仓位|持仓\s+|超限)[^，。；|]{0,24}?)'
+        r'[-+]?\d+(?:\.\d+)?%\s*[>≥]\s*[-+]?\d+(?:\.\d+)?%',
+        r'\1账户比例已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:单票|总仓位|仓位|持仓\s+)[^，。；|]{0,24}?)'
+        r'[-+]?\d+(?:\.\d+)?%'
+        r'(?=\s*(?:已|为|上限|超|基准|附近|只减|未|，|。|；|$))',
+        r'\1账户比例已脱敏',
         cleaned,
     )
     cleaned = re.sub(

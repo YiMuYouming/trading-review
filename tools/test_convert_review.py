@@ -556,6 +556,54 @@ weekday: 周二
         self.assertIn("内部执行记录", text)
         self.assertIn("持仓复核", text)
 
+    def test_public_review_text_redacts_win_execution_rule_ids(self):
+        text = convert_review.sanitize_public_review_text(
+            "冰点规则 WIN-ICE-W1-001 已关闭。"
+        )
+
+        self.assertNotIn("WIN-ICE-W1-001", text)
+        self.assertIn("冰点规则", text)
+
+    def test_public_review_text_redacts_execution_receipt_counts_and_authorization_details(self):
+        text = convert_review.sanitize_public_review_text(
+            "无成交（票据 0）；预案动作未执行，未获弈沐指令。"
+        )
+
+        for secret in ("票据 0", "来源记录 0", "未获弈沐指令"):
+            self.assertNotIn(secret, text)
+        self.assertIn("成交细节已隐藏", text)
+        self.assertIn("执行原因未公开", text)
+
+    def test_public_review_text_redacts_comparator_risk_levels(self):
+        text = convert_review.sanitize_public_review_text(
+            "通宇持续 <32.5（降低风险建议）；中安科（<3.36 降风险）。"
+        )
+
+        for secret in ("32.5", "3.36"):
+            self.assertNotIn(secret, text)
+        self.assertIn("关键位", text)
+
+    def test_public_review_text_redacts_holding_concentration_percentages(self):
+        text = convert_review.sanitize_public_review_text(
+            "总仓位以收盘约 43.74% 为只减不增基准；紫光单票 27.3% >25% 违规；"
+            "持有（超限 27.3%>25%）。"
+        )
+
+        for secret in ("43.74%", "27.3%", "25%"):
+            self.assertNotIn(secret, text)
+        self.assertIn("账户比例已脱敏", text)
+
+    def test_public_review_text_redacts_internal_source_debug_labels(self):
+        text = convert_review.sanitize_public_review_text(
+            "AI context 风险；连板明细源空（limit_up_detail returned=0）。"
+        )
+
+        self.assertNotIn("AI context", text)
+        self.assertNotIn("limit_up_detail", text)
+        self.assertNotIn("returned=0", text)
+        self.assertIn("系统判断", text)
+        self.assertIn("连板明细数据缺失", text)
+
     def test_convert_md_to_html_redacts_public_execution_details(self):
         markdown = """---
 date: 2026-07-14
