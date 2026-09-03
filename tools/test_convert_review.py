@@ -546,6 +546,16 @@ weekday: 周二
             self.assertNotIn(secret, text)
         self.assertIn("收 价格已脱敏", text)
 
+    def test_public_review_text_redacts_chinese_execution_counts(self):
+        text = convert_review.sanitize_public_review_text(
+            "但今天又有五笔买入，也完成三笔卖出：复盘要同时检查减掉什么、又增加什么。"
+        )
+
+        self.assertEqual(
+            text,
+            "但今天又有新增风险暴露，也完成风险处理动作：复盘要同时检查减掉什么、又增加什么。",
+        )
+
     def test_translates_executable_ticket_and_trade_watch_labels(self):
         text = convert_review.sanitize_public_review_text(
             "不创建 executable ticket；两只持仓均进入 trade_watch。"

@@ -298,6 +298,18 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     )
     cleaned = re.sub(r'TICKET-[A-Za-z0-9_-]+', '交易记录', cleaned, flags=re.I)
     cleaned = re.sub(
+        r'[一二三四五六七八九十百千万两零〇\d]+\s*笔\s*'
+        r'(?:买入|开仓|加仓|建仓)(?:\s*(?:部分仓位|仓位))?',
+        '新增风险暴露',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'[一二三四五六七八九十百千万两零〇\d]+\s*笔\s*'
+        r'(?:卖出|清仓|减仓)(?:\s*(?:部分仓位|仓位))?',
+        '风险处理动作',
+        cleaned,
+    )
+    cleaned = re.sub(
         r'(?<![A-Za-z0-9_])tickets?\s*=\s*\d+(?![A-Za-z0-9_])',
         '交易记录数量已隐藏',
         cleaned,
