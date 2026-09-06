@@ -557,6 +557,27 @@ class ConvertDailyNoteTest(unittest.TestCase):
 
         self.assertNotIn("紫光", public_text)
 
+    def test_daily_note_dynamically_anonymizes_current_holding_aliases(self):
+        review_note = self.root / "2026_9_4_Friday_ReviewNote.md"
+        review_note.write_text(
+            SAMPLE_REVIEW_NOTE.replace("date: 2026-06-26", "date: 2026-09-04")
+            .replace(
+                "盘后持仓: 海光信息 300股 成本价 12.34；中信证券 200股",
+                "盘后持仓: 甲辰股份 300股 成本价 12.34；乙巳科技 200股",
+            )
+            .replace(
+                "冰点日更重要的是确认系统有没有帮人少犯错，而不是解释每一笔波动。",
+                "次日先处理甲辰弱势，再观察乙巳承接。",
+            ),
+            encoding="utf-8",
+        )
+
+        note = convert_daily_note.build_daily_note(review_note)
+
+        for secret in ("甲辰股份", "甲辰", "乙巳科技", "乙巳"):
+            self.assertNotIn(secret, note.summary)
+        self.assertIn("持仓标的", note.summary)
+
     def test_daily_note_redacts_exact_account_pnl_amounts(self):
         public_text = convert_daily_note.sanitize_public_text(
             "账户今日的 +22,534 元来自尾盘板块资金回流。"

@@ -603,6 +603,18 @@ weekday: 周二
             self.assertNotIn(secret, text)
         self.assertIn("账户比例已脱敏", text)
 
+    def test_public_review_text_redacts_compact_position_caps_and_account_rule_ids(self):
+        text = convert_review.sanitize_public_review_text(
+            "不新增；现仓48.04%，先处理超限。ACCT-RISK-001：仍持仓时30%上限；"
+            "次日先处理弱势与48.04%总仓风险；连亏持仓上限为30%，"
+            "生产端仍显示0%，昨日计划亦按0%表述；仓位超30%参考上限。"
+        )
+
+        for secret in ("48.04%", "30%", "ACCT-RISK-001"):
+            self.assertNotIn(secret, text)
+        self.assertIn("账户比例已脱敏", text)
+        self.assertIn("内部集中度上限", text)
+
     def test_public_review_text_redacts_internal_source_debug_labels(self):
         text = convert_review.sanitize_public_review_text(
             "AI context 风险；连板明细源空（limit_up_detail returned=0）。"
@@ -671,6 +683,50 @@ weekday: 周二
                 self.assertNotIn("Portal 今日一句话来源", html)
                 self.assertNotIn("不写 ticket", html)
                 self.assertIn("公开结论保留", html)
+            finally:
+                convert_review.REVIEW_NOTES = original_review_notes
+
+    def test_convert_md_to_html_anonymizes_current_holding_names_and_codes(self):
+        markdown = """---
+date: 2026-09-04
+weekday: 周五
+情绪值: 44.5
+上证指数: 3930.12
+上证涨幅: -0.30
+涨停家数: 39
+跌停家数: 9
+盘后持仓: "甲辰科技8000股、乙巳股份4100股；仓位48.04%"
+---
+
+## 一、当日复盘
+
+### 持仓与交易
+
+| 标的 | 代码 | 仓位 | 原因 |
+|------|------|------|------|
+| 甲辰科技 | 600001 | 8000股 | 持仓风险处理 |
+| 乙巳股份 | 000002 | 4100股 | 持仓风险处理 |
+
+### 一句话结论
+
+甲辰科技与乙巳股份仅作持仓风险处理；乙巳继续弱于锚组时优先复核。
+"""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            original_review_notes = convert_review.REVIEW_NOTES
+            convert_review.REVIEW_NOTES = Path(tmp)
+            try:
+                source = Path(tmp) / "2026_9_4_Friday_ReviewNote.md"
+                source.write_text(markdown, encoding="utf-8")
+
+                _, output_path = convert_review.convert_md_to_html(source)
+                html = output_path.read_text(encoding="utf-8")
+
+                for secret in ("甲辰科技", "乙巳股份", "乙巳继续", "600001", "000002"):
+                    self.assertNotIn(secret, html)
+                self.assertIn("持仓标的一", html)
+                self.assertIn("持仓标的二", html)
+                self.assertIn("代码已脱敏", html)
             finally:
                 convert_review.REVIEW_NOTES = original_review_notes
 

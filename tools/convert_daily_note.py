@@ -437,6 +437,7 @@ def build_daily_note(md_path: str | Path, user_feeling: str = "") -> DailyNote:
     md_path = Path(md_path)
     content = md_path.read_text(encoding="utf-8")
     fm = convert_review.parse_frontmatter(content)
+    content = convert_review.anonymize_current_holdings(content, fm)
     date = extract_date(md_path, fm)
     weekday = fm.get("weekday", "")
     s1_text, _ = convert_review.extract_section(content, "一、当日复盘")

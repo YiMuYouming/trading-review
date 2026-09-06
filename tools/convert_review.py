@@ -268,6 +268,35 @@ def numeric_value(value):
     return float(m.group(0)) if m else None
 
 
+def anonymize_current_holdings(text, fm):
+    """Replace current holding names and their security codes with stable public aliases."""
+    content = str(text or '')
+    position_summary = str((fm or {}).get('盘后持仓', ''))
+    names = []
+    for name in re.findall(
+        r'([A-Za-z\u4e00-\u9fff][A-Za-z0-9\u4e00-\u9fff*]{1,15}?)\s*\d+(?:\.\d+)?\s*股',
+        position_summary,
+    ):
+        if name not in names:
+            names.append(name)
+
+    labels = ('一', '二', '三', '四', '五', '六', '七', '八', '九', '十')
+    for index, name in enumerate(names):
+        alias = f'持仓标的{labels[index] if index < len(labels) else index + 1}'
+        short_aliases = []
+        for suffix in ('股份', '科技', '集团', '信息', '电子'):
+            if name.endswith(suffix) and len(name) - len(suffix) >= 2:
+                short_aliases.append(name[:-len(suffix)])
+        codes = set(re.findall(rf'{re.escape(name)}[^\n]{{0,32}}\b([0368]\d{{5}})\b', content))
+        codes.update(re.findall(rf'\b([0368]\d{{5}})\b[^\n]{{0,32}}{re.escape(name)}', content))
+        content = content.replace(name, alias)
+        for short_alias in short_aliases:
+            content = content.replace(short_alias, alias)
+        for code in codes:
+            content = re.sub(rf'\b{re.escape(code)}\b', '代码已脱敏', content)
+    return content
+
+
 def sanitize_public_review_text(text, redact_internal_labels=True):
     """Redact account-specific execution details from the public review layer."""
     cleaned = str(text or '')
@@ -619,6 +648,12 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
     cleaned = re.sub(r'(?<![A-Za-z0-9_])radarsignal(?![A-Za-z0-9_])', '观察信号', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])decision_gate(?![A-Za-z0-9_])', '实时门禁', cleaned, flags=re.I)
     cleaned = re.sub(r'(?<![A-Za-z0-9_])POS-SIZE-\d+(?![A-Za-z0-9_])', '仓位规则', cleaned, flags=re.I)
+    cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])ACCT-[A-Za-z0-9_-]+(?![A-Za-z0-9_])',
+        '账户规则',
+        cleaned,
+        flags=re.I,
+    )
     cleaned = re.sub(
         r'(?<![A-Za-z0-9_])WIN-[A-Za-z0-9_-]+(?![A-Za-z0-9_])',
         '窗口规则',
@@ -1138,6 +1173,36 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         r'(?:维持当前|维持|约为|为|盘后)?\s*)'
         r'(?:约)?\d+(?:\.\d+)?%',
         r'\1账户比例已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(现仓\s*)(?:约)?[-+]?\d+(?:\.\d+)?%',
+        r'\1账户比例已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'((?:仍)?持仓时\s*)(?:约)?[-+]?\d+(?:\.\d+)?%\s*上限',
+        r'\1内部集中度上限',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?:约)?[-+]?\d+(?:\.\d+)?%\s*总仓(?=\s*(?:风险|上限|超限|基准))',
+        '总仓账户比例已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?:连亏)?持仓上限(?:为|约为)?\s*[-+]?\d+(?:\.\d+)?%',
+        '持仓内部集中度上限',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(生产端仍显示|昨日计划亦按)\s*[-+]?\d+(?:\.\d+)?%\s*(?:表述)?',
+        r'\1账户规则口径',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'仓位超\s*[-+]?\d+(?:\.\d+)?%\s*(?:参考)?上限',
+        '仓位超过内部集中度上限',
         cleaned,
     )
     cleaned = re.sub(r'跌超\d+(?:\.\d+)?%', '跌幅达到风险阈值', cleaned)
@@ -2447,6 +2512,7 @@ def convert_md_to_html(md_path):
         content = f.read()
 
     fm = parse_frontmatter(content)
+    content = anonymize_current_holdings(content, fm)
     content = sanitize_public_review_text(content)
 
     # Parse date for filename
