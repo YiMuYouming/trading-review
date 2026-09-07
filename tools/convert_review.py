@@ -686,6 +686,12 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         flags=re.I,
     )
     cleaned = re.sub(
+        r'(?<![A-Za-z0-9_])(?:PLAN_W1_CLOSED|WINDOW_CLOSED|POSITION_ADD_BLOCKED)(?![A-Za-z0-9_])',
+        '执行条件已隐藏',
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
         r'/Users/[A-Za-z0-9._-]+/[^\s`<>|，。；]+',
         '内部审计记录（路径已隐藏）',
         cleaned,
@@ -1032,6 +1038,23 @@ def sanitize_public_review_text(text, redact_internal_labels=True):
         r'((?:清仓|卖出)[^，。；\n|]{0,24}[，,]\s*收盘[：:\s]+)'
         r'[-+]?\d+(?:\.\d+)?(?![\d.%/])',
         r'\1价格已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<![\d.])\d{2,4}(?:\.\d+)?(?=\s*(?:买点|卖点))',
+        '价格已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?<![\d.])\d{2,4}(?:\.\d+)?(?=\s*(?:是|为)\s*(?:脉冲后|冲高后|拉升后)?成交)',
+        '价格已脱敏',
+        cleaned,
+    )
+    cleaned = re.sub(
+        r'(?:从|由)\s*(?:约\s*)?[-+]?\d+(?:\.\d+)?%\s*'
+        r'(?:加至|增至|提高至|提升至|降至|减至|到)\s*'
+        r'(?:约\s*)?[-+]?\d+(?:\.\d+)?%',
+        '账户比例已脱敏',
         cleaned,
     )
     cleaned = re.sub(

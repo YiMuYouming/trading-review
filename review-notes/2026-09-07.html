@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-09-07 周一 复盘笔记</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F7F5F3;--bg2:#FFFFFF;--bg3:#FAFAF9;--bg4:#F5F2EE;--border:#E5E2DE;--text:#2D2926;--text2:#5C5652;--text3:#8A8480;--accent:#D97706;--accent-hover:#B45309;--red:#DC2626;--green:#059669;--blue:#2563EB;--purple:#7C3AED;--amber:#D97706}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{font:16px/1.7 system-ui,-apple-system,'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(247,245,243,.88);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;backdrop-filter:blur(12px)}
+.topbar .title{font-size:18px;font-weight:700;color:var(--accent);white-space:nowrap}
+.topbar .back{font-size:13px;color:var(--text2);padding:3px 10px;border-radius:6px;border:1px solid var(--border);white-space:nowrap;text-decoration:none;transition:all .12s}
+.topbar .back:hover{color:var(--accent);border-color:var(--accent);background:var(--bg4)}
+.topbar .meta{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.chip{padding:3px 11px;border-radius:12px;font-size:13px;font-weight:600;background:var(--bg3);border:1px solid var(--border);white-space:nowrap;color:var(--text2)}
+.chip.red{border-color:var(--red);color:var(--red)}
+.chip.green{border-color:var(--green);color:var(--green)}
+.chip.amber{border-color:var(--amber);color:var(--amber);background:rgba(217,119,6,.08)}
+.chip.blue{border-color:var(--blue);color:var(--blue)}
+.chip.purple{border-color:var(--purple);color:var(--purple)}
+@media(max-width:768px){.topbar .meta{width:100%;margin-left:0}.topbar .chip{white-space:normal;overflow-wrap:anywhere}}
+.layout{display:flex}
+.sidebar{width:210px;flex-shrink:0;position:sticky;top:62px;align-self:flex-start;max-height:calc(100vh - 62px);overflow-y:auto;padding:16px 0 16px 14px;border-right:1px solid var(--border);font-size:14px}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar .label{font-size:11px;text-transform:uppercase;color:var(--text3);padding:8px 10px 4px;letter-spacing:1px;font-weight:600}
+.sidebar a{display:block;padding:5px 10px;color:var(--text2);text-decoration:none;font-size:13px;border-radius:4px;margin-bottom:2px;border-left:2px solid transparent;transition:all .12s}
+.sidebar a:hover{background:var(--bg4);color:var(--text)}
+.sidebar a.s2{padding-left:24px;font-size:12px}
+.sidebar a.active{color:var(--accent);background:var(--bg4);border-left-color:var(--accent)}
+.content{flex:1;padding:24px 32px;max-width:1100px;min-width:0}
+@media(max-width:768px){.sidebar{display:none}.content{padding:16px}}
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden}
+.sh{display:flex;align-items:center;gap:10px;padding:12px 18px;font-size:16px;font-weight:700;cursor:pointer;user-select:none;border-bottom:1px solid var(--border);background:var(--bg4)}
+.sh:hover{background:var(--border)}
+.sh .tog{color:var(--text3);font-size:11px;transition:transform .15s;flex-shrink:0}
+.sh.collapsed .tog{transform:rotate(-90deg)}
+.sh .cnt{font-size:12px;font-weight:400;color:var(--text3);margin-left:auto}
+.sb{padding:0 18px 16px}
+.sb.hide{display:none}
+.si{color:var(--text2);font-size:14px;margin-bottom:12px;line-height:1.6;padding:10px 0 0}
+.tw{overflow-x:auto;margin-bottom:14px}
+.tw table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.tw thead th{position:sticky;top:0;background:var(--bg4);padding:8px 10px;text-align:left;font-weight:600;color:var(--text2);border-bottom:2px solid var(--border);font-size:12px;white-space:nowrap}
+.tw tbody td{padding:7px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tw tbody tr:hover{background:var(--bg4)}
+.tw tbody tr:nth-child(even){background:rgba(0,0,0,.015)}
+.up{color:var(--red);font-weight:600}
+.down{color:var(--green);font-weight:600}
+.dim{color:var(--text3)}
+.badge{display:inline-block;padding:2px 8px;border-radius:9px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge-red{background:rgba(220,38,38,.1);color:var(--red)}
+.badge-green{background:rgba(5,150,105,.1);color:var(--green)}
+.badge-yellow{background:rgba(217,119,6,.1);color:var(--amber)}
+.badge-blue{background:rgba(37,99,235,.08);color:var(--blue)}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:14px}
+.sc{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px}
+.sbx{padding:12px 16px;background:var(--bg4);border-left:4px solid var(--blue);border-radius:0 8px 8px 0;margin-bottom:14px;font-size:14px;line-height:1.6}
+.sbx.warn{border-left-color:var(--amber)}
+.sbx.red{border-left-color:var(--red)}
+.sbx.green{border-left-color:var(--green)}
+.sh2{font-size:17px;font-weight:700;margin:20px 0 10px;color:var(--text);padding-top:4px}
+.sh3{font-size:15px;font-weight:600;margin:14px 0 8px;color:var(--text);padding-top:2px}
+#s1b,.section#s3>.sh{font-family:"Noto Serif SC","Noto Serif","Songti SC",serif}
+#s1b + .emotion-board .emotion-kpi .klabel,#s1b + .emotion-board .emotion-kpi .kval,#s1b + .emotion-board .emotion-conclusion,#s3>.sb>.stats-grid .stat-card .lbl,#s3>.sb>.stats-grid .stat-card .val,#s3>.sb>.sbx{font-family:"Noto Sans SC","PingFang SC","Hiragino Sans GB",system-ui,sans-serif}
+#s1b + .emotion-board .emotion-kpi .kval,#s3>.sb>.stats-grid .stat-card .val{font-weight:700;letter-spacing:-.01em}
+.para{font-size:14px;line-height:1.7;margin-bottom:8px;color:var(--text)}
+.tight-list{font-size:14px;line-height:1.6;margin-bottom:8px;padding-left:20px}
+.tight-list li{margin-bottom:3px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-align:center}
+.stat-card .val{font-size:22px;font-weight:700}
+.stat-card .lbl{font-size:11px;color:var(--text3);margin-top:2px}
+.stat-card .val.red{color:var(--red)}.stat-card .val.green{color:var(--green)}.stat-card .val.amber{color:var(--amber)}
+.node-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:14px}
+.node-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px}
+.node-card .nhead{font-weight:700;font-size:14px;margin-bottom:6px}
+.node-card .nbody{font-size:13px;color:var(--text2);line-height:1.6}
+.node-timeline{position:relative;display:grid;gap:14px;margin:12px 0 18px;padding-left:18px}
+.node-timeline::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,rgba(217,119,6,.55),rgba(217,119,6,.12))}
+.node-note-card{position:relative;background:linear-gradient(180deg,#fff,#FBF8F3);border:1px solid rgba(229,226,222,.95);border-radius:12px;padding:14px 16px;min-width:0;box-shadow:0 10px 26px rgba(45,41,38,.045)}
+.node-note-card::before{content:"";position:absolute;left:-19px;top:20px;width:10px;height:10px;border-radius:999px;background:#D97706;box-shadow:0 0 0 4px #F7F5F3,0 0 0 6px rgba(217,119,6,.18)}
+.node-phase{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:16px;font-weight:900;color:var(--text);margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid rgba(229,226,222,.8)}
+.node-phase span{font-family:'Noto Serif SC',serif}
+.node-phase em{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--accent);background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.18);border-radius:999px;padding:4px 8px;white-space:nowrap}
+.node-detail{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;padding:9px 0;border-top:1px solid rgba(229,226,222,.64)}
+.node-detail:first-of-type{border-top:0}
+.node-label{font-size:12px;font-weight:900;color:var(--accent);line-height:1.5}
+.node-copy{font-size:13px;color:var(--text2);line-height:1.7;word-break:break-word}
+.node-copy strong{color:var(--text)}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:12px 0 18px}
+.lesson-card{position:relative;background:linear-gradient(180deg,#fff,#FCFAF7);border:1px solid rgba(229,226,222,.96);border-radius:12px;padding:15px 15px 14px;box-shadow:0 12px 28px rgba(45,41,38,.045);overflow:hidden}
+.lesson-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}
+.lesson-card.warning::before{background:var(--red)}
+.lesson-card.topic::before{background:var(--purple)}
+.lesson-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.lesson-tag{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:900}
+.lesson-card.cognition .lesson-tag{background:rgba(37,99,235,.08);color:var(--blue)}
+.lesson-card.warning .lesson-tag{background:rgba(220,38,38,.08);color:var(--red)}
+.lesson-card.topic .lesson-tag{background:rgba(124,58,237,.08);color:var(--purple)}
+.lesson-type{font-size:11px;font-weight:900;color:var(--text3);letter-spacing:.08em;white-space:nowrap}
+.lesson-principle{font-family:'Noto Serif SC',serif;font-size:17px;line-height:1.45;font-weight:800;color:var(--text);margin-bottom:11px;word-break:break-word}
+.lesson-label{font-size:11px;font-weight:900;color:var(--accent);letter-spacing:.08em;margin-bottom:5px}
+.lesson-evidence{background:rgba(245,242,238,.72);border:1px solid rgba(229,226,222,.82);border-radius:9px;padding:10px 11px;font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:10px}
+.lesson-evidence .para{font-size:13px;margin-bottom:0;color:var(--text2)}
+.lesson-action{position:relative;background:rgba(217,119,6,.07);border:1px solid rgba(217,119,6,.18);border-radius:9px;padding:9px 11px 9px 32px;font-size:13px;line-height:1.6;color:var(--text)}
+.lesson-action::before{content:"→";position:absolute;left:12px;top:9px;color:var(--accent);font-weight:900}
+@media(max-width:520px){.lesson-grid{grid-template-columns:1fr}.lesson-head{align-items:flex-start}.lesson-type{white-space:normal;text-align:right}.lesson-principle{font-size:16px}}
+.warn-box{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.6}
+.warn-box .wtitle{font-weight:700;color:var(--red);margin-bottom:4px}
+[id]{scroll-margin-top:70px}
+.verdict{background:var(--bg3);border:1px solid var(--green);border-radius:8px;padding:14px;margin:12px 0}
+.verdict .vt{font-weight:700;color:var(--green);margin-bottom:4px;font-size:15px}
+.verdict .vb{font-size:14px;color:var(--text2);line-height:1.7}
+.debate-row{display:flex;gap:12px;margin-bottom:10px;font-size:13px;line-height:1.5}
+.debate-row .dr-label{min-width:100px;font-weight:600;color:var(--text2);text-align:right;padding-top:2px}
+.debate-row .dr-body{flex:1;padding:8px 12px;background:var(--bg3);border-radius:6px}
+.debate-row .dr-body.accept{background:rgba(5,150,105,.06);border-left:3px solid var(--green)}
+.debate-row .dr-body.partial{background:rgba(217,119,6,.04);border-left:3px solid var(--amber)}
+.emotion-board{display:grid;gap:14px;margin:10px 0 16px}
+.emotion-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.emotion-kpi{background:linear-gradient(180deg,#fff,var(--bg3));border:1px solid var(--border);border-radius:10px;padding:11px 12px;min-height:76px}
+.emotion-kpi .klabel{font-size:12px;color:var(--text3);margin-bottom:4px}
+.emotion-kpi .kval{font-size:20px;line-height:1.15;font-weight:800;color:var(--text);word-break:break-word}
+.emotion-kpi.good .kval{color:var(--red)}.emotion-kpi.warn .kval{color:var(--amber)}.emotion-kpi.bad .kval{color:var(--green)}
+.emotion-conclusion{display:flex;align-items:baseline;gap:8px;margin:0 0 14px;padding:3px 0 3px 10px;border-left:3px solid var(--red);font-size:14px;line-height:1.6;flex-wrap:wrap}
+.emotion-conclusion-label{font-weight:700;color:var(--red);white-space:nowrap}.emotion-conclusion-text{color:var(--text);font-weight:600;word-break:break-word}
+.emotion-stage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.emotion-stage{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px}
+.emotion-stage .stage-title{font-size:14px;font-weight:800;color:var(--accent);margin-bottom:8px}
+.emotion-row{display:grid;grid-template-columns:82px minmax(0,1fr);gap:8px;border-top:1px solid rgba(229,226,222,.75);padding:7px 0;font-size:12px}
+.emotion-row:first-of-type{border-top:0}
+.emotion-row .rlabel{color:var(--text3);white-space:normal;line-height:1.35;min-width:0}
+.emotion-row .rval{color:var(--text2);line-height:1.45;word-break:break-word}
+.emotion-row.major{display:block;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 10px;margin-top:8px}
+.emotion-row.major .rlabel{display:block;margin-bottom:3px;font-weight:700;color:var(--text)}
+.emotion-thresholds{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.24);border-radius:10px;padding:12px}
+.emotion-thresholds .threshold-title{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:8px}
+.emotion-thresholds .threshold-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+.emotion-thresholds .threshold-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 9px;font-size:12px;line-height:1.45}
+.emotion-thresholds .threshold-item strong{color:var(--text);margin-right:6px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a id="back-home" class="back" href="../index.html#reviews">← 返回首页</a>
+  <div class="title">2026-09-07 周一 复盘笔记</div>
+  <div class="meta">
+    <span class="chip green">情绪 60.2%</span>
+    <span class="chip red">上证 3932.70 +0.07%</span>
+    <span class="chip blue">93涨停 / 2跌停</span>
+    <span class="chip purple">持仓 持仓状态已记录</span>
+    <span class="chip green">终稿 (红蓝对抗完成)</span>
+  </div>
+</div>
+
+<div class="layout">
+<div class="sidebar" id="sidebar">
+  <div class="label">导航</div>
+  <a href="#s0">第〇部分 当日操作指引</a>
+  <a href="#s1">§一 当日复盘</a>
+  <a href="#s1a" class="s2">大盘全景</a>
+  <a href="#s1b" class="s2">情绪高标</a>
+  <a href="#s1c" class="s2">节点说明</a>
+  <a href="#s1d" class="s2">涨停结构</a>
+  <a href="#s1e" class="s2">自选池表现</a>
+  <a href="#s1f" class="s2">持仓与交易</a>
+  <a href="#s1g" class="s2">风格检测</a>
+  <a href="#s1h" class="s2">趋势持仓复盘</a>
+  <a href="#s1i" class="s2">窗口操作</a>
+  <a href="#s1j" class="s2">结论</a>
+  <a href="#s2">§二 心得与教训</a>
+  <a href="#s3">§三 次日预案</a>
+  <a href="#s3a" class="s2">连板自选池</a>
+  <a href="#s3b" class="s2">趋势自选池</a>
+  <a href="#s4">§四 红方对抗</a>
+  <a href="#s4a" class="s2">Round 1 红方</a>
+  <a href="#s4b" class="s2">Round 2 蓝方</a>
+  <a href="#s4c" class="s2">Round 3 终审</a>
+  <a href="#sa">附录A 盘前速查</a>
+  <a href="#sd">数据附录</a>
+</div>
+
+<div class="content">
+
+<div class="section" id="s0">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> 第〇部分 · 当日操作指引<span class="cnt">公开操作边界</span>
+</div>
+<div class="sb"><div class="si">
+盘中 开工补录。综合 9 月 4 日终稿、今日规则条件、盘前数据入口已隐藏 实时账户/行情与外围事件；所有触发仅用于观察或持仓风险处理，不授予新增买入。<br>
+</div>
+<div class="sh2">主标的与锚点组</div>
+<div class="tw"><table><thead><tr><th>主标的</th><th>状态</th><th>锚点组</th><th>锚点用途</th><th>触发/失效后动作</th></tr></thead><tbody><tr><td>持仓标的一 代码已脱敏</td><td>持仓风险处理</td><td>本票分时承接、市场宽度</td><td>判断独立承接是否继续</td><td>风险条件已记录（具体阈值已脱敏）</td></tr><tr><td>持仓标的二 代码已脱敏</td><td>弱势持仓风险处理</td><td>远东股份、思源电气</td><td>判断电网同链相对强弱</td><td>锚组较强而持仓标的二继续弱，优先降低持仓标的二风险；锚组走弱同样不拖延风险处理</td></tr></tbody></table></div>
+<div class="sh2">持仓处理</div>
+<div class="tw"><table><thead><tr><th>标的</th><th>成本</th><th>仓位</th><th>止损</th><th>可卖状态已记录</th><th>操作策略</th></tr></thead><tbody><tr><td>持仓标的一</td><td>已脱敏</td><td>已脱敏</td><td>关键风险位（已脱敏）</td><td>按账户事实复核</td><td>盘中已减仓部分仓位；不加仓，失去承接时继续提高降风险优先级</td></tr><tr><td>持仓标的二</td><td>已脱敏</td><td>已脱敏</td><td>关键风险位（已脱敏）</td><td>按账户事实复核</td><td>盘中已在执行条件外加仓部分仓位；不再加仓，继续弱于锚组时优先处理可卖风险</td></tr></tbody></table></div>
+<div class="sh2">连板板块→操作映射</div>
+<div class="tw"><table><thead><tr><th>板块</th><th>温度标（只盯）</th><th>操作标的（买/低吸）</th><th>触发条件</th></tr></thead><tbody><tr><td>文化传媒/零售</td><td>龙版传媒、国芳集团</td><td>无</td><td>只判断高度与退潮，不转成买点</td></tr><tr><td>农业养殖</td><td>亚盛集团、罗牛山</td><td>无</td><td>只判断宽度是否延续，不转成买点</td></tr></tbody></table></div>
+<div class="sh2">趋势板块→操作映射</div>
+<div class="tw"><table><thead><tr><th>板块</th><th>观察标的（只盯）</th><th>操作标的（回踩买）</th><th>触发条件</th></tr></thead><tbody><tr><td>电网设备</td><td>远东股份、思源电气</td><td>持仓标的二风险处理</td><td>风险条件已记录（具体阈值已脱敏）</td></tr><tr><td>计算机设备</td><td>持仓标的一本票承接</td><td>持仓标的一风险处理</td><td>风险条件已记录（具体阈值已脱敏）</td></tr><tr><td>军工船舶</td><td>中国船舶、中兵红箭</td><td>无</td><td>只判断风险偏好，不开新仓</td></tr></tbody></table></div>
+<div class="sh2">操作指南</div>
+<div class="para"><strong>总基调</strong>：两只持仓优先，禁止加仓和新开；盘中 最终执行条件为关闭。</div>
+<div class="para"><strong>仓位</strong>：盘中持仓标的一减仓部分仓位后约成交价已隐藏%；盘中持仓标的二在执行条件外加仓部分仓位后，盘中回读总仓位约账户比例已脱敏。可加仓空间0；持仓标的二当日新买可卖状态已记录，其余可卖状态已记录。规则条件口径仍为“不新增、先处理超限与弱势风险”。</div>
+<div class="para"><strong>不碰</strong>：9月4日终稿排除的22只、临时热点追涨、摊低成本、任何执行条件外新增买入。</div>
+<div class="para"><strong>风险</strong>：连续亏损4天触发全局硬门；盘中 iwencai=数据状态已记录，连板侧证据不完整；盘前基准 已同步且状态 ok。持仓标的二这笔加仓的来源记录保留 连亏执行条件、执行条件已隐藏、仓位规则、执行条件已隐藏、执行条件已隐藏，补录已成事实不改变执行条件。成交时原因未提供；盘中弈沐后补“光通信连跌后板块共振、持仓标的二放量站回均线、GPT/英伟达算力需求支持”。复核确认板块与分时量价事实，但持仓标的二光通信收入只约占4.6%，价格已脱敏买点处于盘中-盘中脉冲后，且是原浮亏仓账户比例已脱敏；观察理由部分成立，执行逻辑不成立。外围方面，美股9月4日标普-0.38%、道指-0.51%、纳指-0.29%，强就业与收益率上行构成风险压力；9月7日美股因劳动节休市。A50只取得9月4日+0.48%的上一交易日参考，未取得9月7日可靠实时值。</div>
+<div class="para">盘前/早盘详证与三情景见当日盯盘笔记。</div>
+<div class="para">- 盘中 已成交事实：持仓标的二金额已脱敏加仓部分仓位，交易流水已隐藏；成交时原因未提供，盘中弈沐后补光通信共振/放量站均线/GPT与英伟达算力需求支持三层理由；成交事实核对 四项回读通过。</div>
+<div class="para">- 盘中 理由复核：通信设备+3.05%、元件+5.80%，光通信概念涨停11只，板块共振成立；持仓标的二在盘中、盘中、盘中放量且高于累计VWAP，但价格已脱敏是脉冲后成交。公司2025年光通信收入约占主营4.6%，输配电气约88%；它是线缆+光纤光缆映射，不是光模块中军。日线在MA5/10/20上，但60分钟MA10向下；中期上升结构尚在，短周期修复未完。结论：观察理由部分成立，执行逻辑不成立。</div>
+<hr class="divider"></div>
+</div>
+<div class="section" id="s1">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> §一 · 当日复盘
+</div>
+<div class="sb"><div class="sh3" id="s1a">📊 表1：大盘全景</div><div class="tw"><table><thead><tr><th>节点</th><th>情绪</th><th>上证(%)</th><th>涨/跌停</th><th>量能</th><th>涨跌比</th><th>总竞价涨幅</th><th>关键异动</th></tr></thead><tbody><tr><td>竞价</td><td>52.5</td><td><span class="up">+0.32%</span></td><td>2/1</td><td>157.04亿</td><td>2357/2134</td><td>—</td><td>—</td></tr><tr><td>早盘</td><td>63.7</td><td><span class="up">+0.02%</span></td><td>39/3</td><td>6693.21亿</td><td>3219/1836</td><td>—</td><td>—</td></tr><tr><td>午盘</td><td>56.6</td><td><span class="down">-0.25%</span></td><td>72/3</td><td>1.24万亿</td><td>2882/2208</td><td>—</td><td>—</td></tr><tr><td>尾盘</td><td>61.1</td><td><span class="up">+0.05%</span></td><td>92/3</td><td>1.72万亿</td><td>3112/1979</td><td>—</td><td>—</td></tr><tr><td>收盘</td><td>60.2</td><td><span class="up">+0.07%</span></td><td>93/2</td><td>1.95万亿</td><td>3073/2016</td><td>—</td><td>—</td></tr></tbody></table></div><div class="sh3" id="s1b">📈 表2：情绪高标</div><div class="emotion-board"><div class="emotion-summary-grid"><div class="emotion-kpi good"><div class="klabel">赚钱效应</div><div class="kval">好</div></div><div class="emotion-kpi "><div class="klabel">涨停收益</div><div class="kval">3.48</div></div><div class="emotion-kpi "><div class="klabel">连板收益</div><div class="kval">5.07</div></div><div class="emotion-kpi "><div class="klabel">封板率</div><div class="kval">1</div></div><div class="emotion-kpi "><div class="klabel">炸板率</div><div class="kval">0</div></div><div class="emotion-kpi "><div class="klabel">一进二</div><div class="kval">N</div></div><div class="emotion-kpi "><div class="klabel">三进四</div><div class="kval">N</div></div></div><div class="emotion-stage-grid"><div class="emotion-stage"><div class="stage-title">竞价</div><div class="emotion-row"><span class="rlabel">涨停收益</span><span class="rval">1.12</span></div><div class="emotion-row"><span class="rlabel">连板收益</span><span class="rval">2.35</span></div><div class="emotion-row"><span class="rlabel">炸板收益</span><span class="rval">0.29</span></div><div class="emotion-row"><span class="rlabel">封板率</span><span class="rval">1</span></div><div class="emotion-row"><span class="rlabel">炸板率</span><span class="rval">0</span></div><div class="emotion-row"><span class="rlabel">赚钱效应</span><span class="rval">一般</span></div></div><div class="emotion-stage"><div class="stage-title">早盘</div><div class="emotion-row"><span class="rlabel">涨停收益</span><span class="rval">3.52</span></div><div class="emotion-row"><span class="rlabel">连板收益</span><span class="rval">3.51</span></div><div class="emotion-row"><span class="rlabel">炸板收益</span><span class="rval">-0.08</span></div><div class="emotion-row"><span class="rlabel">封板率</span><span class="rval">1</span></div><div class="emotion-row"><span class="rlabel">炸板率</span><span class="rval">0</span></div><div class="emotion-row"><span class="rlabel">赚钱效应</span><span class="rval">好</span></div></div><div class="emotion-stage"><div class="stage-title">午盘</div><div class="emotion-row"><span class="rlabel">涨停收益</span><span class="rval">3.48</span></div><div class="emotion-row"><span class="rlabel">连板收益</span><span class="rval">5.07</span></div><div class="emotion-row"><span class="rlabel">炸板收益</span><span class="rval">-0.2</span></div><div class="emotion-row"><span class="rlabel">封板率</span><span class="rval">1</span></div><div class="emotion-row"><span class="rlabel">炸板率</span><span class="rval">0</span></div><div class="emotion-row"><span class="rlabel">赚钱效应</span><span class="rval">好</span></div></div><div class="emotion-stage"><div class="stage-title">尾盘</div><div class="emotion-row"><span class="rlabel">涨停收益</span><span class="rval">3.48</span></div><div class="emotion-row"><span class="rlabel">连板收益</span><span class="rval">5.07</span></div><div class="emotion-row"><span class="rlabel">炸板收益</span><span class="rval">-0.2</span></div><div class="emotion-row"><span class="rlabel">封板率</span><span class="rval">1</span></div><div class="emotion-row"><span class="rlabel">炸板率</span><span class="rval">0</span></div><div class="emotion-row"><span class="rlabel">赚钱效应</span><span class="rval">好</span></div></div><div class="emotion-stage"><div class="stage-title">收盘</div><div class="emotion-row"><span class="rlabel">涨停收益</span><span class="rval">3.48</span></div><div class="emotion-row"><span class="rlabel">连板收益</span><span class="rval">5.07</span></div><div class="emotion-row"><span class="rlabel">炸板收益</span><span class="rval">-0.2</span></div><div class="emotion-row"><span class="rlabel">封板率</span><span class="rval">1</span></div><div class="emotion-row"><span class="rlabel">炸板率</span><span class="rval">0</span></div><div class="emotion-row"><span class="rlabel">赚钱效应</span><span class="rval">好</span></div></div></div><div class="emotion-thresholds"><div class="threshold-title">门槛速查</div><div class="threshold-grid"><div class="threshold-item"><strong>竞价强势家数</strong>&gt;10(降温)/&gt;30(高位)</div><div class="threshold-item"><strong>涨停收益</strong>&gt;2%(低迷)/&gt;3%(正常)</div><div class="threshold-item"><strong>炸板率</strong>&lt;30%(W1追涨)/&lt;40%(W2冰点)</div><div class="threshold-item"><strong>整体晋级率</strong>辅助参考（非硬卡）</div><div class="threshold-item"><strong>一进二晋级率</strong>&gt;15%(低迷)/&gt;18%(主升)</div><div class="threshold-item"><strong>二进三晋级率</strong>&gt;25%(2进3策略)</div><div class="threshold-item"><strong>二进三晋级率近 3 日均值</strong>≥20%环境开放/&lt;20%环境关闭</div><div class="threshold-item"><strong>三进四晋级率</strong>&gt;35%(3进4+策略)</div><div class="threshold-item"><strong>赚钱效应</strong>好(&gt;3%+&gt;40%)/差(&lt;2%+&lt;20%)</div></div></div></div><div class="sh3" id="s1c">🔍 节点说明</div><div class="si"><div class="para"><strong>竞价</strong>：情绪52.5；上证+0.32%；涨跌停2/1；量能157.04亿；涨跌比2357/2134；关键异动：—</div>
+<div class="para"><strong>早盘</strong>：情绪63.7；上证+0.02%；涨跌停39/3；量能6693.21亿；涨跌比3219/1836；关键异动：—</div>
+<div class="para"><strong>午盘</strong>：情绪56.6；上证-0.25%；涨跌停72/3；量能1.24万亿；涨跌比2882/2208；关键异动：—</div>
+<div class="para"><strong>尾盘</strong>：情绪61.1；上证+0.05%；涨跌停92/3；量能1.72万亿；涨跌比3112/1979；关键异动：—</div>
+<div class="para"><strong>收盘</strong>：情绪60.2；上证+0.07%；涨跌停93/2；量能1.95万亿；涨跌比3073/2016；关键异动：半导体、通信设备、元件放量走强。</div></div><div class="sh3" id="s1e">🎯 当日自选池表现</div><div class="sh3" id="s1f">💰 持仓与交易</div><div class="tw"><table><thead><tr><th>板块</th><th>操作</th><th>标的</th><th>仓位</th><th>盈亏</th><th>原因</th></tr></thead><tbody><tr><td>计算机设备</td><td>卖出</td><td>持仓标的一</td><td>已脱敏</td><td>金额已脱敏</td><td>成交价已隐藏减仓部分仓位，已实现毛盈利金额已脱敏，降低风险敞口</td></tr><tr><td>线缆/光通信映射</td><td>买入</td><td>持仓标的二</td><td>已脱敏</td><td>金额已脱敏</td><td>板块放量共振与分时站回均线成立，但光通信收入占比低、脉冲后追加且触发连亏/仓位/窗口阻断</td></tr></tbody></table></div><div class="tw"><table><thead><tr><th>标的</th><th>成本</th><th>现价</th><th>浮盈/股</th><th>浮盈率</th><th>仓位</th><th>可卖状态已记录</th><th>评价</th></tr></thead><tbody><tr><td>持仓标的一</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>-1.59%</td><td>已脱敏</td><td>按账户事实复核</td><td>减仓方向正确；后续只按承接和风险处理</td></tr><tr><td>持仓标的二</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>-4.32%</td><td>已脱敏</td><td>按账户事实复核</td><td>观察理由部分成立，但浮亏重仓加仓违反执行执行条件</td></tr></tbody></table></div><div class="sh3">🛡️ 账户风控</div><div class="tw"><table><thead><tr><th>指标</th><th>数值</th><th>阈值</th><th>状态</th></tr></thead><tbody><tr><td>当日盈亏</td><td>-0.22%（金额已脱敏）</td><td>-3%熔断</td><td>✅未触发</td></tr><tr><td>周累计回撤</td><td>—（当前源未提供）</td><td>6%预警</td><td>⚠️未取证</td></tr><tr><td>月累计回撤</td><td>—（当前源未提供）</td><td>10%预警</td><td>⚠️未取证</td></tr><tr><td>连亏天数</td><td>4天</td><td>≥2天空仓/禁止新增</td><td>🚨触发连亏执行条件</td></tr><tr><td>单日熔断</td><td>未触发</td><td>-3%</td><td>✅</td></tr></tbody></table></div><div class="sh3" id="s1g">📐 风格检测</div><div class="tw"><table><thead><tr><th>维度</th><th>分数</th><th>明细</th></tr></thead><tbody><tr><td>维度一：量能</td><td>23/30</td><td>1.95万亿，环比持平，近5日波动率6.12%</td></tr><tr><td>维度二：连板生态</td><td>27/40</td><td>最高6板，昨涨停收益3.48%；二进三近3日均值12.5%</td></tr><tr><td>维度三：趋势赚钱效应</td><td>11/30</td><td>上证MA20向下，趋势走强板块4个，大市值红盘35%</td></tr><tr><td>总分</td><td>61/100</td><td>连板主导：连板61.33% / 趋势38.67%；但连亏硬门关闭新增买入</td></tr></tbody></table></div><div class="sh3">📤 卖出追踪</div><div class="tw"><table><thead><tr><th>标的</th><th>卖出日</th><th>卖出价</th><th>卖出理由</th><th>+1日收盘</th><th>+2日收盘</th><th>信号校准</th></tr></thead><tbody><tr><td>无/股票名</td><td>—</td><td>已脱敏</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody></table></div><div class="sh3" id="s1h">📈 趋势持仓复盘</div><div class="tw"><table><thead><tr><th>项目</th><th>评估结果</th><th>备注</th></tr></thead><tbody><tr><td>趋势强度</td><td>强/中/弱/不适用</td><td>—</td></tr><tr><td>板块指数位置</td><td>站上关键位日线/跌破关键位日线/不适用</td><td>—</td></tr><tr><td>主力资金趋势</td><td>近3日净流入/流出/不适用</td><td>—</td></tr><tr><td>分歧 vs 退潮</td><td>分歧/退潮/不适用</td><td>—</td></tr><tr><td>预警信号是否触发</td><td>触发/未触发/不适用</td><td>—</td></tr><tr><td>趋势规则信号校准</td><td>准确/不准确/待观察/不适用</td><td>—</td></tr></tbody></table></div><div class="sh3" id="s1i">🪟 窗口操作记录</div><div class="tw"><table><thead><tr><th>窗口</th><th>昨日预案</th><th>实际情况</th><th>实际操作</th><th>对不对</th></tr></thead><tbody><tr><td>W1</td><td>只处理持仓风险，不新增</td><td>持仓标的一弱势；持仓标的二随光通信映射脉冲</td><td>持仓标的一减仓部分仓位</td><td>✅降风险正确</td></tr><tr><td>W2</td><td>不新增，持仓风险优先</td><td>光通信/元件强，但上证MA20向下</td><td>无</td><td>✅未继续增加敞口</td></tr></tbody></table></div><div class="sh3">🎭 预期差与盘感</div><div class="si"><div class="para"><strong>盘前基准</strong>：连亏4天，新增买入关闭；只处理持仓标的一、持仓标的二两只持仓风险。</div>
+<div class="para"><strong>实际竞价</strong>：情绪52.5，上证+0.32%，量能157.04亿，涨跌比2357/2134，未发生系统性风险。</div>
+<div class="para"><strong>盘面定性</strong>：元件、通信设备、半导体领涨，深证与创业板明显强于上证；风格分数61偏连板，但上证MA20向下、连板环境闭合值仅12.5%。</div>
+<div class="para"><strong>弈沐盘感</strong>：未单独提供全局盘感；已记录对持仓标的二“板块共振+放量站回分时均线”的买入理由。</div></div><div class="sh3" id="s1j">💡 一句话结论</div><div class="sbx"><hr class="divider"></div></div>
+</div>
+<div class="section" id="s2">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> §二 · 心得与教训
+</div>
+<div class="sb"><div class="si"><div class="si">
+最多 5 条。格式：`[教训/认知/议题] 标题 — 结论`。能落规则的再进入规则反馈流程，不在这里直接改规则。<br>
+</div>
+<div class="sh2">今日认知</div></div><div class="lesson-grid"><article class="lesson-card warning"><div class="lesson-head"><div class="lesson-tag">教训</div><div class="lesson-type">风险校正</div></div><div class="lesson-label">可复用原则</div><div class="lesson-principle">板块共振不等于个股可加仓</div><div class="lesson-label">当日证据</div><div class="lesson-evidence"><div class="para">持仓标的二有放量和光通信映射，但主营仍以输配电线缆为主，且加仓时已浮亏重仓、连亏硬门未过；下次先过账户/仓位/窗口门，再评估板块与个股。</div></div><div class="lesson-label">下次动作</div><div class="lesson-action">下次出手前先停顿复核预案、窗口、量能和失效点，缺一项就降级处理。</div></article><article class="lesson-card cognition"><div class="lesson-head"><div class="lesson-tag">认知</div><div class="lesson-type">今日提炼</div></div><div class="lesson-label">可复用原则</div><div class="lesson-principle">观察理由与执行逻辑要分开</div><div class="lesson-label">当日证据</div><div class="lesson-evidence"><div class="para">今日光通信/元件共振属实，但它只能提高观察权重，不能覆盖连亏执行条件、仓位规则和窗口约束。</div></div><div class="lesson-label">下次动作</div><div class="lesson-action">信号触发后按预案执行，复盘只评估规则质量，不倒果为因。</div></article><article class="lesson-card warning"><div class="lesson-head"><div class="lesson-tag">教训</div><div class="lesson-type">风险校正</div></div><div class="lesson-label">可复用原则</div><div class="lesson-principle">先减风险再讨论机会</div><div class="lesson-label">当日证据</div><div class="lesson-evidence"><div class="para">持仓标的一减仓直接降低了敞口，这与当日硬门方向一致。</div></div><div class="lesson-label">下次动作</div><div class="lesson-action">下次出手前先停顿复核预案、窗口、量能和失效点，缺一项就降级处理。</div></article></div><div class="si"><hr class="divider"></div></div>
+</div>
+<div class="section" id="s3">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> §三 · 次日预案
+</div>
+<div class="sb"><div class="stats-grid"><div class="stat-card"><div class="lbl">风格</div><div class="val amber">61/100，连板主导；连板61.33%，趋势38.67%。</div></div><div class="stat-card"><div class="lbl">资金分配</div><div class="val">新增资金0%；只保留观察池与持仓风险处理。</div></div><div class="stat-card"><div class="lbl">仓位上限</div><div class="val amber">连亏执行条件状态下账户比例已脱敏；账户比</div></div></div><div class="sbx warn"><strong>总基调</strong>：先处理持仓标的一、持仓标的二两只持仓；其余11只只服务于锚定板块强弱和风险，没有新增买入授权。<br><strong>为什么</strong>：科技、光通信和元件放量修复，但上证MA20向下，二进三近3日均值仅12.5%，账户又已连亏4天。<br><strong>基准预期</strong>：先看光通信/元件能否延续宽度，再用远东、思源对照持仓标的二；若持仓弱于锚组或失去承接，降低风险敞口。</div><div class="sh3">🔮 明日连板判定</div><div class="tw"><table><thead><tr><th>板层</th><th>晋级率</th><th>阈值</th><th>结果</th></tr></thead><tbody><tr><td>一进二</td><td>缺完整分层口径</td><td>>15%(低迷)/>18%(主升)</td><td>排除</td></tr><tr><td>二进三</td><td>缺完整分层口径</td><td>>25%</td><td>排除</td></tr><tr><td>三进四+</td><td>缺失</td><td>>35%</td><td>排除</td></tr><tr><td>大环境(二进三晋级率近 3 日均值)</td><td>12.5%</td><td>≥20%开放/<20%关闭</td><td>关闭</td></tr><tr><td>情绪</td><td>60.2</td><td>强势</td><td>只观察高度与分歧，不做连板新增</td></tr></tbody></table></div><div class="sh3" id="s3a">🎯 连板自选池</div><div class="sh3" id="s3b">📈 趋势自选池</div><div class="tw"><table><thead><tr><th>层级</th><th>标的</th><th>代码</th><th>今日定位</th><th>窗口</th><th>今日检查</th><th>触发/失效</th><th>入选路径</th><th>板块状态</th><th>选入理由</th><th>数据依据</th></tr></thead><tbody><tr><td>持仓主标的</td><td>持仓标的一</td><td>代码已脱敏</td><td>持仓处理</td><td>持仓</td><td>分时承接与风险敞口</td><td>风险条件已记录（具体阈值已脱敏）</td><td>持仓保底</td><td>退潮观察</td><td>持仓风险处理，不加仓</td><td>成本已脱敏/收21.07/可卖部分仓位</td></tr><tr><td>持仓主标的</td><td>持仓标的二</td><td>代码已脱敏</td><td>持仓处理</td><td>持仓</td><td>对照远东、思源与光通信宽度</td><td>持续强于锚组仅保留；转弱或接近收紧线则降风险</td><td>持仓保底</td><td>候选观察</td><td>持仓风险处理，不加仓</td><td>成本已脱敏/收36.96/当日可卖部分仓位</td></tr><tr><td>锚点</td><td>远东股份</td><td>600869</td><td>观察标</td><td>观察</td><td>线缆同链宽度</td><td>强于持仓标的二则对持仓标的二减分；同步走弱则板块失效</td><td>持仓保底</td><td>候选观察</td><td>持仓标的二宽度锚</td><td>-1.51%/20.88</td></tr><tr><td>锚点</td><td>思源电气</td><td>002028</td><td>观察标</td><td>观察</td><td>电网设备中军强弱</td><td>强于持仓标的二则对持仓标的二减分；板块破位则整组失效</td><td>持仓保底</td><td>候选观察</td><td>持仓标的二中军锚</td><td>-1.49%/145.00</td></tr><tr><td>锚点</td><td>长飞光纤</td><td>601869</td><td>观察标</td><td>观察</td><td>光通信宽度与容量</td><td>宽度延续则保留；补跌或单票独强则失效</td><td>中军聚集</td><td>两日强</td><td>光纤光缆容量锚</td><td>+5.73%/成交49.12亿</td></tr><tr><td>锚点</td><td>光迅科技</td><td>002281</td><td>观察标</td><td>观察</td><td>光模块高度与强度</td><td>强度延续则保留；炸板带动宽度收缩则失效</td><td>持续主线</td><td>两日强</td><td>光模块强度锚</td><td>涨停/184.47</td></tr><tr><td>锚点</td><td>鹏鼎控股</td><td>002938</td><td>观察标</td><td>观察</td><td>PCB容量与趋势</td><td>元件宽度延续则保留；放量破位则失效</td><td>中军聚集</td><td>两日强</td><td>PCB容量锚</td><td>+8.04%/成交24.72亿</td></tr><tr><td>观察标</td><td>中国动力</td><td>600482</td><td>观察标</td><td>观察</td><td>其他电源设备容量</td><td>与自动化方向同向则保留；单日脉冲则失效</td><td>中军聚集</td><td>两日强</td><td>电源设备容量锚</td><td>+6.25%/成交10.19亿</td></tr><tr><td>观察标</td><td>科瑞技术</td><td>002957</td><td>观察标</td><td>观察</td><td>自动化/工控强度</td><td>板块宽度延续则保留；炸板或补跌则失效</td><td>持续主线</td><td>两日强</td><td>自动化高度锚</td><td>涨停/40.92</td></tr></tbody></table></div><div class="sh3">🚫 不碰</div><div class="si"><div class="para">- 中水渔业、中远通、中央商场、长江通信、新赛股份、新华百货、绿的谐波：移出次日主动观察池。</div>
+<div class="para">- 任何浮亏补仓、光通信脉冲后追涨、将锚点强势误读成持仓加仓信号。</div></div><div class="sh3">📏 Rules 校验</div><div class="si"><div class="para">- 可卖状态以账户事实为准。</div>
+<div class="para">- 情绪 <35%：不适用，收盘60.2。</div>
+<div class="para">- 情绪 >80%：未触发。</div>
+<div class="para">- 周五W1：明日为周二，不适用。</div>
+<div class="para">- W1硬条件使用规则源：未将量比作为W1硬门。</div>
+<div class="para">- 仓位/连亏：连亏4天、总仓位账户比例已脱敏；只降风险，不新增。</div>
+<hr class="divider"></div></div>
+</div>
+<div class="section" id="s4">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> §四 · 红方对抗<span class="cnt">0轮辩论</span>
+</div>
+<div class="sb"><div class="sh3" id="s4a">🔴 Round 1：洋米红方质疑</div><div class="sh3" id="s4b">🔵 Round 2：蓝方回应（稳米）</div><div class="sh3" id="s4c">🟢 Round 3：洋米终审</div></div>
+</div>
+<div class="section" id="sa">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> 附录A · 盘前速查<span class="cnt">周一开盘只看这里</span>
+</div>
+<div class="sb"><div class="tw"><table><thead><tr><th>笔</th><th>仓位</th><th>时机</th><th>约束</th></tr></thead><tbody><tr><td>笔 1 定方向</td><td>已脱敏</td><td>突破确认日买入</td><td>首笔，必须先做</td></tr><tr><td>笔 2 接回踩</td><td>已脱敏</td><td>缩量回踩 MA5/MA10，量比<1.0，板块净流出<10亿，建仓后2天内</td><td>笔1微亏可做；分时回踩也可做；只做一次</td></tr><tr><td>笔 3 追确认</td><td>已脱敏</td><td>笔1/笔2浮盈后 + 放量上攻 + 站回关键价位</td><td>加速段（连续2天大阳）禁止做</td></tr></tbody></table></div><div class="sh3">📋 持仓处理</div><div class="tw"><table><thead><tr><th>票</th><th>成本</th><th>现持仓</th><th>止损</th><th>阶段</th><th>加仓触发</th><th>加仓量</th><th>不做</th></tr></thead><tbody><tr><td>持仓标的一</td><td>已脱敏</td><td>已脱敏</td><td>关键风险位（已脱敏）</td><td>持仓风险处理</td><td>—</td><td>0</td><td>浮亏加仓；失去承接则降风险</td></tr><tr><td>持仓标的二</td><td>已脱敏</td><td>已脱敏</td><td>关键风险位（已脱敏）</td><td>重仓浮亏风险处理</td><td>—</td><td>0</td><td>继续加仓；弱于锚组或破线则处理可卖部分</td></tr></tbody></table></div><div class="tw"><table><thead><tr><th>板块</th><th>观察标的（只盯）</th><th>操作标的</th><th>触发条件</th></tr></thead><tbody><tr><td>光通信/元件</td><td>长飞光纤、光迅科技、鹏鼎控股</td><td>持仓标的二</td><td>风险条件已记录（具体阈值已脱敏）</td></tr><tr><td>电网设备</td><td>远东股份、思源电气</td><td>持仓标的二</td><td>锚组强而持仓标的二弱则减分；整组走弱同样不拖延风险处理</td></tr><tr><td>计算机设备</td><td>持仓标的一本票承接</td><td>持仓标的一</td><td>风险条件已记录（具体阈值已脱敏）</td></tr></tbody></table></div><div class="tw"><table><thead><tr><th>板块</th><th>温度标（只盯）</th><th>说明</th></tr></thead><tbody><tr><td>传媒/出版</td><td>龙版传媒、中国出版</td><td>只看高度与宽度，不转成买点</td></tr><tr><td>农业养殖</td><td>亚盛集团、罗牛山</td><td>只看梯队与换手承接，连板大环境仍关闭</td></tr></tbody></table></div><div class="tw"><table><thead><tr><th>场景</th><th>仓位</th><th>判定</th></tr></thead><tbody><tr><td>不新增</td><td>已脱敏</td><td>⚠️高于内部集中度上限连亏上限，需降风险</td></tr><tr><td>全部加仓</td><td>已脱敏</td><td>❌可加仓空间0</td></tr></tbody></table></div><div class="sh3">📋 操作指南</div><div class="si"><div class="para"><strong>总基调</strong>：只处理持仓风险，不新开、不加仓。</div>
+<div class="para"><strong>W1</strong>：持仓标的一/持仓标的二风险处理；锚点只作对照。</div>
+<div class="para"><strong>盘中</strong>：看光通信/元件宽度、持仓标的二对锚组相对强弱、持仓标的一承接。</div>
+<div class="para"><strong>W2</strong>：不新买；只复核持仓是否需要降低敞口。</div>
+<div class="para"><strong>仓位</strong>：当前账户比例已脱敏，风控内部集中度上限，新增0%。</div>
+<div class="para"><strong>不碰</strong>：7只已移出票、浮亏补仓、脉冲后追涨。</div>
+<div class="para"><strong>风险</strong>：连亏执行条件、上证MA20向下、持仓标的二重仓且可卖状态批次需重算。</div>
+<div class="sh2">rules 校验</div>
+<div class="para">- 可卖状态以账户事实为准。</div>
+<div class="para">- 仓位规则：新增三笔均为0，禁止浮亏加仓。</div>
+<div class="para">- 情绪 <35%：未触发，但不改变连亏硬门。</div>
+<div class="para">- 周五W1：明日周二，不适用。</div>
+<div class="para">- 仓位/连亏：连亏4天，账户比例已脱敏>内部集中度上限，只降风险。</div>
+<hr class="divider"></div></div>
+</div>
+<div class="section" id="sd">
+<div class="sh" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('hide')">
+  <span class="tog">▼</span> 数据附录<span class="cnt">机器解析用</span>
+</div>
+<div class="sb"><div class="sh3">持仓明细</div><div class="tw"><table><thead><tr><th>标的</th><th>代码</th><th>方向</th><th>数量</th><th>成本</th><th>现价</th><th>浮盈%</th><th>止损</th><th>可卖状态已记录</th><th>状态</th></tr></thead><tbody><tr><td>持仓标的一</td><td>代码已脱敏</td><td>持仓</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>价格已脱敏</td><td>关键风险位（已脱敏）</td><td>按账户事实复核</td><td>持有/降风险</td></tr><tr><td>持仓标的二</td><td>代码已脱敏</td><td>持仓</td><td>已脱敏</td><td>已脱敏</td><td>已脱敏</td><td>价格已脱敏</td><td>关键风险位（已脱敏）</td><td>按账户事实复核</td><td>持有/优先降风险</td></tr></tbody></table></div><div class="sh3">连板自选池</div><div class="tw"><table><thead><tr><th>标的</th><th>代码</th><th>板块</th><th>今日定位</th><th>窗口</th><th>今日检查</th><th>触发/失效</th><th>涨幅</th><th>收盘价</th><th>MA5</th><th>量比</th><th>换手</th><th>备注</th></tr></thead><tbody><tr><td>龙版传媒</td><td>605577</td><td>传媒/出版</td><td>温度标</td><td>观察</td><td>6板高度与分歧承接</td><td>高度延续则保留；断板带动宽度收缩则失效</td><td><span class="up">+10.03</span></td><td>17.11</td><td>—</td><td>—</td><td>—</td><td>只看全市场高度，不作默认买点</td></tr><tr><td>中国出版</td><td>601949</td><td>传媒/出版</td><td>观察标</td><td>观察</td><td>出版宽度与龙版承接</td><td>同向扩散则保留；独立冲高则失效</td><td><span class="up">+9.95</span></td><td>6.41</td><td>—</td><td>—</td><td>—</td><td>传媒趋势锚，仅观察</td></tr><tr><td>亚盛集团</td><td>600108</td><td>农业种植</td><td>观察标</td><td>观察</td><td>3板与农业宽度</td><td>农业同向扩散则保留；高标断层则失效</td><td><span class="up">+10.09</span></td><td>4.80</td><td>—</td><td>—</td><td>—</td><td>农业高度/趋势锚，仅观察</td></tr><tr><td>罗牛山</td><td>000735</td><td>农业养殖</td><td>观察标</td><td>观察</td><td>2板容量与换手承接</td><td>与亚盛同向则保留；补跌或炸板则失效</td><td><span class="up">+9.95</span></td><td>6.74</td><td>—</td><td>—</td><td>—</td><td>养殖宽度锚，仅观察</td></tr></tbody></table></div><div class="sh3">趋势自选池</div><div class="tw"><table><thead><tr><th>标的</th><th>代码</th><th>板块</th><th>今日定位</th><th>窗口</th><th>今日检查</th><th>触发/失效</th><th>涨幅</th><th>收盘价</th><th>MA5</th><th>MA20</th><th>量比</th><th>换手</th><th>备注</th></tr></thead><tbody><tr><td>持仓标的一</td><td>代码已脱敏</td><td>计算机设备</td><td>持仓处理</td><td>持仓</td><td>分时承接与风险敞口</td><td>站稳承接则观察；失去承接则降风险</td><td>价格已脱敏</td><td>已脱敏</td><td>—</td><td>—</td><td>—</td><td>—</td><td>主标的；不加仓，可卖部分仓位</td></tr><tr><td>持仓标的二</td><td>代码已脱敏</td><td>线缆/电网设备</td><td>持仓处理</td><td>持仓</td><td>对照远东、思源与光通信宽度</td><td>强于锚组仅保留；转弱或破线则降风险</td><td>价格已脱敏</td><td>已脱敏</td><td>—</td><td>—</td><td>—</td><td>—</td><td>主标的；不加仓，次日重算可卖量</td></tr><tr><td>远东股份</td><td>600869</td><td>线缆/电网设备</td><td>板块锚定</td><td>观察</td><td>线缆同链宽度</td><td>强于持仓标的二则对持仓标的二减分；同步走弱则板块失效</td><td><span class="down">-1.51</span></td><td>20.88</td><td>—</td><td>—</td><td>—</td><td>—</td><td>服务持仓标的二的宽度锚</td></tr><tr><td>思源电气</td><td>002028</td><td>电网设备</td><td>板块锚定</td><td>观察</td><td>电网中军强弱</td><td>强于持仓标的二则对持仓标的二减分；板块破位则整组失效</td><td><span class="down">-1.49</span></td><td>145.00</td><td>—</td><td>—</td><td>—</td><td>—</td><td>服务持仓标的二的中军锚</td></tr><tr><td>长飞光纤</td><td>601869</td><td>光通信/线缆</td><td>板块锚定</td><td>观察</td><td>光通信宽度与容量</td><td>宽度延续则保留；补跌或单票独强则失效</td><td><span class="up">+5.73</span></td><td>400.51</td><td>—</td><td>—</td><td>—</td><td>3.07</td><td>服务持仓标的二的光通信容量锚；成交49.12亿</td></tr><tr><td>光迅科技</td><td>002281</td><td>光通信/光模块</td><td>板块锚定</td><td>观察</td><td>光模块高度与强度</td><td>强度延续则保留；炸板带动宽度收缩则失效</td><td><span class="up">+10.00</span></td><td>184.47</td><td>—</td><td>—</td><td>—</td><td>—</td><td>服务持仓标的二的光模块强度锚</td></tr><tr><td>鹏鼎控股</td><td>002938</td><td>PCB/元件</td><td>板块锚定</td><td>观察</td><td>PCB容量与趋势</td><td>元件宽度延续则保留；放量破位则失效</td><td><span class="up">+8.04</span></td><td>89.99</td><td>—</td><td>—</td><td>—</td><td>1.21</td><td>光通信/元件链容量锚；成交24.72亿</td></tr><tr><td>中国动力</td><td>600482</td><td>其他电源设备</td><td>观察标</td><td>观察</td><td>电源设备容量</td><td>与自动化方向同向则保留；单日脉冲则失效</td><td><span class="up">+6.25</span></td><td>35.04</td><td>—</td><td>—</td><td>—</td><td>1.32</td><td>电源设备容量锚；成交10.19亿</td></tr><tr><td>科瑞技术</td><td>002957</td><td>自动化/工控</td><td>观察标</td><td>观察</td><td>自动化/工控强度</td><td>板块宽度延续则保留；炸板或补跌则失效</td><td><span class="up">+10.00</span></td><td>40.92</td><td>—</td><td>—</td><td>—</td><td>—</td><td>自动化高度锚，仅观察</td></tr></tbody></table></div><div class="sh3">板块状态</div><div class="tw"><table><thead><tr><th>板块</th><th>类型</th><th>涨停数</th><th>梯队</th><th>龙头</th><th>板块涨跌幅</th><th>主力净流入</th><th>5日线位置</th><th>状态</th></tr></thead><tbody><tr><td>无/板块</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody></table></div><div class="sh3">今日操作</div><div class="tw"><table><thead><tr><th>时间</th><th>动作</th><th>标的</th><th>价格</th><th>盈亏</th><th>原因</th></tr></thead><tbody><tr><td>2026-09-07 盘中</td><td>买入</td><td>持仓标的二</td><td>已脱敏</td><td>金额已脱敏</td><td>光通信/元件放量共振、分时站回均线；观察理由部分成立，执行执行条件不成立</td></tr><tr><td>2026-09-07 盘中</td><td>卖出</td><td>持仓标的一</td><td>已脱敏</td><td>金额已脱敏</td><td>减少风险敞口</td></tr></tbody></table></div><div class="sh3">锚定股状态</div><div class="tw"><table><thead><tr><th>标的</th><th>代码</th><th>窗口</th><th>状态</th><th>影响</th><th>灯</th></tr></thead><tbody><tr><td>无/股票名</td><td>—</td><td>主标的/锚点类型</td><td>—</td><td>对主标的的影响：加分/减分/阻断/降风险</td><td>—</td></tr></tbody></table></div></div>
+</div>
+
+</div>
+</div>
+
+<script>
+const io=new IntersectionObserver(e=>{e.forEach(e=>{const l=document.querySelector(`a[href="#${e.target.id}"]`);if(l&&e.isIntersecting){document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));l.classList.add('active')}})},{rootMargin:'-100px 0px -70% 0px'});
+document.querySelectorAll('.section[id]').forEach(s=>io.observe(s));
+</script>
+<script>
+(function(){
+  var from = new URLSearchParams(location.search).get('from');
+  if (from && /^[A-Za-z0-9_-]+$/.test(from)) {
+    document.getElementById('back-home').href = '../index.html#' + from;
+  }
+})();
+</script>
+</body>
+</html>

@@ -626,6 +626,15 @@ weekday: 周二
         self.assertIn("系统判断", text)
         self.assertIn("连板明细数据缺失", text)
 
+    def test_public_review_text_redacts_compact_execution_state_labels(self):
+        text = convert_review.sanitize_public_review_text(
+            "保留 PLAN_W1_CLOSED、WINDOW_CLOSED、POSITION_ADD_BLOCKED。"
+        )
+
+        for secret in ("PLAN_W1_CLOSED", "WINDOW_CLOSED", "POSITION_ADD_BLOCKED"):
+            self.assertNotIn(secret, text)
+        self.assertIn("执行条件已隐藏", text)
+
     def test_convert_md_to_html_redacts_public_execution_details(self):
         markdown = """---
 date: 2026-07-14
@@ -979,6 +988,16 @@ weekday: 周五
             self.assertNotIn(secret, text)
         self.assertIn("价格已脱敏", text)
         self.assertIn("金额已脱敏", text)
+
+    def test_public_review_text_redacts_compact_post_trade_price_and_position_change(self):
+        text = convert_review.sanitize_public_review_text(
+            "某持仓37.03是脉冲后成交，原浮亏仓从约22.6%加至约28.1%。"
+        )
+
+        for secret in ("37.03", "22.6%", "28.1%"):
+            self.assertNotIn(secret, text)
+        self.assertIn("价格已脱敏", text)
+        self.assertIn("账户比例已脱敏", text)
 
     def test_public_review_text_redacts_spaced_execution_price_before_pnl(self):
         text = convert_review.sanitize_public_review_text(
